@@ -35,7 +35,7 @@ pip3 install -r requirement
                 file1 file2`
 * **位置参数(必选)**
   * **`file`**
-    指定两个比较的iso文件
+    指定两个比较的iso文件，注意以file1作为基准
 
 * **可选参数**
 
