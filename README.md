@@ -1,25 +1,8 @@
-## 0. 背景说明
+## 0. 主要功能
 
-工具聚焦openEuler内核和基础包，检测伙伴二次发行版生态核心特性不丢失，关键配置不更改 结合社区选包策略及软件包等级策略，检查L1、L2软件包版本、打包方式、接口一致性，KABI白名单，架构特性(如鲲鹏/X86特性)使能，性能优化配置，牵引实现扩展仓库openEuler系共享、共用，主流行业应用在openEuler系不同的OSV生态复用度95%。
+1.检测2个ISO（基于RPM）的软件包，软件包内文件，库文件接口（C/C++）,内核KABI的变化差异
 
-检查项
-
-| 序号 | 检查                   |
-| ---- | ---------------------- |
-| 1    | 软件包检测             |
-| 2    | 特性检测               |
-| 3    | 配置检测               |
-
-验证项
-
-| 序号 | 验证项       | 测试                   |
-| ---- | ------------ | ---------------------- |
-| 1    | 兼容性测试   | 安装、卸载、命令、服务 |
-| 2    | 基础性能测试 | 基础benchmark 测试     |
-| 3    | 特性测试     | 特性功能验证           |
-| 4    | 功能测试     | 基础AT测试             |
-
-
+2.检测同一个软件（rpm包）在不同版本下的变化以及差异
 ## 1. 运行环境
 
 ### 1.1. oecp运行环境依赖组件
@@ -29,114 +12,23 @@
 | python3   | python3.7.9及以上| 可先通过yum list命令查看，如果没有该版本需要下载安装 |
 | sqlite    | v3.7.17 及以上版本                                           | 系统自带                                             |
 
-### 1.2. oecp理论运行资源
 
-在运行oecp分析之前，确保虚拟机或物理机的运行规格**大于等于2U8G**，运行前建议重启虚拟机，保证空闲内存足够，建议oecp所在目录空闲磁盘至少**保留20GB**（具体以实际扫描rpm包数量为准）
-
-| 任务分析项           | CPU资源消耗     | 运行耗时                                                          | 输出件大小                                                                        |
-| -------------------- | --------------- | ----------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| 比较两个iso镜像所有比较计划| 2核心，峰值100% | 20~60分钟|程序正常结束，百兆级别，具体大小和比较的镜像差异有关|
-| 比较两个iso镜像所有比较计划| 16核心，峰值100% | 10~60分钟|程序正常结束，百兆级别，具体大小和比较的镜像差异有关|
-
-### 1.3. oecp网络需求
-
-除了相关组件安装，oecp**可完全离线运行**，无需连接网络
-
-## 2. 软件目录结构
-
-| 主目录      | 二级目录               | 三级目录                | 描述                                   |
-| ----------- | ---------------------- | ----------------------- | -------------------------------------- |
-| cli.py      |                        |                         | 命令启动脚本                           |
-| requirement |                        |                         | 工具依赖清单                           |
-| README.md   |                        |                         | 用户指导手册                           |
-| test        |                        |                         | 测试脚本夹                             |
-| doc         |                        |                         | 设计文档文件夹                         |
-|             | oecpimg                |                         | 存放文档图片                           |
-|             | oecp-dev-1.0.md        |                         | 设计文档                               |
-|             | oecp-module-dev-1.0.md |                         | 模块设计文档                           |
-| oecp        |                        |                         |                                        |
-|             | main                   |                         | 主模块                                 |
-|             |                        | factory.py              | 工厂方法，生产ISO、REPO等比较对象      |
-|             |                        | directory.py            | 目录级别对象、ISO对象、REPO对象        |
-|             |                        | repository.py           | 仓库级别对象                           |
-|             |                        | mapping                 | 二进制包和源码包映射                   |
-|             |                        | category.py             | 软件包、二进制包等级                   |
-|             |                        | plan.py                 | 比较计划                               |
-|             | executor               |                         | 比较模块                               |
-|             |                        | base.py                 | 比较器基类                             |
-|             |                        | list.py                 | 比较文件列表、包列表                   |
-|             |                        | null.py                 | 空比较，当比较计划项只需要dumper时使用 |
-|             |                        | nvs.py                  | 符号、版本、名称比较器                 |
-|             |                        | plain.py                | 文件比较                               |
-|             | dumper                 |                         | dumper模块                             |
-|             |                        | base.py                 | dumper基类                             |
-|             |                        | config.py               | rpm包的配置文件                        |
-|             |                        | extract.py              | 提取rpm包内容                          |
-|             |                        | filelist.py             | 文件列表                               |
-|             |                        | kconfig.py              | 内核配置                               |
-|             |                        | null.py                 | 当比较计划项只需要执行比较时使用       |
-|             |                        | packagelist.py          | ISO中包列表                            |
-|             |                        | provides.py             | rpm包提供的符号                        |
-|             |                        | requires.py             | rpm包依赖的符号                        |
-|             | result                 |                         | 结果模块                               |
-|             |                        | compare_result.py       | 保存结果对象                           |
-|             |                        | constants.py            | 比较类型、比较结果宏                   |
-|             |                        | export.py               | 导出比较结果到csv文件                  |
-|             |                        | test_result.py          | 导出compass-ci比较的结果               |
-|             | proxy                  |                         | 第三方代理模块                         |
-|             |                        | rpm_proxy.py            | rpm包常用方法                          |
-|             |                        | proxy/requests_proxy.py | requests功能封装下载功能               |
-|             | utils                  |                         | 工具模块                               |
-|             |                        | utils/logger.py         | 日志                                   |
-|             |                        | utils/misc.py           | 常用工具                               |
-|             |                        | utils/shell.py          | shell命令                              |
-|             |                        | utils/unit_convert.py   | 单位转换                               |
-|             | conf                   |                         | 配置模块                               |
-|             |                        | category                | 包等级配置                             |
-|             |                        | performance             | compass-ci性能测试                     |
-|             |                        | plan                    | 比较计划                               |
-|             |                        | logger.conf             | 日志配置                               |
-
-## 3. 主要功能介绍
-
-oecp工具适用于比较两个ISO镜像之间的差别，具体比较项有：
-
-1）仓库rpm的packagelist（两个仓库包名、版本号、release号比较），对应报告比较类型如下：
-
-- rpm package name
-- rpm filelist
-
-2）config（rpm包内配置）、kconfig（内核配置文件），对应报告比较类型如下：
-
-- rpm config
-- rpm kconfig
-
-3）provides（rpm的provides）、requires（rpm的依赖）等, 对应报告比较类型如下：
-
-- rpm provides
-- rpm requires
-
-4）unixbench, lmbench, mysql性能测试，对应报告比较类型如下：
-
-- performacne
-
-5）服务命令起停测试，对应报告比较类型如下：
-
-- rpm test
+## 2. oecp下载安装与部署
 
 
-## 4. oecp下载安装与部署
+install abidiff (centos): ''' yum install -y epel-release yum install -y libabigail '''
+
+注意：openeuler需要配置openEuler-20.03-SP2以上版本everything仓库
+install abidiff (openEulerr): ''' yum install -y libabigail '''
 
 install oecp:
 '''
-git clone https://gitee.com/xielihao/oecp-lite.git
+git clone https://gitee.com/openeuler/oecp.git
 cd oecp
 pip3 install -r requirement
 '''
 
-## 5. oecp使用
-使用前，安装python依赖库
-pip3 install -r requirement
+## 3. oecp使用
 
 `python3 cli.py [-h] [-n PARALLEL] [-w WORK_DIR] [-p PLAN_PATH]
                 [-c CATEGORY_PATH] [-b PERF_BASELINE_FILE] [-a {x86_64,aarch64}]
@@ -144,7 +36,7 @@ pip3 install -r requirement
                 file1 file2`
 * **位置参数(必选)**
   * **`file`**
-    指定两个比较的iso文件
+    指定两个比较的iso文件，注意以file1作为基准
 
 * **可选参数**
 
@@ -188,51 +80,5 @@ pip3 install -r requirement
   * **`provides_requires.json`**
     比较rpm的provides和requires差异，可通过rpm -pq --provides/requires ${rpm_path}查询
 
-## 6.  软件卸载与环境清理
 
 
-
-## 7.  OECP报告说明
-
-##### 1.最终报告
-
-oecp工具会展示一份最终报告，用与展示最终的测试结果，测试结果参考osv测试标准
-
-##### 2.all-similarity-report
-
-该报告展示了osv测试数据的汇总，有些数据目前暂时不用于最终比较
-
-##### 3.all-rpm-test-report
-
-该报告用于展示测试repo安装的时候，rpm包安装的结果
-
-##### 4.all-result-report
-
-该报告用于展示rpm包对比的汇总结果
-
-##### 5.all-rpm-report
-
-该报告用于暂时rpm对比的详细结果：
-
-compare type栏显示为比较规则，其中包名比较规则如下：
-
-rpm package name explan:
-                    1   -- same name + version + release num + 包名后缀
-
-                    1.1 -- same name + version + release num
-
-                    2   -- same name + version
-
-                    3   -- same name
-
-                    4   -- less
-
-                    5   -- more
-
-其中，1 ，1.1 ，2在最后计算的时候都会作为same比较
-
-可以根据compare detail下的路径，去结果的各层文件夹中取找到详细的报告
-
-##### 6.all-pergormance-report
-
-性能数据统计
