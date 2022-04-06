@@ -12,7 +12,7 @@
 | sqlite    | v3.7.17 及以上版本                                           | 系统自带                                             |
 
 
-## 3. oecp下载安装与部署
+## 2. oecp下载安装与部署
 
 
 install abidiff (centos): ''' yum install -y epel-release yum install -y libabigail '''
@@ -27,7 +27,7 @@ cd oecp
 pip3 install -r requirement
 '''
 
-## 4. oecp使用
+## 3. oecp使用
 
 `python3 cli.py [-h] [-n PARALLEL] [-w WORK_DIR] [-p PLAN_PATH]
                 [-c CATEGORY_PATH] [-b PERF_BASELINE_FILE] [-a {x86_64,aarch64}]
