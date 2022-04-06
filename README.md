@@ -127,6 +127,8 @@ rpm package name explan:
 其中，1 ，1.1 ，2在最后计算的时候都会作为same比较
 
 compare type展示了比较项，可以对比较项进行筛选
+
 compare result如果是same，则表示比较结果相同，如果是数字，则参照rpm package name explan表分析
+
 可以根据compare detail下的路径，去结果的各层文件夹中取找到详细的报告
 
