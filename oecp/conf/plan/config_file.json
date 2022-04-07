@@ -1,0 +1,21 @@
+{
+  "name": "test",
+  "plan": [
+    {
+      "name": "extract",
+      "dumper": "RPMExtractDumper",
+      "executor": "null.NullExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_NULL"
+      }
+    },
+    {
+      "name": "config",
+      "dumper": "ConfigDumper",
+      "executor": "plain.PlainCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_RPM_CONFIG"
+      }
+    }
+  ]
+}

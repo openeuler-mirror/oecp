@@ -1,0 +1,21 @@
+{
+  "name": "test",
+  "plan": [
+        {
+      "name": "extract",
+      "dumper": "RPMExtractDumper",
+      "executor": "null.NullExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_NULL"
+      }
+    },
+    {
+      "name": "abi",
+      "dumper": "ABIDumper",
+      "executor": "abi.ABICompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_RPM_ABI"
+      }
+    }
+  ]
+}

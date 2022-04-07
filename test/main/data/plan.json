@@ -1,0 +1,28 @@
+{
+  "name": "all",
+  "plan": [
+    {
+      "name": "repolist",
+      "dumper": "RepoListDumper",
+      "executor": "ListCompareExecutor"
+    },
+    {
+      "name": "provides",
+      "dumper": "ProvidesDumper",
+      "executor": "NVSCompareExecutor"
+    },
+    {
+      "name": "kabi",
+      "dumper": "KABIDumper",
+      "executor": "PlainCompareExecutor",
+      "config": {
+        "package": "kernel"
+      }
+    },
+    {
+      "name": "not_exist",
+      "dumper": "NonExistDumper",
+      "executor": "NonExistExecutor"
+    }
+  ]
+}

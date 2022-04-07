@@ -1,0 +1,8 @@
+{
+    "certs": [
+	{
+        "base": "/root/osv-iso/openEuler-20.03-LTS-SP1-aarch64-dvd.iso",
+        "cert": "/root/osv-iso/openEuler-20.03-LTS-aarch64-dvd.iso",
+        "plan": "all.json"
+    }]
+}

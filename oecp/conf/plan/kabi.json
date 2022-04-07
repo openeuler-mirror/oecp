@@ -1,0 +1,36 @@
+{
+  "name": "test",
+  "plan": [
+    {
+      "name": "extract",
+      "dumper": "RPMExtractDumper",
+      "executor": "null.NullExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_NULL",
+		"package": "kernel"
+      }
+    },
+    {
+      "name": "kabi",
+      "dumper": "KabiDumper",
+      "executor": "nvs.NVSCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_KABI",
+        "package": "kernel",
+        "show_same": true,
+        "white_list": "kabi_whitelist/aarch64"
+      }
+    },
+    {
+      "name": "drive kabi",
+      "dumper": "KabiDumper",
+      "executor": "nvs.NVSCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_DRIVE_KABI",
+        "package": "kernel",
+        "show_same": true,
+        "white_list": "kabi_whitelist/aarch64_drive_kabi"
+      }
+    }
+  ]
+}

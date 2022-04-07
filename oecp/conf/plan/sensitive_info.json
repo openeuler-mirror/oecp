@@ -1,0 +1,24 @@
+{
+  "name": "sensitive_info",
+  "plan": [    
+    {
+      "name": "sensitive_str",
+      "dumper": "SensitiveStrDumper",
+      "executor": "sensitive.FindSensitiveInfoExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_RPM",
+        "sensitive_str": true,
+        "target": "openEuler"
+      }
+    },
+  {
+    "name": "sensitive_image",
+    "dumper": "SensitiveImageDumper",
+    "executor": "sensitive.FindSensitiveInfoExecutor",
+    "config": {
+      "compare_type": "CMP_TYPE_RPM",
+      "sensitive_image": true
+    }
+  }
+  ]
+}

@@ -1,0 +1,262 @@
+{
+  "lmbench3.syscall.syscall.latency.us": {
+    "average": 0.15593333333333334,
+    "standard_deviation": 0.00012472191289246087
+  },
+  "lmbench3.syscall.stat.latency.us": {
+    "average": 1.0466666666666666,
+    "standard_deviation": 0.010949682897488655
+  },
+  "lmbench3.syscall.open/close.latency.us": {
+    "average": 2.2999666666666667,
+    "standard_deviation": 0.020978772339888974
+  },
+  "lmbench3.Select.100fd.latency.us": {
+    "average": 1.3577333333333332,
+    "standard_deviation": 0.004563867755411998
+  },
+  "lmbench3.Select.100tcp.latency.us": {
+    "average": 2.8110999999999997,
+    "standard_deviation": 0.009133454987024406
+  },
+  "lmbench3.sig_inst": {
+    "average": 0.2316666666666667,
+    "standard_deviation": 0.0007039570693980977
+  },
+  "lmbench3.sig_hndl": {
+    "average": 1.1195333333333333,
+    "standard_deviation": 0.00862644512853101
+  },
+  "lmbench3.Prot_Fault": {
+    "average": 0.18726666666666666,
+    "standard_deviation": 0.008916775700267953
+  },
+  "lmbench3.PIPE.latency.us": {
+    "average": 4.596933333333333,
+    "standard_deviation": 0.034916121714124566
+  },
+  "lmbench3.AF_UNIX.sock.stream.latency.us": {
+    "average": 9.264433333333331,
+    "standard_deviation": 0.12861416027102995
+  },
+  "lmbench3.Process.fork+exit.latency.us": {
+    "average": 412.4341,
+    "standard_deviation": 2.598772696229244
+  },
+  "lmbench3.Process.fork+execve.latency.us": {
+    "average": 1963.3333333333333,
+    "standard_deviation": 39.02229552638964
+  },
+  "lmbench3.Process.fork+/bin/sh.latency.us": {
+    "average": 3342.1666666666665,
+    "standard_deviation": 104.18359862388236
+  },
+  "lmbench3.Mmap_Latency": {
+    "average": 1646.6666666666667,
+    "standard_deviation": 24.225789747475496
+  },
+  "lmbench3.UDP.usinglocalhost.latency.us": {
+    "average": 13.380133333333333,
+    "standard_deviation": 0.748405426371444
+  },
+  "lmbench3.TCP.localhost.latency": {
+    "average": 17.1934,
+    "standard_deviation": 0.7517812048728008
+  },
+  "lmbench3.CONNECT.localhost.latency.us": {
+    "average": 39.49553333333333,
+    "standard_deviation": 0.8149300433506892
+  },
+  "lmbench3.TCP.socket.bandwidth.10MB.MB/sec": {
+    "average": 1837.1066666666666,
+    "standard_deviation": 700.8742160727242
+  },
+  "lmbench3.AF_UNIX.sock.stream.bandwidth.MB/sec": {
+    "average": 4427.68,
+    "standard_deviation": 46.189428083347025
+  },
+  "lmbench3.PIPE.bandwidth.MB/sec": {
+    "average": 1347.6133333333332,
+    "standard_deviation": 103.09629231397652
+  },
+  "lmbench3.FILE.read.bandwidth.MB/sec": {
+    "average": 2908.486666666666,
+    "standard_deviation": 151.4111423318053
+  },
+  "lmbench3.MMAP.read.bandwidth.MB/sec": {
+    "average": 3360.806666666667,
+    "standard_deviation": 195.9638104911778
+  },
+  "lmbench3.BCOPY.libc.bandwidth.MB/sec": {
+    "average": 2606.56,
+    "standard_deviation": 6.831354184932954
+  },
+  "lmbench3.BCOPY.unrolled.bandwidth.MB/sec": {
+    "average": 1267.5533333333333,
+    "standard_deviation": 12.497363277463334
+  },
+  "lmbench3.BCOPY.memory_read.bandwidth.MB/sec": {
+    "average": 2136.096666666667,
+    "standard_deviation": 4.7710888577859505
+  },
+  "lmbench3.BCOPY.memory_write.bandwidth.MB/sec": {
+    "average": 1989.006666666667,
+    "standard_deviation": 4.80538817948719
+  },
+  "lmbench3.CTX.2P.0K.latency.us": {
+    "average": 2.56,
+    "standard_deviation": 0.19304576314093677
+  },
+  "lmbench3.CTX.2P.16K.latency.us": {
+    "average": 2.033333333333333,
+    "standard_deviation": 0.5368012253670399
+  },
+  "lmbench3.CTX.8P.16K.latency.us": {
+    "average": 1.7133333333333336,
+    "standard_deviation": 0.12970050972229147
+  },
+  "lmbench3.CTX.16P.16K.latency.us": {
+    "average": 1.64,
+    "standard_deviation": 0.09933109617167557
+  },
+  "lmbench3.CTX.2P.64K.latency.us": {
+    "average": 1.7366666666666666,
+    "standard_deviation": 0.39835773983806166
+  },
+  "lmbench3.CTX.8P.64K.latency.us": {
+    "average": 1.89,
+    "standard_deviation": 0.032659863237108976
+  },
+  "lmbench3.CTX.16P.64K.latency.us": {
+    "average": 1.7933333333333332,
+    "standard_deviation": 0.12498888839501777
+  },
+  "lmbench3.L1_$": {
+    "average": 1.539,
+    "standard_deviation": 0.0
+  },
+  "lmbench3.L2_$": {
+    "average": 2.7953333333333332,
+    "standard_deviation": 0.00047140452079097976
+  },
+  "lmbench3.Rand_mem": {
+    "average": 96.13666666666666,
+    "standard_deviation": 0.6083016430101824
+  },
+  "lmbench3.Main_mem": {
+    "average": 94.97866666666665,
+    "standard_deviation": 0.6936480055154406
+  },
+  "lmbench3.null_io": {
+    "average": 0.26520000000000005,
+    "standard_deviation": 0.00032659863237109976
+  },
+  "CPU_core_96.unixbench.Dhrystone_2_using_register_variables": {
+    "average": 349879.9666666666,
+    "standard_deviation": 563.5942768418292
+  },
+  "CPU_core_96.unixbench.Double-Precision_Whetstone": {
+    "average": 73061.3,
+    "standard_deviation": 28.868437205130995
+  },
+  "CPU_core_96.unixbench.Execl_Throughput": {
+    "average": 9717.533333333335,
+    "standard_deviation": 55.91376296484553
+  },
+  "CPU_core_96.unixbench.File_Copy_1024_bufsize_2000_maxblocks": {
+    "average": 708.8333333333334,
+    "standard_deviation": 7.24998084288658
+  },
+  "CPU_core_96.unixbench.File_Copy_256_bufsize_500_maxblocks": {
+    "average": 449.03333333333336,
+    "standard_deviation": 3.9364394515291976
+  },
+  "CPU_core_96.unixbench.File_Copy_4096_bufsize_8000_maxblocks": {
+    "average": 1501.3999999999999,
+    "standard_deviation": 26.573671180324375
+  },
+  "CPU_core_96.unixbench.Pipe_Throughput": {
+    "average": 75780.26666666666,
+    "standard_deviation": 5823.653129742151
+  },
+  "CPU_core_96.unixbench.Pipe-based_Context_Switching": {
+    "average": 9862.866666666667,
+    "standard_deviation": 1872.3347925933424
+  },
+  "CPU_core_96.unixbench.Process_Creation": {
+    "average": 5587.100000000001,
+    "standard_deviation": 10.870142593361203
+  },
+  "CPU_core_96.unixbench.Shell_Scripts_(1_concurrent)": {
+    "average": 34550.73333333333,
+    "standard_deviation": 361.5292181215176
+  },
+  "CPU_core_96.unixbench.Shell_Scripts_(8_concurrent)": {
+    "average": 31389.13333333333,
+    "standard_deviation": 408.8671531058576
+  },
+  "CPU_core_96.unixbench.System_Call_Overhead": {
+    "average": 1293.5666666666666,
+    "standard_deviation": 58.33559995596364
+  },
+  "CPU_core_96.unixbench.System_Benchmarks_Index_Score": {
+    "average": 9682.300000000001,
+    "standard_deviation": 92.40717865332067
+  },
+  "CPU_core_1.unixbench.Dhrystone_2_using_register_variables": {
+    "average": 3683.2999999999997,
+    "standard_deviation": 1.8055470085266816
+  },
+  "CPU_core_1.unixbench.Double-Precision_Whetstone": {
+    "average": 763.4,
+    "standard_deviation": 0.14142135623728808
+  },
+  "CPU_core_1.unixbench.Execl_Throughput": {
+    "average": 804.4,
+    "standard_deviation": 37.58465999136706
+  },
+  "CPU_core_1.unixbench.File_Copy_1024_bufsize_2000_maxblocks": {
+    "average": 1566.3666666666666,
+    "standard_deviation": 39.088304587888665
+  },
+  "CPU_core_1.unixbench.File_Copy_256_bufsize_500_maxblocks": {
+    "average": 1088.2666666666667,
+    "standard_deviation": 19.150688992537358
+  },
+  "CPU_core_1.unixbench.File_Copy_4096_bufsize_8000_maxblocks": {
+    "average": 2379.7000000000003,
+    "standard_deviation": 261.4942574257926
+  },
+  "CPU_core_1.unixbench.Pipe_Throughput": {
+    "average": 888.0,
+    "standard_deviation": 1.8239152027072512
+  },
+  "CPU_core_1.unixbench.Pipe-based_Context_Switching": {
+    "average": 542.4333333333334,
+    "standard_deviation": 3.8317387987990568
+  },
+  "CPU_core_1.unixbench.Process_Creation": {
+    "average": 741.6,
+    "standard_deviation": 3.9631637193871754
+  },
+  "CPU_core_1.unixbench.Shell_Scripts_(1_concurrent)": {
+    "average": 1652.0,
+    "standard_deviation": 19.320628009116756
+  },
+  "CPU_core_1.unixbench.Shell_Scripts_(8_concurrent)": {
+    "average": 5660.533333333333,
+    "standard_deviation": 36.877484850364915
+  },
+  "CPU_core_1.unixbench.System_Call_Overhead": {
+    "average": 553.9666666666667,
+    "standard_deviation": 26.672874277479384
+  },
+  "CPU_core_1.unixbench.System_Benchmarks_Index_Score": {
+    "average": 1265.3666666666666,
+    "standard_deviation": 21.398805781839535
+  },
+  "benchmark-sql.Measured_tpmC(NewOrders)": {
+    "average": 139977.12666666668,
+    "standard_deviation": 3802.1280548339746
+  }
+}
