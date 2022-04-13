@@ -12,7 +12,6 @@
           ],
   "rpm_analyse":
           [
-            "rpm cmd",
             "rpm provides",
             "rpm requires"
           ],
@@ -21,6 +20,7 @@
             "rpm config",
             "rpm files",
             "rpm header",
+            "rpm cmd",
             "rpm service"
           ]
 }

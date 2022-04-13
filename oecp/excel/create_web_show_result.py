@@ -12,7 +12,6 @@
 # See the Mulan PSL v2 for more details.
 # **********************************************************************************
 """
-# -*- encoding=utf-8 -*-
 
 import json
 import logging
