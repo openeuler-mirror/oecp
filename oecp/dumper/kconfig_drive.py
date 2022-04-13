@@ -51,7 +51,7 @@ class KconfigDriveDumper(AbstractDumper):
         return kconfig_range_data
 
     def load_kconfig_range(self):
-        kconfig = get_file_by_pattern(r"^config", self.cache_dumper)
+        kconfig = get_file_by_pattern(r"^config-", self.cache_dumper)
         if not kconfig:
             return []
 

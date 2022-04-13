@@ -30,7 +30,7 @@ class KconfigDumper(AbstractDumper):
         self.data = "data"
 
     def load_kconfig(self):
-        kconfig = get_file_by_pattern(r"^config", self.cache_dumper)
+        kconfig = get_file_by_pattern(r"^config-", self.cache_dumper)
         if not kconfig:
             return []
 
