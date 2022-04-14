@@ -1,0 +1,16 @@
+{
+  "name": "test",
+  "plan": [
+    {
+      "name": "filelist",
+      "dumper": "FileListDumper",
+      "executor": "list.ListCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_RPM_FILES",
+        "strict": true,
+        "short_circut": false,
+        "show_same": true
+      }
+    }
+  ]
+}

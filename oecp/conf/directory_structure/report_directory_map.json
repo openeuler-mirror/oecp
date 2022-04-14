@@ -1,0 +1,26 @@
+{
+  "kernel_analyse":
+          [
+            "drive kabi",
+            "drive kconfig",
+            "kabi",
+            "kconfig"
+          ],
+  "rpmabi_analyse":
+          [
+            "rpm abi"
+          ],
+  "rpm_analyse":
+          [
+            "rpm provides",
+            "rpm requires"
+          ],
+  "rpmfile_analyse":
+          [
+            "rpm config",
+            "rpm files",
+            "rpm header",
+            "rpm cmd",
+            "rpm service"
+          ]
+}

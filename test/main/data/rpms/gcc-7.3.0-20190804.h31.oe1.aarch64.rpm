@@ -1,0 +1,47 @@
+import os
+import logging
+from unittest import TestCase
+from src.dumper.provides import ProvidesDumper
+from src.utils.logger import init_logger
+
+
+class TestProvides(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        init_logger()
+        cls.logger = logging.getLogger("test")
+
+    def test_single_dump(self):
+        rpm = os.path.join(os.path.dirname(__file__), "rpm_list",
+                           "openEuler20.03-LTS-SP1", "git-2.27.0-2.oe1.x86_64.rpm")
+        single_dump = ProvidesDumper('provides', 'local').single_dump(rpm)
+        self.assertEqual(single_dump, {'rpm': 'git-2.27.0-2.oe1.x86_64.rpm',
+                                       'provides': [{'name': 'git', 'symbol': '=', 'version': '2.27.0-2.oe1'},
+                                                    {'name': 'git', 'symbol': '<=', 'version': '2.27.0-2.oe1'},
+                                                    {'name': 'git(x86-64)', 'symbol': '=',
+                                                     'version': '2.27.0-2.oe1'},
+                                                    {'name': 'git-core', 'symbol': '', 'version': ''},
+                                                    {'name': 'git-p4', 'symbol': '', 'version': ''},
+                                                    {'name': 'git-subtree', 'symbol': '', 'version': ''}]})
+
+    def test_multi_dump(self):
+        rpm_list_path = os.path.join(os.path.dirname(__file__), "rpm_list", "Kylin-V10-SP2")
+        rpm_list = os.listdir(rpm_list_path)
+        rpm_list_full_path = [os.path.join(rpm_list_path, x) for x in rpm_list]
+        multi_dump = ProvidesDumper('provides', 'local').multi_dump(rpm_list_full_path)
+        self.assertEqual(multi_dump, [{'rpm': 'bash-5.0-14.se.01.ky10.x86_64.rpm',
+                                       'provides': [{'name': '/bin/bash', 'symbol': '', 'version': ''},
+                                                    {'name': '/bin/sh', 'symbol': '', 'version': ''},
+                                                    {'name': 'bash', 'symbol': '=', 'version': '5.0-14.se.01.ky10'},
+                                                    {'name': 'bash(x86-64)', 'symbol': '=',
+                                                     'version': '5.0-14.se.01.ky10'},
+                                                    {'name': 'config(bash)', 'symbol': '=',
+                                                     'version': '5.0-14.se.01.ky10'}]},
+                                      {'rpm': 'git-2.27.0-2.ky10.x86_64.rpm',
+                                       'provides': [{'name': 'git', 'symbol': '=', 'version': '2.27.0-2.ky10'},
+                                                    {'name': 'git', 'symbol': '<=', 'version': '2.27.0-2.ky10'},
+                                                    {'name': 'git(x86-64)', 'symbol': '=', 'version': '2.27.0-2.ky10'},
+                                                    {'name': 'git-core', 'symbol': '', 'version': ''},
+                                                    {'name': 'git-p4', 'symbol': '', 'version': ''},
+                                                    {'name': 'git-subtree', 'symbol': '', 'version': ''}]}]
+                         )

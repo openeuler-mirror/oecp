@@ -1,0 +1,18 @@
+{
+    "x86_64":
+    {
+        "testbox": "2288hv5-2s44p-384g--b2",
+        "os_mount":"local",
+        "os_lv_size": "30G",
+        "os_lv":"20220111456"
+
+    },
+    "aarch64":
+    {
+        "testbox": "taishan200-2280-2s48p-256g--a27",
+        "queue": "lys-arm",
+        "os_mount":"local",
+        "os_lv_size": "30G"
+
+    }
+}

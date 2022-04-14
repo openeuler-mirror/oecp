@@ -1,0 +1,3128 @@
+{
+    "/etc/snmp/snmpd.conf": {
+        "filename": "snmpd.conf",
+        "path": "/etc/snmp/snmpd.conf",
+        "data": {}
+    },
+    "/etc/snmp/snmptrapd.conf": {
+        "filename": "snmptrapd.conf",
+        "path": "/etc/snmp/snmptrapd.conf",
+        "data": {}
+    },
+    "/etc/dbus-1/system.d/org.freedesktop.PackageKit.conf": {
+        "filename": "org.freedesktop.PackageKit.conf",
+        "path": "/etc/dbus-1/system.d/org.freedesktop.PackageKit.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?> <!-- -*- XML -*- -->",
+            "<policy user": "\"root\">",
+            "<allow own": "\"org.freedesktop.PackageKit\"/>",
+            "<policy context": "\"default\">",
+            "<allow send_destination": "\"org.freedesktop.PackageKit\"",
+            "send_interface": "\"org.freedesktop.PackageKit\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/org.freedesktop.ModemManager1.conf": {
+        "filename": "org.freedesktop.ModemManager1.conf",
+        "path": "/etc/dbus-1/system.d/org.freedesktop.ModemManager1.conf",
+        "data": {
+            "<policy context": "\"default\">",
+            "<allow send_destination": "\"org.freedesktop.ModemManager1\"/>",
+            "<policy user": "\"root\">",
+            "<allow own": "\"org.freedesktop.ModemManager1\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/org.fedoraproject.SetroubleshootFixit.conf": {
+        "filename": "org.fedoraproject.SetroubleshootFixit.conf",
+        "path": "/etc/dbus-1/system.d/org.fedoraproject.SetroubleshootFixit.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?> <!-- -*- XML -*- -->",
+            "<policy user": "\"root\">",
+            "<allow own": "\"org.fedoraproject.SetroubleshootFixit\"/>",
+            "<policy context": "\"default\">",
+            "<allow send_destination": "\"org.fedoraproject.SetroubleshootFixit\"",
+            "send_interface": "\"org.fedoraproject.SetroubleshootFixit\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/org.freedesktop.sssd.infopipe.conf": {
+        "filename": "org.freedesktop.sssd.infopipe.conf",
+        "path": "/etc/dbus-1/system.d/org.freedesktop.sssd.infopipe.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?> <!--*-nxml-*-->",
+            "<policy user": "\"root\">",
+            "<allow own": "\"org.freedesktop.sssd.infopipe\"/>",
+            "<policy context": "\"default\">",
+            "<allow send_destination": "\"org.freedesktop.sssd.infopipe\"",
+            "send_interface": "\"org.freedesktop.DBus.Introspectable\"/>",
+            "send_member": "\"GetAll\"/>",
+            "<allow send_interface": "\"org.freedesktop.sssd.infopipe\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/org.freedesktop.UDisks2.conf": {
+        "filename": "org.freedesktop.UDisks2.conf",
+        "path": "/etc/dbus-1/system.d/org.freedesktop.UDisks2.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?> <!-- -*- XML -*- -->",
+            "<policy user": "\"root\">",
+            "<allow own": "\"org.freedesktop.UDisks2\"/>",
+            "<policy context": "\"default\">",
+            "<allow send_destination": "\"org.freedesktop.UDisks2\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/org.freedesktop.PolicyKit1.conf": {
+        "filename": "org.freedesktop.PolicyKit1.conf",
+        "path": "/etc/dbus-1/system.d/org.freedesktop.PolicyKit1.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?> <!-- -*- XML -*- -->",
+            "<policy user": "\"polkitd\">",
+            "<allow own": "\"org.freedesktop.PolicyKit1\"/>",
+            "<policy context": "\"default\">",
+            "<allow send_destination": "\"org.freedesktop.PolicyKit1\"/>",
+            "<allow send_interface": "\"org.freedesktop.PolicyKit1.AuthenticationAgent\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/teamd.conf": {
+        "filename": "teamd.conf",
+        "path": "/etc/dbus-1/system.d/teamd.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?> <!--*-nxml-*-->",
+            "<policy user": "\"root\">",
+            "<allow own_prefix": "\"org.libteam.teamd\"/>",
+            "<allow send_interface": "\"org.libteam.teamd\"/>",
+            "<policy context": "\"default\">",
+            "<deny own_prefix": "\"org.libteam.teamd\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/nm-dispatcher.conf": {
+        "filename": "nm-dispatcher.conf",
+        "path": "/etc/dbus-1/system.d/nm-dispatcher.conf",
+        "data": {
+            "<policy user": "\"root\">",
+            "<allow own": "\"org.freedesktop.nm_dispatcher\"/>",
+            "<allow send_destination": "\"org.freedesktop.nm_dispatcher\"/>",
+            "<policy context": "\"default\">",
+            "<deny own": "\"org.freedesktop.nm_dispatcher\"/>",
+            "<deny send_destination": "\"org.freedesktop.nm_dispatcher\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/com.kylin.backup.conf": {
+        "filename": "com.kylin.backup.conf",
+        "path": "/etc/dbus-1/system.d/com.kylin.backup.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?> <!-- -*- XML -*- -->",
+            "<policy user": "\"root\">",
+            "<allow own": "\"com.kylin.backup\"/>",
+            "<allow send_interface": "\"com.kylin.backup.manager\" />",
+            "<policy context": "\"default\">",
+            "<allow send_destination": "\"com.kylin.backup\"",
+            "send_interface": "\"org.freedesktop.DBus.Introspectable\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/pulseaudio-system.conf": {
+        "filename": "pulseaudio-system.conf",
+        "path": "/etc/dbus-1/system.d/pulseaudio-system.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?><!--*-nxml-*-->",
+            "<policy user": "\"pulse\">",
+            "<allow own": "\"org.pulseaudio.Server\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/org.freedesktop.realmd.conf": {
+        "filename": "org.freedesktop.realmd.conf",
+        "path": "/etc/dbus-1/system.d/org.freedesktop.realmd.conf",
+        "data": {
+            "<policy user": "\"root\">",
+            "<allow own": "\"org.freedesktop.realmd\"/>",
+            "<policy context": "\"default\">",
+            "<allow send_destination": "\"org.freedesktop.realmd\" />"
+        }
+    },
+    "/etc/dbus-1/system.d/org.freedesktop.UPower.conf": {
+        "filename": "org.freedesktop.UPower.conf",
+        "path": "/etc/dbus-1/system.d/org.freedesktop.UPower.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?> <!-- -*- XML -*- -->",
+            "<policy user": "\"root\">",
+            "<allow own": "\"org.freedesktop.UPower\"/>",
+            "<policy context": "\"default\">",
+            "<allow send_destination": "\"org.freedesktop.UPower\"",
+            "send_interface": "\"org.freedesktop.DBus.Introspectable\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/org.freedesktop.Accounts.conf": {
+        "filename": "org.freedesktop.Accounts.conf",
+        "path": "/etc/dbus-1/system.d/org.freedesktop.Accounts.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<policy user": "\"root\">",
+            "<allow own": "\"org.freedesktop.Accounts\"/>",
+            "<policy context": "\"default\">",
+            "<allow send_destination": "\"org.freedesktop.Accounts\"/>",
+            "send_interface": "\"org.freedesktop.DBus.Properties\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/bluetooth.conf": {
+        "filename": "bluetooth.conf",
+        "path": "/etc/dbus-1/system.d/bluetooth.conf",
+        "data": {
+            "<policy user": "\"root\">",
+            "<allow own": "\"org.bluez\"/>",
+            "<allow send_destination": "\"org.bluez\"/>",
+            "<allow send_interface": "\"org.bluez.Agent1\"/>",
+            "<policy at_console": "\"true\">",
+            "<policy group": "\"lp\">",
+            "<policy context": "\"default\">",
+            "<deny send_destination": "\"org.bluez\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/org.selinux.conf": {
+        "filename": "org.selinux.conf",
+        "path": "/etc/dbus-1/system.d/org.selinux.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?> <!-- -*- XML -*- -->",
+            "<policy user": "\"root\">",
+            "<allow own": "\"org.selinux\"/>",
+            "<policy at_console": "\"true\">",
+            "<allow send_destination": "\"org.selinux\"/>",
+            "<policy context": "\"default\">",
+            "send_interface": "\"org.freedesktop.DBus.Introspectable\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/org.gnome.GConf.Defaults.conf": {
+        "filename": "org.gnome.GConf.Defaults.conf",
+        "path": "/etc/dbus-1/system.d/org.gnome.GConf.Defaults.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?> <!-- -*- XML -*- -->",
+            "<policy user": "\"root\">",
+            "<allow own": "\"org.gnome.GConf.Defaults\"/>",
+            "<allow send_destination": "\"org.gnome.GConf.Defaults\"/>",
+            "<policy context": "\"default\">"
+        }
+    },
+    "/etc/dbus-1/system.d/com.redhat.PrinterDriversInstaller.conf": {
+        "filename": "com.redhat.PrinterDriversInstaller.conf",
+        "path": "/etc/dbus-1/system.d/com.redhat.PrinterDriversInstaller.conf",
+        "data": {
+            "<policy user": "\"root\">",
+            "<allow send_destination": "\"com.redhat.PrinterDriversInstaller\"",
+            "send_interface": "\"com.redhat.PrinterDriversInstaller\"/>",
+            "<policy context": "\"default\">",
+            "<allow own": "\"com.redhat.PrinterDriversInstaller\"/>",
+            "<deny send_destination": "\"com.redhat.PrinterDriversInstaller\""
+        }
+    },
+    "/etc/dbus-1/system.d/wpa_supplicant.conf": {
+        "filename": "wpa_supplicant.conf",
+        "path": "/etc/dbus-1/system.d/wpa_supplicant.conf",
+        "data": {
+            "<policy user": "\"root\">",
+            "<allow own": "\"fi.epitest.hostap.WPASupplicant\"/>",
+            "<allow send_destination": "\"fi.epitest.hostap.WPASupplicant\"/>",
+            "<allow send_interface": "\"fi.epitest.hostap.WPASupplicant\"/>",
+            "<allow receive_sender": "\"fi.w1.wpa_supplicant1\" receive_type=\"signal\"/>",
+            "<policy context": "\"default\">",
+            "<deny own": "\"fi.epitest.hostap.WPASupplicant\"/>",
+            "<deny send_destination": "\"fi.epitest.hostap.WPASupplicant\"/>",
+            "<deny receive_sender": "\"fi.w1.wpa_supplicant1\" receive_type=\"signal\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/org.fedoraproject.Setroubleshootd.conf": {
+        "filename": "org.fedoraproject.Setroubleshootd.conf",
+        "path": "/etc/dbus-1/system.d/org.fedoraproject.Setroubleshootd.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?> <!-- -*- XML -*- -->",
+            "<policy user": "\"setroubleshoot\">",
+            "<allow own": "\"org.fedoraproject.Setroubleshootd\"/>",
+            "<allow send_destination": "\"org.fedoraproject.Setroubleshootd\"/>",
+            "<policy context": "\"default\">",
+            "send_interface": "\"org.fedoraproject.SetroubleshootdIface\"",
+            "send_member": "\"start\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/com.redhat.NewPrinterNotification.conf": {
+        "filename": "com.redhat.NewPrinterNotification.conf",
+        "path": "/etc/dbus-1/system.d/com.redhat.NewPrinterNotification.conf",
+        "data": {
+            "<policy user": "\"root\">",
+            "<allow send_destination": "\"com.redhat.NewPrinterNotification\"",
+            "send_interface": "\"com.redhat.NewPrinterNotification\"/>",
+            "<policy context": "\"default\">",
+            "<allow own": "\"com.redhat.NewPrinterNotification\"/>",
+            "<deny send_destination": "\"com.redhat.NewPrinterNotification\""
+        }
+    },
+    "/etc/dbus-1/system.d/FirewallD.conf": {
+        "filename": "FirewallD.conf",
+        "path": "/etc/dbus-1/system.d/FirewallD.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?> <!-- -*- XML -*- -->",
+            "<policy user": "\"root\">",
+            "<allow own": "\"org.fedoraproject.FirewallD1\"/>",
+            "<allow send_destination": "\"org.fedoraproject.FirewallD1\"/>",
+            "<policy context": "\"default\">",
+            "send_interface": "\"org.freedesktop.DBus.Introspectable\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/com.kylin.kysec.conf": {
+        "filename": "com.kylin.kysec.conf",
+        "path": "/etc/dbus-1/system.d/com.kylin.kysec.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?> <!-- -*- XML -*- -->",
+            "<policy user": "\"root\">",
+            "<allow own": "\"com.kylin.kysec\"/>",
+            "<policy context": "\"default\">",
+            "<allow send_destination": "\"com.kylin.kysec\"/>",
+            "send_interface": "\"org.freedesktop.DBus.Introspectable\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/org.freedesktop.NetworkManager.conf": {
+        "filename": "org.freedesktop.NetworkManager.conf",
+        "path": "/etc/dbus-1/system.d/org.freedesktop.NetworkManager.conf",
+        "data": {
+            "<policy user": "\"root\">",
+            "<allow own": "\"org.freedesktop.NetworkManager\"/>",
+            "<allow send_destination": "\"org.freedesktop.NetworkManager\"/>",
+            "send_interface": "\"org.freedesktop.NetworkManager.PPP\"/>",
+            "<allow send_interface": "\"org.freedesktop.NetworkManager.SecretAgent\"/>",
+            "<deny send_interface": "\"...\" /> (see dbus-daemon(8) for details).",
+            "<policy context": "\"default\">",
+            "<deny own": "\"org.freedesktop.NetworkManager\"/>",
+            "<deny send_destination": "\"org.freedesktop.NetworkManager\"/>",
+            "send_member": "\"SetLogging\"/>",
+            "<limit name": "\"max_replies_per_connection\">1024</limit>"
+        }
+    },
+    "/etc/dbus-1/system.d/org.mate.SettingsDaemon.DateTimeMechanism.conf": {
+        "filename": "org.mate.SettingsDaemon.DateTimeMechanism.conf",
+        "path": "/etc/dbus-1/system.d/org.mate.SettingsDaemon.DateTimeMechanism.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?> <!-- -*- XML -*- -->",
+            "<policy user": "\"root\">",
+            "<allow own": "\"org.mate.SettingsDaemon.DateTimeMechanism\"/>",
+            "<allow send_destination": "\"org.mate.SettingsDaemon.DateTimeMechanism\"/>",
+            "<allow receive_sender": "\"org.mate.SettingsDaemon.DateTimeMechanism\"/>",
+            "<policy context": "\"default\">"
+        }
+    },
+    "/etc/dbus-1/system.d/org.freedesktop.activation.conf": {
+        "filename": "org.freedesktop.activation.conf",
+        "path": "/etc/dbus-1/system.d/org.freedesktop.activation.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?> <!-- -*- XML -*- -->",
+            "<policy user": "\"root\">",
+            "<allow own": "\"org.freedesktop.activation\"/>",
+            "<allow send_destination": "\"org.freedesktop.activation\" />",
+            "<allow receive_sender": "\"org.freedesktop.activation\" />",
+            "<policy context": "\"default\">",
+            "<allow send_interface": "\"org.freedesktop.activation.interface\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/dnsmasq.conf": {
+        "filename": "dnsmasq.conf",
+        "path": "/etc/dbus-1/system.d/dnsmasq.conf",
+        "data": {
+            "<policy user": "\"root\">",
+            "<allow own": "\"uk.org.thekelleys.dnsmasq\"/>",
+            "<allow send_destination": "\"uk.org.thekelleys.dnsmasq\"/>",
+            "<policy context": "\"default\">",
+            "<deny own": "\"uk.org.thekelleys.dnsmasq\"/>",
+            "<deny send_destination": "\"uk.org.thekelleys.dnsmasq\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/com.redhat.tuned.conf": {
+        "filename": "com.redhat.tuned.conf",
+        "path": "/etc/dbus-1/system.d/com.redhat.tuned.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<policy context": "\"default\">",
+            "<allow receive_sender": "\"com.redhat.tuned\" />",
+            "<allow send_destination": "\"com.redhat.tuned\" send_interface=\"org.freedesktop.DBus.Introspectable\" />",
+            "<policy user": "\"root\">",
+            "<allow own": "\"com.redhat.tuned\" />"
+        }
+    },
+    "/etc/dbus-1/system.d/com.kylin.computer.conf": {
+        "filename": "com.kylin.computer.conf",
+        "path": "/etc/dbus-1/system.d/com.kylin.computer.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?> <!-- -*- XML -*- -->",
+            "<policy user": "\"root\">",
+            "<allow own": "\"com.kylin.computer\"/>",
+            "<allow send_interface": "\"com.kylin.computer\"/>",
+            "<policy context": "\"default\">",
+            "<allow send_destination": "\"com.kylin.computer\"",
+            "send_interface": "\"org.freedesktop.DBus.Introspectable\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/org.freedesktop.GeoClue2.conf": {
+        "filename": "org.freedesktop.GeoClue2.conf",
+        "path": "/etc/dbus-1/system.d/org.freedesktop.GeoClue2.conf",
+        "data": {
+            "<policy context": "\"default\">",
+            "<allow send_destination": "\"org.freedesktop.GeoClue2\"/>",
+            "<policy user": "\"geoclue\">",
+            "<allow own": "\"org.freedesktop.GeoClue2\"/>",
+            "<allow receive_sender": "\"fi.w1.wpa_supplicant1\"",
+            "receive_type": "\"signal\"/>",
+            "send_interface": "\"org.freedesktop.DBus.Properties\"",
+            "send_member": "\"Get\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/org.freedesktop.GeoClue2.Agent.conf": {
+        "filename": "org.freedesktop.GeoClue2.Agent.conf",
+        "path": "/etc/dbus-1/system.d/org.freedesktop.GeoClue2.Agent.conf",
+        "data": {
+            "<policy user": "\"geoclue\">",
+            "<allow send_interface": "\"org.freedesktop.GeoClue2.Agent\"",
+            "send_path": "\"/org/freedesktop/GeoClue2/Agent\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/org.freedesktop.RealtimeKit1.conf": {
+        "filename": "org.freedesktop.RealtimeKit1.conf",
+        "path": "/etc/dbus-1/system.d/org.freedesktop.RealtimeKit1.conf",
+        "data": {
+            "<policy user": "\"rtkit\">",
+            "<allow own": "\"org.freedesktop.RealtimeKit1\"/>",
+            "<policy context": "\"default\">",
+            "<allow send_destination": "\"org.freedesktop.RealtimeKit1\"/>",
+            "<allow receive_sender": "\"org.freedesktop.RealtimeKit1\"/>",
+            "<deny send_destination": "\"org.freedesktop.RealtimeKit1\"",
+            "send_interface": "\"org.freedesktop.RealtimeKit1\" send_member=\"Exit\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/nm-ifcfg-rh.conf": {
+        "filename": "nm-ifcfg-rh.conf",
+        "path": "/etc/dbus-1/system.d/nm-ifcfg-rh.conf",
+        "data": {
+            "<policy context": "\"default\">",
+            "<allow send_destination": "\"com.redhat.ifcfgrh1\"/>",
+            "<policy user": "\"root\">",
+            "<allow own": "\"com.redhat.ifcfgrh1\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/com.redhat.lvmdbus1.conf": {
+        "filename": "com.redhat.lvmdbus1.conf",
+        "path": "/etc/dbus-1/system.d/com.redhat.lvmdbus1.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?> <!--*-nxml-*-->",
+            "<policy user": "\"root\">",
+            "<allow own_prefix": "\"com.redhat.lvmdbus1\"/>",
+            "<allow send_destination": "\"com.redhat.lvmdbus1\"/>",
+            "<policy context": "\"default\">",
+            "<deny own_prefix": "\"com.redhat.lvmdbus1\"/>",
+            "<deny send_destination": "\"com.redhat.lvmdbus1\"/>"
+        }
+    },
+    "/etc/dbus-1/system.d/blivet.conf": {
+        "filename": "blivet.conf",
+        "path": "/etc/dbus-1/system.d/blivet.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?> <!-- -*- XML -*- -->",
+            "<policy user": "\"root\">",
+            "<allow own": "\"com.redhat.Blivet1\"/>",
+            "<allow send_destination": "\"com.redhat.Blivet1\"/>"
+        }
+    },
+    "/etc/dbus-1/session.conf": {
+        "filename": "session.conf",
+        "path": "/etc/dbus-1/session.conf",
+        "data": {}
+    },
+    "/etc/dbus-1/system.conf": {
+        "filename": "system.conf",
+        "path": "/etc/dbus-1/system.conf",
+        "data": {}
+    },
+    "/etc/firebird/firebird.conf": {
+        "filename": "firebird.conf",
+        "path": "/etc/firebird/firebird.conf",
+        "data": {}
+    },
+    "/etc/firebird/databases.conf": {
+        "filename": "databases.conf",
+        "path": "/etc/firebird/databases.conf",
+        "data": {
+            "employee.fdb ": " $(dir_sampleDb)/employee.fdb",
+            "employee ": " $(dir_sampleDb)/employee.fdb",
+            "security.db ": " $(dir_secDb)/security3.fdb",
+            "RemoteAccess ": " false",
+            "DefaultDbCachePages ": " 50"
+        }
+    },
+    "/etc/firebird/plugins.conf": {
+        "filename": "plugins.conf",
+        "path": "/etc/firebird/plugins.conf",
+        "data": {
+            "Plugin ": " UDR {",
+            "Module ": " $(dir_plugins)/udr_engine",
+            "Config ": " UDR_config",
+            "path ": " $(dir_plugins)/udr"
+        }
+    },
+    "/etc/firebird/fbtrace.conf": {
+        "filename": "fbtrace.conf",
+        "path": "/etc/firebird/fbtrace.conf",
+        "data": {
+            "database ": " %[\\\\/]my_database.fdb",
+            "enabled ": " true",
+            "log_filename ": " \\1.log"
+        }
+    },
+    "/etc/lightdm/users.conf": {
+        "filename": "users.conf",
+        "path": "/etc/lightdm/users.conf",
+        "data": {
+            "minimum-uid": "500",
+            "hidden-users": "nobody nobody4 noaccess",
+            "hidden-shells": "/bin/false /usr/sbin/nologin /sbin/nologin"
+        }
+    },
+    "/etc/lightdm/keys.conf": {
+        "filename": "keys.conf",
+        "path": "/etc/lightdm/keys.conf",
+        "data": {}
+    },
+    "/etc/lightdm/lightdm.conf": {
+        "filename": "lightdm.conf",
+        "path": "/etc/lightdm/lightdm.conf",
+        "data": {}
+    },
+    "/etc/lightdm/ukui-greeter.conf": {
+        "filename": "ukui-greeter.conf",
+        "path": "/etc/lightdm/ukui-greeter.conf",
+        "data": {
+            "draw-user-background": "true",
+            "background": "/usr/share/backgrounds/kylin/kylin-background.png",
+            "background-color": "#035290",
+            "logo": "/usr/share/ukui-greeter/images/logo.png",
+            "cof": "/usr/share/ukui-greeter/images/cof.png"
+        }
+    },
+    "/etc/gtk-2.0/im-multipress.conf": {
+        "filename": "im-multipress.conf",
+        "path": "/etc/gtk-2.0/im-multipress.conf",
+        "data": {
+            "KP_1 ": " .;,;?;!;';\";1;-;(;);@;/;:;_",
+            "KP_2 ": " a;b;c;2;\u00e4;\u00e0;\u00e1;\u00e3;\u00e2;\u00e5;\u00e6;\u00e7",
+            "KP_3 ": " d;e;f;3;\u00e8;\u00e9;\u00eb;\u00ea;\u00f0",
+            "KP_4 ": " g;h;i;4;\u00ec;\u00ed;\u00ee;\u00ef",
+            "KP_5 ": " j;k;l;5;\u00a3",
+            "KP_6 ": " m;n;o;6;\u00f6;\u00f2;\u00f3;\u00f4;\u00f5;\u00f8;\u00f1",
+            "KP_7 ": " p;q;r;s;7;\u00df;$",
+            "KP_8 ": " t;u;v;8;\u00fc;\u00f9;\u00fa;\u00fb",
+            "KP_9 ": " w;x;y;z;9;\u00fd;\u00fe",
+            "KP_0 ": " \\s;0"
+        }
+    },
+    "/etc/tuned/tuned-main.conf": {
+        "filename": "tuned-main.conf",
+        "path": "/etc/tuned/tuned-main.conf",
+        "data": {
+            "daemon ": " 1",
+            "dynamic_tuning ": " 0",
+            "sleep_interval ": " 1",
+            "update_interval ": " 10",
+            "recommend_command ": " 1",
+            "reapply_sysctl ": " 1",
+            "default_instance_priority ": " 0",
+            "udev_buffer_size ": " 1MB"
+        }
+    },
+    "/etc/tuned/sap-hana-vmware-variables.conf": {
+        "filename": "sap-hana-vmware-variables.conf",
+        "path": "/etc/tuned/sap-hana-vmware-variables.conf",
+        "data": {
+            "sap_hana_vmware_nic": "!*"
+        }
+    },
+    "/etc/tuned/cpu-partitioning-variables.conf": {
+        "filename": "cpu-partitioning-variables.conf",
+        "path": "/etc/tuned/cpu-partitioning-variables.conf",
+        "data": {}
+    },
+    "/etc/yum.conf": {
+        "filename": "yum.conf",
+        "path": "/etc/yum.conf",
+        "data": {
+            "gpgcheck": "1",
+            "installonly_limit": "3",
+            "clean_requirements_on_remove": "True",
+            "best": "True",
+            "skip_if_unavailable": "False"
+        }
+    },
+    "/etc/PackageKit/PackageKit.conf": {
+        "filename": "PackageKit.conf",
+        "path": "/etc/PackageKit/PackageKit.conf",
+        "data": {}
+    },
+    "/etc/PackageKit/Vendor.conf": {
+        "filename": "Vendor.conf",
+        "path": "/etc/PackageKit/Vendor.conf",
+        "data": {
+            "DefaultUrl": "https://gitee.com/openeuler/community/issues",
+            "CodecUrl": "https://gitee.com/openeuler/community/issues",
+            "HardwareUrl": "https://gitee.com/openeuler/community/issues",
+            "FontUrl": "https://gitee.com/openeuler/community/issues",
+            "MimeUrl": "https://gitee.com/openeuler/community/issues"
+        }
+    },
+    "/etc/gnome-logs/gnome-logs.conf": {
+        "filename": "gnome-logs.conf",
+        "path": "/etc/gnome-logs/gnome-logs.conf",
+        "data": {
+            "name": "Gnome logs",
+            "name[zh_CN]": "\u65e5\u5fd7\u7ba1\u7406"
+        }
+    },
+    "/etc/pool.conf": {
+        "filename": "pool.conf",
+        "path": "/etc/pool.conf",
+        "data": {
+            "min pool conn ": " 5",
+            "max pool conn ": " 10",
+            "max member age ": " 120",
+            "user ": " guest",
+            "password ": " sybase",
+            "database ": " tempdb",
+            "server ": " JDBC_42",
+            "port ": " 5000"
+        }
+    },
+    "/etc/watchdog.conf": {
+        "filename": "watchdog.conf",
+        "path": "/etc/watchdog.conf",
+        "data": {
+            "watchdog-device": " /dev/watchdog",
+            "watchdog-timeout": " 300",
+            "interval": " 30",
+            "realtime": " yes",
+            "priority": " 1"
+        }
+    },
+    "/etc/updatedb.conf": {
+        "filename": "updatedb.conf",
+        "path": "/etc/updatedb.conf",
+        "data": {
+            "PRUNE_BIND_MOUNTS ": " \"yes\"",
+            "PRUNEFS ": " \"9p afs anon_inodefs auto autofs bdev binfmt_misc cgroup cifs coda configfs cpuset debugfs devpts ecryptfs exofs fuse fuse.sshfs fusectl gfs gfs2 gpfs hugetlbfs inotifyfs iso9660 jffs2 lustre mqueue ncpfs nfs nfs4 nfsd pipefs proc ramfs rootfs rpc_pipefs securityfs selinuxfs sfs sockfs sysfs tmpfs ubifs udf usbfs ceph fuse.ceph\"",
+            "PRUNENAMES ": " \".git .hg .svn .bzr .arch-ids {arch} CVS\"",
+            "PRUNEPATHS ": " \"/afs /media /mnt /net /sfs /tmp /udev /var/cache/ccache /var/lib/yum/yumdb /var/lib/dnf/yumdb /var/spool/cups /var/spool/squid /var/tmp /var/lib/ceph\""
+        }
+    },
+    "/etc/mcelog/mcelog.conf": {
+        "filename": "mcelog.conf",
+        "path": "/etc/mcelog/mcelog.conf",
+        "data": {
+            "filter ": " yes",
+            "client-user ": " root",
+            "socket-path ": " /var/run/mcelog-client",
+            "dimm-tracking-enabled ": " yes",
+            "dmi-prepopulate ": " no",
+            "uc-error-trigger ": " dimm-error-trigger",
+            "uc-error-threshold ": " 1 / 24h",
+            "ce-error-trigger ": " dimm-error-trigger",
+            "ce-error-threshold ": " 10 / 24h",
+            "socket-tracing-enabled ": " yes",
+            "mem-uc-error-threshold ": " 100 / 24h",
+            "mem-ce-error-trigger ": " socket-memory-error-trigger",
+            "mem-ce-error-threshold ": " 100 / 24h",
+            "mem-ce-error-log ": " yes",
+            "cache-threshold-trigger ": " cache-error-trigger",
+            "cache-threshold-log ": " yes",
+            "memory-ce-threshold ": " 10 / 24h",
+            "memory-ce-trigger ": " page-error-trigger",
+            "memory-ce-log ": " yes",
+            "memory-ce-action ": " soft",
+            "children-max ": " 2",
+            "directory ": " /etc/mcelog/triggers"
+        }
+    },
+    "/etc/sysconfig/sysstat.ioconf": {
+        "filename": "sysstat.ioconf",
+        "path": "/etc/sysconfig/sysstat.ioconf",
+        "data": {}
+    },
+    "/etc/sysconfig/nftables.conf": {
+        "filename": "nftables.conf",
+        "path": "/etc/sysconfig/nftables.conf",
+        "data": {}
+    },
+    "/etc/sysctl.conf": {
+        "filename": "sysctl.conf",
+        "path": "/etc/sysctl.conf",
+        "data": {
+            "kernel.sysrq": "0",
+            "net.ipv4.ip_forward": "0",
+            "net.ipv4.conf.all.send_redirects": "0",
+            "net.ipv4.conf.default.send_redirects": "0",
+            "net.ipv4.conf.all.accept_source_route": "0",
+            "net.ipv4.conf.default.accept_source_route": "0",
+            "net.ipv4.conf.all.accept_redirects": "0",
+            "net.ipv4.conf.default.accept_redirects": "0",
+            "net.ipv4.conf.all.secure_redirects": "0",
+            "net.ipv4.conf.default.secure_redirects": "0",
+            "net.ipv4.icmp_echo_ignore_broadcasts": "1",
+            "net.ipv4.icmp_ignore_bogus_error_responses": "1",
+            "net.ipv4.conf.all.rp_filter": "1",
+            "net.ipv4.conf.default.rp_filter": "1",
+            "net.ipv4.tcp_syncookies": "1",
+            "kernel.dmesg_restrict": "1",
+            "net.ipv6.conf.all.accept_redirects": "0",
+            "net.ipv6.conf.default.accept_redirects": "0"
+        }
+    },
+    "/etc/libreport/report_event.conf": {
+        "filename": "report_event.conf",
+        "path": "/etc/libreport/report_event.conf",
+        "data": {
+            "EVENT": "report-gui type=libreport"
+        }
+    },
+    "/etc/libreport/events/report_Uploader.conf": {
+        "filename": "report_Uploader.conf",
+        "path": "/etc/libreport/events/report_Uploader.conf",
+        "data": {}
+    },
+    "/etc/libreport/events/report_Logger.conf": {
+        "filename": "report_Logger.conf",
+        "path": "/etc/libreport/events/report_Logger.conf",
+        "data": {
+            "Logger_Append": "yes"
+        }
+    },
+    "/etc/libreport/forbidden_words.conf": {
+        "filename": "forbidden_words.conf",
+        "path": "/etc/libreport/forbidden_words.conf",
+        "data": {}
+    },
+    "/etc/libreport/ignored_words.conf": {
+        "filename": "ignored_words.conf",
+        "path": "/etc/libreport/ignored_words.conf",
+        "data": {
+            ".keymap": "",
+            "USER": "",
+            "USERNAME": "",
+            "SHELL": "/sbin/nologin",
+            "SSH_ASKPASS": ""
+        }
+    },
+    "/etc/libreport/libreport.conf": {
+        "filename": "libreport.conf",
+        "path": "/etc/libreport/libreport.conf",
+        "data": {}
+    },
+    "/etc/libreport/workflows.d/anaconda_event.conf": {
+        "filename": "anaconda_event.conf",
+        "path": "/etc/libreport/workflows.d/anaconda_event.conf",
+        "data": {
+            "EVENT": "workflow_AnacondaFedora component=anaconda"
+        }
+    },
+    "/etc/libreport/workflows.d/report_logger.conf": {
+        "filename": "report_logger.conf",
+        "path": "/etc/libreport/workflows.d/report_logger.conf",
+        "data": {}
+    },
+    "/etc/libreport/workflows.d/report_uploader.conf": {
+        "filename": "report_uploader.conf",
+        "path": "/etc/libreport/workflows.d/report_uploader.conf",
+        "data": {}
+    },
+    "/etc/libreport/plugins/mantisbt_format.conf": {
+        "filename": "mantisbt_format.conf",
+        "path": "/etc/libreport/plugins/mantisbt_format.conf",
+        "data": {}
+    },
+    "/etc/libreport/plugins/bugzilla_formatdup.conf": {
+        "filename": "bugzilla_formatdup.conf",
+        "path": "/etc/libreport/plugins/bugzilla_formatdup.conf",
+        "data": {}
+    },
+    "/etc/libreport/plugins/rhtsupport.conf": {
+        "filename": "rhtsupport.conf",
+        "path": "/etc/libreport/plugins/rhtsupport.conf",
+        "data": {}
+    },
+    "/etc/libreport/plugins/bugzilla_format.conf": {
+        "filename": "bugzilla_format.conf",
+        "path": "/etc/libreport/plugins/bugzilla_format.conf",
+        "data": {}
+    },
+    "/etc/libreport/plugins/bugzilla_formatdup_anaconda.conf": {
+        "filename": "bugzilla_formatdup_anaconda.conf",
+        "path": "/etc/libreport/plugins/bugzilla_formatdup_anaconda.conf",
+        "data": {}
+    },
+    "/etc/libreport/plugins/mantisbt_formatdup.conf": {
+        "filename": "mantisbt_formatdup.conf",
+        "path": "/etc/libreport/plugins/mantisbt_formatdup.conf",
+        "data": {}
+    },
+    "/etc/libreport/plugins/bugzilla_format_anaconda.conf": {
+        "filename": "bugzilla_format_anaconda.conf",
+        "path": "/etc/libreport/plugins/bugzilla_format_anaconda.conf",
+        "data": {}
+    },
+    "/etc/libreport/plugins/mantisbt_formatdup_analyzer_libreport.conf": {
+        "filename": "mantisbt_formatdup_analyzer_libreport.conf",
+        "path": "/etc/libreport/plugins/mantisbt_formatdup_analyzer_libreport.conf",
+        "data": {}
+    },
+    "/etc/libreport/plugins/mantisbt.conf": {
+        "filename": "mantisbt.conf",
+        "path": "/etc/libreport/plugins/mantisbt.conf",
+        "data": {
+            "MantisbtURL ": " http://localhost/mantisbt/",
+            "SSLVerify ": " no",
+            "Login ": "",
+            "Password ": ""
+        }
+    },
+    "/etc/libreport/plugins/bugzilla.conf": {
+        "filename": "bugzilla.conf",
+        "path": "/etc/libreport/plugins/bugzilla.conf",
+        "data": {
+            "SSLVerify ": " yes",
+            "Login ": "",
+            "Password ": "",
+            "DontMatchComponents ": " selinux-policy"
+        }
+    },
+    "/etc/libreport/plugins/upload.conf": {
+        "filename": "upload.conf",
+        "path": "/etc/libreport/plugins/upload.conf",
+        "data": {}
+    },
+    "/etc/libreport/plugins/bugzilla_format_kernel.conf": {
+        "filename": "bugzilla_format_kernel.conf",
+        "path": "/etc/libreport/plugins/bugzilla_format_kernel.conf",
+        "data": {}
+    },
+    "/etc/libreport/plugins/bugzilla_format_analyzer_libreport.conf": {
+        "filename": "bugzilla_format_analyzer_libreport.conf",
+        "path": "/etc/libreport/plugins/bugzilla_format_analyzer_libreport.conf",
+        "data": {}
+    },
+    "/etc/libreport/plugins/mantisbt_format_analyzer_libreport.conf": {
+        "filename": "mantisbt_format_analyzer_libreport.conf",
+        "path": "/etc/libreport/plugins/mantisbt_format_analyzer_libreport.conf",
+        "data": {}
+    },
+    "/etc/libreport/plugins/ureport.conf": {
+        "filename": "ureport.conf",
+        "path": "/etc/libreport/plugins/ureport.conf",
+        "data": {}
+    },
+    "/etc/libreport/events.d/bugzilla_anaconda_event.conf": {
+        "filename": "bugzilla_anaconda_event.conf",
+        "path": "/etc/libreport/events.d/bugzilla_anaconda_event.conf",
+        "data": {
+            "EVENT": "report_Bugzilla component=anaconda"
+        }
+    },
+    "/etc/libreport/events.d/bugzilla_event.conf": {
+        "filename": "bugzilla_event.conf",
+        "path": "/etc/libreport/events.d/bugzilla_event.conf",
+        "data": {
+            "EVENT": "report_Bugzilla analyzer=libreport"
+        }
+    },
+    "/etc/libreport/events.d/rhtsupport_event.conf": {
+        "filename": "rhtsupport_event.conf",
+        "path": "/etc/libreport/events.d/rhtsupport_event.conf",
+        "data": {
+            "EVENT": "report_RHTSupport"
+        }
+    },
+    "/etc/libreport/events.d/collect_dnf.conf": {
+        "filename": "collect_dnf.conf",
+        "path": "/etc/libreport/events.d/collect_dnf.conf",
+        "data": {
+            "EVENT": "notify component=dnf",
+            "new_name": "${log//\\//_}",
+            "logs": "`find /var/cache/dnf -iname '*.log'`",
+            "journalctl _SYSTEMD_UNIT": "dnf-makecache.service &>dnf-makecache.log",
+            "username": "`cat username`",
+            "if [[ $username !": " \"root\" ]]; then"
+        }
+    },
+    "/etc/libreport/events.d/emergencyanalysis_event.conf": {
+        "filename": "emergencyanalysis_event.conf",
+        "path": "/etc/libreport/events.d/emergencyanalysis_event.conf",
+        "data": {
+            "EVENT": "report_EmergencyAnalysis",
+            "EXCLUDE_FROM_REPORT": "\"\" reporter-upload 1>/dev/null"
+        }
+    },
+    "/etc/libreport/events.d/print_event.conf": {
+        "filename": "print_event.conf",
+        "path": "/etc/libreport/events.d/print_event.conf",
+        "data": {
+            "EVENT": "report_Logger"
+        }
+    },
+    "/etc/libreport/events.d/blivet-gui_event.conf": {
+        "filename": "blivet-gui_event.conf",
+        "path": "/etc/libreport/events.d/blivet-gui_event.conf",
+        "data": {
+            "EVENT": "notify component=blivet-gui"
+        }
+    },
+    "/etc/libreport/events.d/uploader_event.conf": {
+        "filename": "uploader_event.conf",
+        "path": "/etc/libreport/events.d/uploader_event.conf",
+        "data": {
+            "EVENT": "report_Uploader reporter-upload"
+        }
+    },
+    "/etc/resolv.conf": {
+        "filename": "resolv.conf",
+        "path": "/etc/resolv.conf",
+        "data": {}
+    },
+    "/etc/udev/udev.conf": {
+        "filename": "udev.conf",
+        "path": "/etc/udev/udev.conf",
+        "data": {}
+    },
+    "/etc/named.conf": {
+        "filename": "named.conf",
+        "path": "/etc/named.conf",
+        "data": {}
+    },
+    "/etc/cgsnapshot_blacklist.conf": {
+        "filename": "cgsnapshot_blacklist.conf",
+        "path": "/etc/cgsnapshot_blacklist.conf",
+        "data": {}
+    },
+    "/etc/setroubleshoot/setroubleshoot.conf": {
+        "filename": "setroubleshoot.conf",
+        "path": "/etc/setroubleshoot/setroubleshoot.conf",
+        "data": {
+            "client_users ": " *",
+            "fix_cmd_users ": " root",
+            "binary_protocol_socket_path ": " /var/run/audit_events",
+            "text_protocol_socket_path ": " /var/run/audispd_events",
+            "retry_interval ": " 60",
+            "path ": " /var/run/setroubleshoot/setroubleshoot_server",
+            "address_list ": " {unix}%(path)s hostname",
+            "default_port ": " 69783",
+            "database_dir ": " /var/lib/setroubleshoot",
+            "filename ": " setroubleshoot",
+            "max_alerts ": " 50",
+            "max_alert_age ": "",
+            "smtp_host ": " localhost",
+            "smtp_port ": " 25",
+            "from_address ": " SELinux_Troubleshoot",
+            "subject ": " SELinux AVC Alert",
+            "recipients_filepath ": " /var/lib/setroubleshoot/email_alert_recipients",
+            "pid_file ": " /var/run/setroubleshootd.pid",
+            "project_url ": " https://pagure.io/setroubleshoot",
+            "help_url ": " https://pagure.io/docs/setroubleshoot/",
+            "bug_report_url ": " http://bugzilla.redhat.com/bugzilla/enter_bug.cgi",
+            "web_browser_launcher ": " /usr/bin/xdg-open",
+            "plugin_dir ": " /usr/share/setroubleshoot/plugins",
+            "level ": " warning",
+            "log_full_report ": " True"
+        }
+    },
+    "/etc/sestatus.conf": {
+        "filename": "sestatus.conf",
+        "path": "/etc/sestatus.conf",
+        "data": {}
+    },
+    "/etc/fonts/fonts.conf": {
+        "filename": "fonts.conf",
+        "path": "/etc/fonts/fonts.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>",
+            "<dir prefix": "\"xdg\">fonts</dir>",
+            "<match target": "\"pattern\">",
+            "<test qual": "\"any\" name=\"family\">",
+            "<edit name": "\"family\" mode=\"assign\" binding=\"same\">",
+            "<include ignore_missing": "\"yes\">conf.d</include>",
+            "<cachedir prefix": "\"xdg\">fontconfig</cachedir>"
+        }
+    },
+    "/etc/fonts/conf.d/60-generic.conf": {
+        "filename": "60-generic.conf",
+        "path": "/etc/fonts/conf.d/60-generic.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>",
+            "<test name": "\"lang\">",
+            "<test qual": "\"all\" name=\"color\" compare=\"not_eq\">",
+            "<edit name": "\"color\" mode=\"append\">",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/59-lohit-devanagari.conf": {
+        "filename": "59-lohit-devanagari.conf",
+        "path": "/etc/fonts/conf.d/59-lohit-devanagari.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/61-stix.conf": {
+        "filename": "61-stix.conf",
+        "path": "/etc/fonts/conf.d/61-stix.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/61-urw-c059.conf": {
+        "filename": "61-urw-c059.conf",
+        "path": "/etc/fonts/conf.d/61-urw-c059.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/20-unhint-small-dejavu-lgc-serif.conf": {
+        "filename": "20-unhint-small-dejavu-lgc-serif.conf",
+        "path": "/etc/fonts/conf.d/20-unhint-small-dejavu-lgc-serif.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<match target": "\"font\">",
+            "<test name": "\"family\">",
+            "<test compare": "\"less\" name=\"pixelsize\">",
+            "<edit name": "\"hinting\">"
+        }
+    },
+    "/etc/fonts/conf.d/10-hinting-slight.conf": {
+        "filename": "10-hinting-slight.conf",
+        "path": "/etc/fonts/conf.d/10-hinting-slight.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>",
+            "<match target": "\"pattern\">",
+            "<edit name": "\"hintstyle\" mode=\"append\"><const>hintslight</const></edit>"
+        }
+    },
+    "/etc/fonts/conf.d/65-0-jomolhari.conf": {
+        "filename": "65-0-jomolhari.conf",
+        "path": "/etc/fonts/conf.d/65-0-jomolhari.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<test name": "\"lang\">",
+            "<edit name": "\"family\" mode=\"prepend\">",
+            "<match target": "\"font\">"
+        }
+    },
+    "/etc/fonts/conf.d/59-liberation-mono.conf": {
+        "filename": "59-liberation-mono.conf",
+        "path": "/etc/fonts/conf.d/59-liberation-mono.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/20-unhint-small-dejavu-lgc-sans.conf": {
+        "filename": "20-unhint-small-dejavu-lgc-sans.conf",
+        "path": "/etc/fonts/conf.d/20-unhint-small-dejavu-lgc-sans.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<match target": "\"font\">",
+            "<test name": "\"family\">",
+            "<test compare": "\"less\" name=\"pixelsize\">",
+            "<edit name": "\"hinting\">"
+        }
+    },
+    "/etc/fonts/conf.d/20-unhint-small-dejavu-lgc-sans-mono.conf": {
+        "filename": "20-unhint-small-dejavu-lgc-sans-mono.conf",
+        "path": "/etc/fonts/conf.d/20-unhint-small-dejavu-lgc-sans-mono.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<match target": "\"font\">",
+            "<test name": "\"family\">",
+            "<test compare": "\"less\" name=\"pixelsize\">",
+            "<edit name": "\"hinting\">"
+        }
+    },
+    "/etc/fonts/conf.d/61-urw-p052.conf": {
+        "filename": "61-urw-p052.conf",
+        "path": "/etc/fonts/conf.d/61-urw-p052.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/65-0-lohit-assamese.conf": {
+        "filename": "65-0-lohit-assamese.conf",
+        "path": "/etc/fonts/conf.d/65-0-lohit-assamese.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<test name": "\"lang\" compare=\"contains\">",
+            "<edit name": "\"family\" mode=\"prepend\">",
+            "<match target": "\"font\">"
+        }
+    },
+    "/etc/fonts/conf.d/65-0-lohit-tamil.conf": {
+        "filename": "65-0-lohit-tamil.conf",
+        "path": "/etc/fonts/conf.d/65-0-lohit-tamil.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<test name": "\"lang\" compare=\"contains\">",
+            "<edit name": "\"family\" mode=\"prepend\">",
+            "<match target": "\"font\">"
+        }
+    },
+    "/etc/fonts/conf.d/61-urw-fallback-backwards.conf": {
+        "filename": "61-urw-fallback-backwards.conf",
+        "path": "/etc/fonts/conf.d/61-urw-fallback-backwards.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "": "===================  =============================================",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/60-latin.conf": {
+        "filename": "60-latin.conf",
+        "path": "/etc/fonts/conf.d/60-latin.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>"
+        }
+    },
+    "/etc/fonts/conf.d/20-unhint-small-dejavu-sans.conf": {
+        "filename": "20-unhint-small-dejavu-sans.conf",
+        "path": "/etc/fonts/conf.d/20-unhint-small-dejavu-sans.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<match target": "\"font\">",
+            "<test name": "\"family\">",
+            "<test compare": "\"less\" name=\"pixelsize\">",
+            "<edit name": "\"hinting\">"
+        }
+    },
+    "/etc/fonts/conf.d/90-synthetic.conf": {
+        "filename": "90-synthetic.conf",
+        "path": "/etc/fonts/conf.d/90-synthetic.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>",
+            "<match target": "\"font\">",
+            "<test name": "\"slant\">",
+            "<test target": "\"pattern\" name=\"slant\" compare=\"not_eq\">",
+            "<edit name": "\"matrix\" mode=\"assign\">"
+        }
+    },
+    "/etc/fonts/conf.d/61-urw-nimbus-roman.conf": {
+        "filename": "61-urw-nimbus-roman.conf",
+        "path": "/etc/fonts/conf.d/61-urw-nimbus-roman.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/gnu-free-sans-fonts.conf": {
+        "filename": "gnu-free-sans-fonts.conf",
+        "path": "/etc/fonts/conf.d/gnu-free-sans-fonts.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<match target": "\"scan\">",
+            "<test name": "\"family\">",
+            "<edit name": "\"lang\" mode=\"assign\">"
+        }
+    },
+    "/etc/fonts/conf.d/58-dejavu-lgc-sans-mono.conf": {
+        "filename": "58-dejavu-lgc-sans-mono.conf",
+        "path": "/etc/fonts/conf.d/58-dejavu-lgc-sans-mono.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/61-urw-standard-symbols-ps.conf": {
+        "filename": "61-urw-standard-symbols-ps.conf",
+        "path": "/etc/fonts/conf.d/61-urw-standard-symbols-ps.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/gnu-free-serif-fonts.conf": {
+        "filename": "gnu-free-serif-fonts.conf",
+        "path": "/etc/fonts/conf.d/gnu-free-serif-fonts.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<match target": "\"scan\">",
+            "<test name": "\"family\">",
+            "<edit name": "\"lang\" mode=\"assign\">"
+        }
+    },
+    "/etc/fonts/conf.d/58-dejavu-lgc-serif.conf": {
+        "filename": "58-dejavu-lgc-serif.conf",
+        "path": "/etc/fonts/conf.d/58-dejavu-lgc-serif.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/49-sansserif.conf": {
+        "filename": "49-sansserif.conf",
+        "path": "/etc/fonts/conf.d/49-sansserif.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>",
+            "<match target": "\"pattern\">",
+            "<test qual": "\"all\" name=\"family\" compare=\"not_eq\">",
+            "<edit name": "\"family\" mode=\"append_last\">"
+        }
+    },
+    "/etc/fonts/conf.d/61-julietaula-montserrat.conf": {
+        "filename": "61-julietaula-montserrat.conf",
+        "path": "/etc/fonts/conf.d/61-julietaula-montserrat.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>"
+        }
+    },
+    "/etc/fonts/conf.d/65-0-lohit-gujarati.conf": {
+        "filename": "65-0-lohit-gujarati.conf",
+        "path": "/etc/fonts/conf.d/65-0-lohit-gujarati.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<test name": "\"lang\" compare=\"contains\">",
+            "<edit name": "\"family\" mode=\"prepend\">",
+            "<match target": "\"font\">"
+        }
+    },
+    "/etc/fonts/conf.d/58-dejavu-lgc-sans.conf": {
+        "filename": "58-dejavu-lgc-sans.conf",
+        "path": "/etc/fonts/conf.d/58-dejavu-lgc-sans.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/61-urw-z003.conf": {
+        "filename": "61-urw-z003.conf",
+        "path": "/etc/fonts/conf.d/61-urw-z003.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/57-dejavu-serif.conf": {
+        "filename": "57-dejavu-serif.conf",
+        "path": "/etc/fonts/conf.d/57-dejavu-serif.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/65-fonts-persian.conf": {
+        "filename": "65-fonts-persian.conf",
+        "path": "/etc/fonts/conf.d/65-fonts-persian.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>",
+            "<alias binding": "\"same\">",
+            "<match target": "\"scan\">",
+            "<test name": "\"family\" compare=\"eq\" ignore-blanks=\"true\">",
+            "<edit name": "\"foundry\">",
+            "<test target": "\"pattern\" name=\"slant\" compare=\"not_eq\">"
+        }
+    },
+    "/etc/fonts/conf.d/57-dejavu-sans.conf": {
+        "filename": "57-dejavu-sans.conf",
+        "path": "/etc/fonts/conf.d/57-dejavu-sans.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/45-generic.conf": {
+        "filename": "45-generic.conf",
+        "path": "/etc/fonts/conf.d/45-generic.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>",
+            "<alias binding": "\"same\">",
+            "<test name": "\"family\">",
+            "<edit name": "\"lang\" mode=\"prepend\">",
+            "<test qual": "\"all\" name=\"family\" compare=\"not_eq\">"
+        }
+    },
+    "/etc/fonts/conf.d/59-liberation-serif.conf": {
+        "filename": "59-liberation-serif.conf",
+        "path": "/etc/fonts/conf.d/59-liberation-serif.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/65-0-paktype-naskh-basic.conf": {
+        "filename": "65-0-paktype-naskh-basic.conf",
+        "path": "/etc/fonts/conf.d/65-0-paktype-naskh-basic.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<test name": "\"lang\">",
+            "<edit name": "\"family\" mode=\"prepend\">"
+        }
+    },
+    "/etc/fonts/conf.d/61-urw-nimbus-sans.conf": {
+        "filename": "61-urw-nimbus-sans.conf",
+        "path": "/etc/fonts/conf.d/61-urw-nimbus-sans.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/65-google-droid-sans.conf": {
+        "filename": "65-google-droid-sans.conf",
+        "path": "/etc/fonts/conf.d/65-google-droid-sans.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<match target": "\"scan\">",
+            "<test name": "\"family\">",
+            "<edit name": "\"fontversion\">",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/25-no-bitmap-fedora.conf": {
+        "filename": "25-no-bitmap-fedora.conf",
+        "path": "/etc/fonts/conf.d/25-no-bitmap-fedora.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<match target": "\"font\">",
+            "<test name": "\"family\" compare=\"eq\">",
+            "<edit name": "\"embeddedbitmap\" mode=\"assign\">"
+        }
+    },
+    "/etc/fonts/conf.d/59-liberation-sans.conf": {
+        "filename": "59-liberation-sans.conf",
+        "path": "/etc/fonts/conf.d/59-liberation-sans.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/30-lohit-gurmukhi.conf": {
+        "filename": "30-lohit-gurmukhi.conf",
+        "path": "/etc/fonts/conf.d/30-lohit-gurmukhi.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/31-cantarell.conf": {
+        "filename": "31-cantarell.conf",
+        "path": "/etc/fonts/conf.d/31-cantarell.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<match target": "\"pattern\">",
+            "<test qual": "\"any\" name=\"family\">",
+            "<edit name": "\"family\" mode=\"assign\" binding=\"weak\">"
+        }
+    },
+    "/etc/fonts/conf.d/20-unhint-small-dejavu-sans-mono.conf": {
+        "filename": "20-unhint-small-dejavu-sans-mono.conf",
+        "path": "/etc/fonts/conf.d/20-unhint-small-dejavu-sans-mono.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<match target": "\"font\">",
+            "<test name": "\"family\">",
+            "<test compare": "\"less\" name=\"pixelsize\">",
+            "<edit name": "\"hinting\">"
+        }
+    },
+    "/etc/fonts/conf.d/65-0-lohit-bengali.conf": {
+        "filename": "65-0-lohit-bengali.conf",
+        "path": "/etc/fonts/conf.d/65-0-lohit-bengali.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<test name": "\"lang\" compare=\"contains\">",
+            "<edit name": "\"family\" mode=\"prepend\">",
+            "<match target": "\"font\">"
+        }
+    },
+    "/etc/fonts/conf.d/20-unhint-small-vera.conf": {
+        "filename": "20-unhint-small-vera.conf",
+        "path": "/etc/fonts/conf.d/20-unhint-small-vera.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>",
+            "<match target": "\"font\">",
+            "<test name": "\"family\" compare=\"eq\" ignore-blanks=\"true\">",
+            "<edit name": "\"hinting\">"
+        }
+    },
+    "/etc/fonts/conf.d/65-0-lohit-gurmukhi.conf": {
+        "filename": "65-0-lohit-gurmukhi.conf",
+        "path": "/etc/fonts/conf.d/65-0-lohit-gurmukhi.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<test name": "\"lang\" compare=\"contains\">",
+            "<edit name": "\"family\" mode=\"prepend\">",
+            "<match target": "\"font\">"
+        }
+    },
+    "/etc/fonts/conf.d/45-latin.conf": {
+        "filename": "45-latin.conf",
+        "path": "/etc/fonts/conf.d/45-latin.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>"
+        }
+    },
+    "/etc/fonts/conf.d/66-sil-nuosu.conf": {
+        "filename": "66-sil-nuosu.conf",
+        "path": "/etc/fonts/conf.d/66-sil-nuosu.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>"
+        }
+    },
+    "/etc/fonts/conf.d/40-nonlatin.conf": {
+        "filename": "40-nonlatin.conf",
+        "path": "/etc/fonts/conf.d/40-nonlatin.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>"
+        }
+    },
+    "/etc/fonts/conf.d/65-nonlatin.conf": {
+        "filename": "65-nonlatin.conf",
+        "path": "/etc/fonts/conf.d/65-nonlatin.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>"
+        }
+    },
+    "/etc/fonts/conf.d/69-unifont.conf": {
+        "filename": "69-unifont.conf",
+        "path": "/etc/fonts/conf.d/69-unifont.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>"
+        }
+    },
+    "/etc/fonts/conf.d/51-local.conf": {
+        "filename": "51-local.conf",
+        "path": "/etc/fonts/conf.d/51-local.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>",
+            "<include ignore_missing": "\"yes\">local.conf</include>"
+        }
+    },
+    "/etc/fonts/conf.d/65-0-lohit-telugu.conf": {
+        "filename": "65-0-lohit-telugu.conf",
+        "path": "/etc/fonts/conf.d/65-0-lohit-telugu.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<test name": "\"lang\" compare=\"contains\">",
+            "<edit name": "\"family\" mode=\"prepend\">"
+        }
+    },
+    "/etc/fonts/conf.d/20-unhint-small-dejavu-serif.conf": {
+        "filename": "20-unhint-small-dejavu-serif.conf",
+        "path": "/etc/fonts/conf.d/20-unhint-small-dejavu-serif.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<match target": "\"font\">",
+            "<test name": "\"family\">",
+            "<test compare": "\"less\" name=\"pixelsize\">",
+            "<edit name": "\"hinting\">"
+        }
+    },
+    "/etc/fonts/conf.d/10-scale-bitmap-fonts.conf": {
+        "filename": "10-scale-bitmap-fonts.conf",
+        "path": "/etc/fonts/conf.d/10-scale-bitmap-fonts.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>",
+            "Note that color bitmap fonts have scalable": "true, while",
+            "non-color ones have scalable": "false.  Both groups have outline=false.",
+            "<match target": "\"font\">",
+            "<test name": "\"outline\" compare=\"eq\">",
+            "<edit name": "\"pixelsizefixupfactor\" mode=\"assign\">",
+            "<name target": "\"pattern\">pixelsize</name>"
+        }
+    },
+    "/etc/fonts/conf.d/61-urw-nimbus-mono-ps.conf": {
+        "filename": "61-urw-nimbus-mono-ps.conf",
+        "path": "/etc/fonts/conf.d/61-urw-nimbus-mono-ps.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/30-lohit-odia.conf": {
+        "filename": "30-lohit-odia.conf",
+        "path": "/etc/fonts/conf.d/30-lohit-odia.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/30-metric-aliases.conf": {
+        "filename": "30-metric-aliases.conf",
+        "path": "/etc/fonts/conf.d/30-metric-aliases.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>",
+            "": "=====================  ==================  =================  ==================",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/65-1-lohit-devanagari.conf": {
+        "filename": "65-1-lohit-devanagari.conf",
+        "path": "/etc/fonts/conf.d/65-1-lohit-devanagari.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<test name": "\"lang\" compare=\"contains\">",
+            "<edit name": "\"family\" mode=\"prepend\">"
+        }
+    },
+    "/etc/fonts/conf.d/65-0-google-noto-serif-cjk-ttc.conf": {
+        "filename": "65-0-google-noto-serif-cjk-ttc.conf",
+        "path": "/etc/fonts/conf.d/65-0-google-noto-serif-cjk-ttc.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<test name": "\"lang\">",
+            "<edit name": "\"family\" mode=\"prepend\">"
+        }
+    },
+    "/etc/fonts/conf.d/65-sil-padauk.conf": {
+        "filename": "65-sil-padauk.conf",
+        "path": "/etc/fonts/conf.d/65-sil-padauk.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>"
+        }
+    },
+    "/etc/fonts/conf.d/80-delicious.conf": {
+        "filename": "80-delicious.conf",
+        "path": "/etc/fonts/conf.d/80-delicious.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>",
+            "<match target": "\"scan\">",
+            "<test name": "\"family\" compare=\"eq\" ignore-blanks=\"true\">",
+            "<edit name": "\"weight\">"
+        }
+    },
+    "/etc/fonts/conf.d/61-urw-bookman.conf": {
+        "filename": "61-urw-bookman.conf",
+        "path": "/etc/fonts/conf.d/61-urw-bookman.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/50-user.conf": {
+        "filename": "50-user.conf",
+        "path": "/etc/fonts/conf.d/50-user.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>",
+            "<include ignore_missing": "\"yes\" prefix=\"xdg\">fontconfig/conf.d</include>"
+        }
+    },
+    "/etc/fonts/conf.d/65-0-google-noto-sans-cjk-ttc.conf": {
+        "filename": "65-0-google-noto-sans-cjk-ttc.conf",
+        "path": "/etc/fonts/conf.d/65-0-google-noto-sans-cjk-ttc.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<test name": "\"lang\">",
+            "<edit name": "\"family\" mode=\"prepend\">"
+        }
+    },
+    "/etc/fonts/conf.d/65-0-lohit-odia.conf": {
+        "filename": "65-0-lohit-odia.conf",
+        "path": "/etc/fonts/conf.d/65-0-lohit-odia.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<test name": "\"lang\" compare=\"contains\">",
+            "<edit name": "\"family\" mode=\"prepend\">",
+            "<match target": "\"font\">"
+        }
+    },
+    "/etc/fonts/conf.d/61-urw-gothic.conf": {
+        "filename": "61-urw-gothic.conf",
+        "path": "/etc/fonts/conf.d/61-urw-gothic.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/61-adobe-source-code-pro.conf": {
+        "filename": "61-adobe-source-code-pro.conf",
+        "path": "/etc/fonts/conf.d/61-adobe-source-code-pro.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>"
+        }
+    },
+    "/etc/fonts/conf.d/57-dejavu-sans-mono.conf": {
+        "filename": "57-dejavu-sans-mono.conf",
+        "path": "/etc/fonts/conf.d/57-dejavu-sans-mono.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/61-urw-d050000l.conf": {
+        "filename": "61-urw-d050000l.conf",
+        "path": "/etc/fonts/conf.d/61-urw-d050000l.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<alias binding": "\"same\">"
+        }
+    },
+    "/etc/fonts/conf.d/65-0-lohit-kannada.conf": {
+        "filename": "65-0-lohit-kannada.conf",
+        "path": "/etc/fonts/conf.d/65-0-lohit-kannada.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<test name": "\"lang\" compare=\"contains\">",
+            "<edit name": "\"family\" mode=\"prepend\">",
+            "<match target": "\"font\">"
+        }
+    },
+    "/etc/fonts/conf.d/gnu-free-mono-fonts.conf": {
+        "filename": "gnu-free-mono-fonts.conf",
+        "path": "/etc/fonts/conf.d/gnu-free-mono-fonts.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>"
+        }
+    },
+    "/etc/fonts/conf.d/25-unhint-nonlatin.conf": {
+        "filename": "25-unhint-nonlatin.conf",
+        "path": "/etc/fonts/conf.d/25-unhint-nonlatin.conf",
+        "data": {
+            "<?xml version": "\"1.0\"?>",
+            "<its:rules xmlns:its": "\"http://www.w3.org/2005/11/its\" version=\"1.0\">",
+            "<its:translateRule translate": "\"no\" selector=\"/fontconfig/*[not(self::description)]\"/>",
+            "<match target": "\"font\">",
+            "<test name": "\"family\" compare=\"eq\" ignore-blanks=\"true\">",
+            "<edit name": "\"hinting\" mode=\"assign\">"
+        }
+    },
+    "/etc/fonts/conf.d/66-sil-abyssinica.conf": {
+        "filename": "66-sil-abyssinica.conf",
+        "path": "/etc/fonts/conf.d/66-sil-abyssinica.conf",
+        "data": {
+            "<?xml version": "\"1.0\" encoding=\"UTF-8\"?>",
+            "<match target": "\"font\">",
+            "<test name": "\"family\" ignore-blanks=\"yes\">",
+            "<edit name": "\"autohint\" mode=\"assign\">"
+        }
+    },
+    "/etc/udisks2/udisks2.conf": {
+        "filename": "udisks2.conf",
+        "path": "/etc/udisks2/udisks2.conf",
+        "data": {
+            "modules": "*",
+            "modules_load_preference": "ondemand",
+            "encryption": "luks1"
+        }
+    },
+    "/etc/kdump.conf": {
+        "filename": "kdump.conf",
+        "path": "/etc/kdump.conf",
+        "data": {}
+    },
+    "/etc/logrotate.conf": {
+        "filename": "logrotate.conf",
+        "path": "/etc/logrotate.conf",
+        "data": {}
+    },
+    "/etc/sysctl.d/99-sysctl.conf": {
+        "filename": "99-sysctl.conf",
+        "path": "/etc/sysctl.d/99-sysctl.conf",
+        "data": {
+            "kernel.sysrq": "0",
+            "net.ipv4.ip_forward": "0",
+            "net.ipv4.conf.all.send_redirects": "0",
+            "net.ipv4.conf.default.send_redirects": "0",
+            "net.ipv4.conf.all.accept_source_route": "0",
+            "net.ipv4.conf.default.accept_source_route": "0",
+            "net.ipv4.conf.all.accept_redirects": "0",
+            "net.ipv4.conf.default.accept_redirects": "0",
+            "net.ipv4.conf.all.secure_redirects": "0",
+            "net.ipv4.conf.default.secure_redirects": "0",
+            "net.ipv4.icmp_echo_ignore_broadcasts": "1",
+            "net.ipv4.icmp_ignore_bogus_error_responses": "1",
+            "net.ipv4.conf.all.rp_filter": "1",
+            "net.ipv4.conf.default.rp_filter": "1",
+            "net.ipv4.tcp_syncookies": "1",
+            "kernel.dmesg_restrict": "1",
+            "net.ipv6.conf.all.accept_redirects": "0",
+            "net.ipv6.conf.default.accept_redirects": "0"
+        }
+    },
+    "/etc/my.cnf": {
+        "filename": "my.cnf",
+        "path": "/etc/my.cnf",
+        "data": {
+            "pid-file": "/data/mysql/run/mysqld.pid",
+            "default-character-set": "utf8",
+            "socket": "/data/mysql/run/mysql.sock",
+            "server-id": "1",
+            "log-error": "/data/mysql/log/mysql.log",
+            "tmpdir": "/data/mysql/tmp",
+            "datadir": "/data/mysql/data",
+            "default_authentication_plugin": "mysql_native_password",
+            "port": "3306",
+            "user": "root",
+            "max_connections": "2000",
+            "back_log": "4000",
+            "performance_schema": "OFF",
+            "max_prepared_stmt_count": "128000",
+            "innodb_log_file_size": "1268M",
+            "innodb_log_files_in_group": "19",
+            "innodb_open_files": "10000",
+            "table_open_cache_instances": "64",
+            "innodb_buffer_pool_size": "230G",
+            "innodb_buffer_pool_instances": "19",
+            "innodb_log_buffer_size": "1457M",
+            "default_time_zone": "+8:00",
+            "thread_cache_size": "2000",
+            "sync_binlog": "3",
+            "innodb_flush_log_at_trx_commit": "2",
+            "innodb_use_native_aio": "1",
+            "innodb_spin_wait_delay": "176",
+            "innodb_sync_spin_loops": "43",
+            "innodb_flush_method": "O_DIRECT",
+            "innodb_io_capacity": "38660",
+            "innodb_io_capacity_max": "40000",
+            "innodb_lru_scan_depth": "5046",
+            "innodb_page_cleaners": "22",
+            "innodb_spin_wait_pause_multiplier": "25",
+            "innodb_flush_neighbors": "0",
+            "innodb_write_io_threads": "5",
+            "innodb_read_io_threads": "3",
+            "innodb_purge_threads": "32",
+            "sql_mode": "STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION,NO_AUTO_VALUE_ON_ZERO,STRICT_ALL_TABLES",
+            "log-bin": "mysql-bin",
+            "ssl": "0",
+            "table_open_cache": "30000",
+            "max_connect_errors": "2000",
+            "innodb_adaptive_hash_index": "0",
+            "mysqlx": "0"
+        }
+    },
+    "/etc/security/pwquality.conf": {
+        "filename": "pwquality.conf",
+        "path": "/etc/security/pwquality.conf",
+        "data": {
+            "minlen ": " 8",
+            "dcredit ": " 0",
+            "ucredit ": " 0",
+            "lcredit ": " 0",
+            "ocredit ": " 0",
+            "minclass ": " 3"
+        }
+    },
+    "/etc/security/access.conf": {
+        "filename": "access.conf",
+        "path": "/etc/security/access.conf",
+        "data": {}
+    },
+    "/etc/security/group.conf": {
+        "filename": "group.conf",
+        "path": "/etc/security/group.conf",
+        "data": {}
+    },
+    "/etc/security/time.conf": {
+        "filename": "time.conf",
+        "path": "/etc/security/time.conf",
+        "data": {}
+    },
+    "/etc/security/sepermit.conf": {
+        "filename": "sepermit.conf",
+        "path": "/etc/security/sepermit.conf",
+        "data": {}
+    },
+    "/etc/security/namespace.conf": {
+        "filename": "namespace.conf",
+        "path": "/etc/security/namespace.conf",
+        "data": {}
+    },
+    "/etc/security/pam_env.conf": {
+        "filename": "pam_env.conf",
+        "path": "/etc/security/pam_env.conf",
+        "data": {}
+    },
+    "/etc/security/limits.conf": {
+        "filename": "limits.conf",
+        "path": "/etc/security/limits.conf",
+        "data": {}
+    },
+    "/etc/security/faillock.conf": {
+        "filename": "faillock.conf",
+        "path": "/etc/security/faillock.conf",
+        "data": {}
+    },
+    "/etc/init/ttyS0.conf": {
+        "filename": "ttyS0.conf",
+        "path": "/etc/init/ttyS0.conf",
+        "data": {
+            "start on stopped rc RUNLEVEL": "[2345] and (",
+            "container CONTAINER": "lxc or"
+        }
+    },
+    "/etc/init/kpatch.conf": {
+        "filename": "kpatch.conf",
+        "path": "/etc/init/kpatch.conf",
+        "data": {
+            "grep -q \"kpatch.enable": "0\" /proc/cmdline && exit 1",
+            "dmesg | grep -q \"Command line.*kpatch.enable": "0\" && exit 1"
+        }
+    },
+    "/etc/firewalld/firewalld-standard.conf": {
+        "filename": "firewalld-standard.conf",
+        "path": "/etc/firewalld/firewalld-standard.conf",
+        "data": {
+            "DefaultZone": "public",
+            "MinimalMark": "100",
+            "CleanupOnExit": "yes",
+            "Lockdown": "no",
+            "IPv6_rpfilter": "yes",
+            "IndividualCalls": "no",
+            "LogDenied": "off",
+            "AutomaticHelpers": "system"
+        }
+    },
+    "/etc/firewalld/firewalld.conf": {
+        "filename": "firewalld.conf",
+        "path": "/etc/firewalld/firewalld.conf",
+        "data": {
+            "DefaultZone": "public",
+            "MinimalMark": "100",
+            "CleanupOnExit": "yes",
+            "Lockdown": "no",
+            "IPv6_rpfilter": "yes",
+            "IndividualCalls": "no",
+            "LogDenied": "off",
+            "AutomaticHelpers": "system"
+        }
+    },
+    "/etc/gtk-3.0/im-multipress.conf": {
+        "filename": "im-multipress.conf",
+        "path": "/etc/gtk-3.0/im-multipress.conf",
+        "data": {
+            "KP_1 ": " .;,;?;!;';\";1;-;(;);@;/;:;_",
+            "KP_2 ": " a;b;c;2;\u00e4;\u00e0;\u00e1;\u00e3;\u00e2;\u00e5;\u00e6;\u00e7",
+            "KP_3 ": " d;e;f;3;\u00e8;\u00e9;\u00eb;\u00ea;\u00f0",
+            "KP_4 ": " g;h;i;4;\u00ec;\u00ed;\u00ee;\u00ef",
+            "KP_5 ": " j;k;l;5;\u00a3",
+            "KP_6 ": " m;n;o;6;\u00f6;\u00f2;\u00f3;\u00f4;\u00f5;\u00f8;\u00f1",
+            "KP_7 ": " p;q;r;s;7;\u00df;$",
+            "KP_8 ": " t;u;v;8;\u00fc;\u00f9;\u00fa;\u00fb",
+            "KP_9 ": " w;x;y;z;9;\u00fd;\u00fe",
+            "KP_0 ": " \\s;0"
+        }
+    },
+    "/etc/tcsd.conf": {
+        "filename": "tcsd.conf",
+        "path": "/etc/tcsd.conf",
+        "data": {}
+    },
+    "/etc/freetds.conf": {
+        "filename": "freetds.conf",
+        "path": "/etc/freetds.conf",
+        "data": {
+            "tds version ": " auto",
+            ";dump file ": " /tmp/freetds.log",
+            ";debug flags ": " 0xffff",
+            ";timeout ": " 10",
+            ";connect timeout ": " 10",
+            "text size ": " 64512",
+            "host ": " symachine.domain.com",
+            "port ": " 5000"
+        }
+    },
+    "/etc/fuse.conf": {
+        "filename": "fuse.conf",
+        "path": "/etc/fuse.conf",
+        "data": {}
+    },
+    "/etc/wpa_supplicant/wpa_supplicant.conf": {
+        "filename": "wpa_supplicant.conf",
+        "path": "/etc/wpa_supplicant/wpa_supplicant.conf",
+        "data": {
+            "ctrl_interface": "/var/run/wpa_supplicant",
+            "ctrl_interface_group": "wheel"
+        }
+    },
+    "/etc/gssproxy/24-nfs-server.conf": {
+        "filename": "24-nfs-server.conf",
+        "path": "/etc/gssproxy/24-nfs-server.conf",
+        "data": {
+            "mechs ": " krb5",
+            "socket ": " /run/gssproxy.sock",
+            "cred_store ": " keytab:/etc/krb5.keytab",
+            "trusted ": " yes",
+            "kernel_nfsd ": " yes",
+            "euid ": " 0"
+        }
+    },
+    "/etc/gssproxy/gssproxy.conf": {
+        "filename": "gssproxy.conf",
+        "path": "/etc/gssproxy/gssproxy.conf",
+        "data": {}
+    },
+    "/etc/gssproxy/99-nfs-client.conf": {
+        "filename": "99-nfs-client.conf",
+        "path": "/etc/gssproxy/99-nfs-client.conf",
+        "data": {
+            "mechs ": " krb5",
+            "cred_store ": " keytab:/etc/krb5.keytab",
+            "cred_usage ": " initiate",
+            "allow_any_uid ": " yes",
+            "trusted ": " yes",
+            "euid ": " 0"
+        }
+    },
+    "/etc/bluetooth/main.conf": {
+        "filename": "main.conf",
+        "path": "/etc/bluetooth/main.conf",
+        "data": {
+            "AutoEnable": "true"
+        }
+    },
+    "/etc/host.conf": {
+        "filename": "host.conf",
+        "path": "/etc/host.conf",
+        "data": {}
+    },
+    "/etc/warnquota.conf": {
+        "filename": "warnquota.conf",
+        "path": "/etc/warnquota.conf",
+        "data": {
+            "MAIL_CMD ": " \"/bin/echo\"",
+            "FROM ": " \"bas@example.com\"",
+            "SUBJECT ": " Hey, user, clean up your account!",
+            "CC_TO ": " \"sysadm@example.com\"",
+            "SUPPORT ": " \"support@example.com\"",
+            "PHONE ": " \"(123) 456-1111 or (222) 333-4444\"",
+            "MESSAGE         ": " Hello user %i, I've noticed you use too much space\\",
+            "SIGNATURE": " See you!|Your admin of %h|",
+            "GROUP_MESSAGE": " Hello,|\\",
+            "GROUP_SIGNATURE": " See you!|Your admin|"
+        }
+    },
+    "/etc/dracut.conf": {
+        "filename": "dracut.conf",
+        "path": "/etc/dracut.conf",
+        "data": {
+            "install_items+": "\" /usr/share/fonts/kingsoft/FZKTK.TTF /etc/fonts/fonts.conf /usr/lib64/plymouth/label.so /usr/lib64/plymouth/details.so /usr/lib64/plymouth/script.so /usr/lib64/plymouth/two-step.so /usr/lib64/plymouth/tribar.so /usr/lib64/plymouth/fade-throbber.so /usr/lib64/plymouth/text.so /usr/lib64/plymouth/renderers/frame-buffer.so /usr/lib64/plymouth/renderers/drm.so /usr/lib64/plymouth/space-flares.so /usr/lib64/plymouth/throbgress.so /usr/bin/xz \""
+        }
+    },
+    "/etc/sgml/sgml.conf": {
+        "filename": "sgml.conf",
+        "path": "/etc/sgml/sgml.conf",
+        "data": {
+            "SGML_BASE_DIR": "/usr/share/sgml",
+            "SGML_CATALOGS_DIR": "/etc/sgml"
+        }
+    },
+    "/etc/prelink.conf.d/caja.conf": {
+        "filename": "caja.conf",
+        "path": "/etc/prelink.conf.d/caja.conf",
+        "data": {}
+    },
+    "/etc/prelink.conf.d/grub2.conf": {
+        "filename": "grub2.conf",
+        "path": "/etc/prelink.conf.d/grub2.conf",
+        "data": {}
+    },
+    "/etc/tomcat/tomcat.conf": {
+        "filename": "tomcat.conf",
+        "path": "/etc/tomcat/tomcat.conf",
+        "data": {
+            "TOMCAT_CFG_LOADED": "\"1\"",
+            "TOMCATS_BASE": "\"/var/lib/tomcats/\"",
+            "JAVA_HOME": "\"/usr/lib/jvm/jre\"",
+            "CATALINA_HOME": "\"/usr/share/tomcat\"",
+            "CATALINA_TMPDIR": "\"/var/cache/tomcat/temp\"",
+            "JAVA_OPTS": "\"-Djavax.sql.DataSource.Factory=org.apache.commons.dbcp.BasicDataSourceFactory\"",
+            "SECURITY_MANAGER": "\"false\""
+        }
+    },
+    "/etc/xattr.conf": {
+        "filename": "xattr.conf",
+        "path": "/etc/xattr.conf",
+        "data": {}
+    },
+    "/etc/gss/mech.d/gssproxy.conf": {
+        "filename": "gssproxy.conf",
+        "path": "/etc/gss/mech.d/gssproxy.conf",
+        "data": {}
+    },
+    "/etc/java/eclipse.conf": {
+        "filename": "eclipse.conf",
+        "path": "/etc/java/eclipse.conf",
+        "data": {
+            "eclipse.root": "/usr/lib/eclipse",
+            "eclipse.dropins.noarch": "/usr/share/eclipse/dropins",
+            "eclipse.droplets.noarch": "/usr/share/eclipse/droplets",
+            "eclipse.dropins.archful": "/usr/lib/eclipse/dropins",
+            "eclipse.droplets.archful": "/usr/lib/eclipse/droplets",
+            "eclipse.bundles": "/usr/share/java,/usr/lib/java",
+            "scl.namespace": "",
+            "scl.root": ""
+        }
+    },
+    "/etc/java/java.conf": {
+        "filename": "java.conf",
+        "path": "/etc/java/java.conf",
+        "data": {
+            "JAVA_LIBDIR": "/usr/share/java",
+            "JNI_LIBDIR": "/usr/lib/java"
+        }
+    },
+    "/etc/dnf/automatic.conf": {
+        "filename": "automatic.conf",
+        "path": "/etc/dnf/automatic.conf",
+        "data": {
+            "upgrade_type ": " default",
+            "random_sleep ": " 0",
+            "download_updates ": " yes",
+            "apply_updates ": " no",
+            "emit_via ": " stdio",
+            "email_from ": " root@example.com",
+            "email_to ": " root",
+            "email_host ": " localhost",
+            "debuglevel ": " 1"
+        }
+    },
+    "/etc/dnf/dnf.conf": {
+        "filename": "dnf.conf",
+        "path": "/etc/dnf/dnf.conf",
+        "data": {
+            "gpgcheck": "1",
+            "installonly_limit": "3",
+            "clean_requirements_on_remove": "True",
+            "best": "True",
+            "skip_if_unavailable": "False"
+        }
+    },
+    "/etc/dnf/protected.d/yum.conf": {
+        "filename": "yum.conf",
+        "path": "/etc/dnf/protected.d/yum.conf",
+        "data": {}
+    },
+    "/etc/dnf/protected.d/systemd.conf": {
+        "filename": "systemd.conf",
+        "path": "/etc/dnf/protected.d/systemd.conf",
+        "data": {}
+    },
+    "/etc/dnf/protected.d/dnf.conf": {
+        "filename": "dnf.conf",
+        "path": "/etc/dnf/protected.d/dnf.conf",
+        "data": {}
+    },
+    "/etc/dnf/protected.d/sudo.conf": {
+        "filename": "sudo.conf",
+        "path": "/etc/dnf/protected.d/sudo.conf",
+        "data": {}
+    },
+    "/etc/dnf/plugins/copr.conf": {
+        "filename": "copr.conf",
+        "path": "/etc/dnf/plugins/copr.conf",
+        "data": {
+            "hostname ": " copr.fedorainfracloud.org",
+            "protocol ": " https",
+            "port ": " 443"
+        }
+    },
+    "/etc/dnf/plugins/debuginfo-install.conf": {
+        "filename": "debuginfo-install.conf",
+        "path": "/etc/dnf/plugins/debuginfo-install.conf",
+        "data": {
+            "enabled": "1",
+            "autoupdate": "0"
+        }
+    },
+    "/etc/request-key.conf": {
+        "filename": "request-key.conf",
+        "path": "/etc/request-key.conf",
+        "data": {}
+    },
+    "/etc/sensors3.conf": {
+        "filename": "sensors3.conf",
+        "path": "/etc/sensors3.conf",
+        "data": {}
+    },
+    "/etc/samba/smb.conf": {
+        "filename": "smb.conf",
+        "path": "/etc/samba/smb.conf",
+        "data": {
+            "workgroup ": " SAMBA",
+            "security ": " user",
+            "passdb backend ": " tdbsam",
+            "printing ": " cups",
+            "printcap name ": " cups",
+            "load printers ": " yes",
+            "cups options ": " raw",
+            "comment ": " Home Directories",
+            "valid users ": " %S, %D%w%S",
+            "browseable ": " No",
+            "read only ": " No",
+            "inherit acls ": " Yes",
+            "path ": " /var/tmp",
+            "printable ": " Yes",
+            "create mask ": " 0600",
+            "write list ": " @printadmin root",
+            "force group ": " @printadmin",
+            "directory mask ": " 0775"
+        }
+    },
+    "/etc/systemd/networkd.conf": {
+        "filename": "networkd.conf",
+        "path": "/etc/systemd/networkd.conf",
+        "data": {}
+    },
+    "/etc/systemd/timesyncd.conf": {
+        "filename": "timesyncd.conf",
+        "path": "/etc/systemd/timesyncd.conf",
+        "data": {}
+    },
+    "/etc/systemd/bootchart.conf": {
+        "filename": "bootchart.conf",
+        "path": "/etc/systemd/bootchart.conf",
+        "data": {}
+    },
+    "/etc/systemd/coredump.conf": {
+        "filename": "coredump.conf",
+        "path": "/etc/systemd/coredump.conf",
+        "data": {}
+    },
+    "/etc/systemd/pstore.conf": {
+        "filename": "pstore.conf",
+        "path": "/etc/systemd/pstore.conf",
+        "data": {}
+    },
+    "/etc/systemd/resolved.conf": {
+        "filename": "resolved.conf",
+        "path": "/etc/systemd/resolved.conf",
+        "data": {}
+    },
+    "/etc/systemd/sleep.conf": {
+        "filename": "sleep.conf",
+        "path": "/etc/systemd/sleep.conf",
+        "data": {}
+    },
+    "/etc/systemd/system/docker.service.d/http-proxy.conf": {
+        "filename": "http-proxy.conf",
+        "path": "/etc/systemd/system/docker.service.d/http-proxy.conf",
+        "data": {
+            "Environment": "\"HTTPS_PROXY=http://172.168.131.1:3128/\""
+        }
+    },
+    "/etc/systemd/system/rc-local.service.d/override.conf": {
+        "filename": "override.conf",
+        "path": "/etc/systemd/system/rc-local.service.d/override.conf",
+        "data": {
+            "IgnoreSIGPIPE": "no",
+            "TasksMax": "infinity"
+        }
+    },
+    "/etc/systemd/journald.conf": {
+        "filename": "journald.conf",
+        "path": "/etc/systemd/journald.conf",
+        "data": {}
+    },
+    "/etc/systemd/logind.conf": {
+        "filename": "logind.conf",
+        "path": "/etc/systemd/logind.conf",
+        "data": {}
+    },
+    "/etc/systemd/user.conf": {
+        "filename": "user.conf",
+        "path": "/etc/systemd/user.conf",
+        "data": {}
+    },
+    "/etc/systemd/system.conf": {
+        "filename": "system.conf",
+        "path": "/etc/systemd/system.conf",
+        "data": {
+            "LogLevel": "warning",
+            "LogTarget": "journal",
+            "RuntimeWatchdogSec": "5min",
+            "ShutdownWatchdogSec": "10min"
+        }
+    },
+    "/etc/sos.conf": {
+        "filename": "sos.conf",
+        "path": "/etc/sos.conf",
+        "data": {}
+    },
+    "/etc/security_custom.conf": {
+        "filename": "security_custom.conf",
+        "path": "/etc/security_custom.conf",
+        "data": {}
+    },
+    "/etc/yum/pluginconf.d/copr.conf": {
+        "filename": "copr.conf",
+        "path": "/etc/yum/pluginconf.d/copr.conf",
+        "data": {
+            "hostname ": " copr.fedorainfracloud.org",
+            "protocol ": " https",
+            "port ": " 443"
+        }
+    },
+    "/etc/yum/pluginconf.d/debuginfo-install.conf": {
+        "filename": "debuginfo-install.conf",
+        "path": "/etc/yum/pluginconf.d/debuginfo-install.conf",
+        "data": {
+            "enabled": "1",
+            "autoupdate": "0"
+        }
+    },
+    "/etc/yum/protected.d/yum.conf": {
+        "filename": "yum.conf",
+        "path": "/etc/yum/protected.d/yum.conf",
+        "data": {}
+    },
+    "/etc/yum/protected.d/systemd.conf": {
+        "filename": "systemd.conf",
+        "path": "/etc/yum/protected.d/systemd.conf",
+        "data": {}
+    },
+    "/etc/yum/protected.d/dnf.conf": {
+        "filename": "dnf.conf",
+        "path": "/etc/yum/protected.d/dnf.conf",
+        "data": {}
+    },
+    "/etc/yum/protected.d/sudo.conf": {
+        "filename": "sudo.conf",
+        "path": "/etc/yum/protected.d/sudo.conf",
+        "data": {}
+    },
+    "/etc/chrony.conf": {
+        "filename": "chrony.conf",
+        "path": "/etc/chrony.conf",
+        "data": {}
+    },
+    "/etc/X11/xorg.conf.d/00-keyboard.conf": {
+        "filename": "00-keyboard.conf",
+        "path": "/etc/X11/xorg.conf.d/00-keyboard.conf",
+        "data": {}
+    },
+    "/etc/X11/xinit/xinput.d/none.conf": {
+        "filename": "none.conf",
+        "path": "/etc/X11/xinit/xinput.d/none.conf",
+        "data": {
+            "XIM": "none",
+            "XIM_PROGRAM": "",
+            "XIM_ARGS": "",
+            "GTK_IM_MODULE": "gtk-im-context-simple",
+            "QT_IM_MODULE": "xim",
+            "IMSETTINGS_IGNORE_ME": "yes"
+        }
+    },
+    "/etc/X11/xinit/xinput.d/xcompose.conf": {
+        "filename": "xcompose.conf",
+        "path": "/etc/X11/xinit/xinput.d/xcompose.conf",
+        "data": {
+            "XIM": "none",
+            "XIM_PROGRAM": "/bin/true",
+            "XIM_ARGS": "",
+            "GTK_IM_MODULE": "xim",
+            "QT_IM_MODULE": "xim",
+            "SHORT_DESC": "\"X compose table\"",
+            "LONG_DESC": "\"X locale based compose table\""
+        }
+    },
+    "/etc/X11/xinit/xinput.d/fcitx.conf": {
+        "filename": "fcitx.conf",
+        "path": "/etc/X11/xinit/xinput.d/fcitx.conf",
+        "data": {
+            "XIM": "fcitx",
+            "XIM_PROGRAM": "/usr/bin/fcitx",
+            "ICON": "\"/usr/share/pixmaps/fcitx.png\"",
+            "XIM_ARGS": "\"-D\"",
+            "PREFERENCE_PROGRAM": "/usr/bin/fcitx-configtool",
+            "SHORT_DESC": "\"FCITX\"",
+            "GTK_IM_MODULE": "fcitx",
+            "QT_IM_MODULE": "fcitx"
+        }
+    },
+    "/etc/X11/xinit/xinput.d/xim.conf": {
+        "filename": "xim.conf",
+        "path": "/etc/X11/xinit/xinput.d/xim.conf",
+        "data": {
+            "xim_tmplang": "${LC_CTYPE:-${LANG:-\"en_US.UTF-8\"}}",
+            "xim_lang_region": "$(echo $xim_tmplang | sed -e 's/\\..*//' -e 's/@.*//' | tr '[:upper:]' '[:lower:]')",
+            "xim_lang_ll": "$(echo $xim_lang_region | sed -e 's/^\\([a-z].*\\)_.*/\\1/')",
+            "xim_lang_cc": "$(echo $xim_lang_region | sed -e '/.*_[a-z].*/{s/.*_\\([a-z].*\\)/\\1/;p};{d}' | tr '[:lower:]' '[:upper:]')",
+            "if [ \"x${xim_lang_cc}\" !": " \"x\" ]; then",
+            "xim_lang_ll_CC": "\"${xim_lang_ll}_${xim_lang_cc}\"",
+            "GTK_IM_MODULE": "xim",
+            "QT_IM_MODULE": "xim"
+        }
+    },
+    "/etc/X11/xinit/xinput.d/im-cedilla.conf": {
+        "filename": "im-cedilla.conf",
+        "path": "/etc/X11/xinit/xinput.d/im-cedilla.conf",
+        "data": {
+            "XIM": "none",
+            "XIM_PROGRAM": "/bin/true",
+            "XIM_ARGS": "",
+            "SHORT_DESC": "im-cedilla",
+            "GTK_IM_MODULE": "cedilla",
+            "QT_IM_MODULE": "xim"
+        }
+    },
+    "/etc/nfsmount.conf": {
+        "filename": "nfsmount.conf",
+        "path": "/etc/nfsmount.conf",
+        "data": {}
+    },
+    "/etc/modprobe.d/tuned.conf": {
+        "filename": "tuned.conf",
+        "path": "/etc/modprobe.d/tuned.conf",
+        "data": {}
+    },
+    "/etc/modprobe.d/firewalld-sysctls.conf": {
+        "filename": "firewalld-sysctls.conf",
+        "path": "/etc/modprobe.d/firewalld-sysctls.conf",
+        "data": {}
+    },
+    "/etc/nfs.conf": {
+        "filename": "nfs.conf",
+        "path": "/etc/nfs.conf",
+        "data": {}
+    },
+    "/etc/my.cnf.d/mariadb-server.cnf": {
+        "filename": "mariadb-server.cnf",
+        "path": "/etc/my.cnf.d/mariadb-server.cnf",
+        "data": {}
+    },
+    "/etc/my.cnf.d/mysql-clients.cnf": {
+        "filename": "mysql-clients.cnf",
+        "path": "/etc/my.cnf.d/mysql-clients.cnf",
+        "data": {}
+    },
+    "/etc/ld.so.conf.d/dyninst-x86_64.conf": {
+        "filename": "dyninst-x86_64.conf",
+        "path": "/etc/ld.so.conf.d/dyninst-x86_64.conf",
+        "data": {}
+    },
+    "/etc/ld.so.conf.d/sssd-x86_64.conf": {
+        "filename": "sssd-x86_64.conf",
+        "path": "/etc/ld.so.conf.d/sssd-x86_64.conf",
+        "data": {}
+    },
+    "/etc/ld.so.conf.d/tracker-x86_64.conf": {
+        "filename": "tracker-x86_64.conf",
+        "path": "/etc/ld.so.conf.d/tracker-x86_64.conf",
+        "data": {}
+    },
+    "/etc/ld.so.conf.d/openldap-x86_64.conf": {
+        "filename": "openldap-x86_64.conf",
+        "path": "/etc/ld.so.conf.d/openldap-x86_64.conf",
+        "data": {}
+    },
+    "/etc/ld.so.conf.d/kernel-4.19.90-23.8.v2101.ky10.x86_64.conf": {
+        "filename": "kernel-4.19.90-23.8.v2101.ky10.x86_64.conf",
+        "path": "/etc/ld.so.conf.d/kernel-4.19.90-23.8.v2101.ky10.x86_64.conf",
+        "data": {}
+    },
+    "/etc/ld.so.conf.d/sudo-x86_64.conf": {
+        "filename": "sudo-x86_64.conf",
+        "path": "/etc/ld.so.conf.d/sudo-x86_64.conf",
+        "data": {}
+    },
+    "/etc/ld.so.conf.d/tracker-miners-x86_64.conf": {
+        "filename": "tracker-miners-x86_64.conf",
+        "path": "/etc/ld.so.conf.d/tracker-miners-x86_64.conf",
+        "data": {}
+    },
+    "/etc/ld.so.conf.d/bind-export-x86_64.conf": {
+        "filename": "bind-export-x86_64.conf",
+        "path": "/etc/ld.so.conf.d/bind-export-x86_64.conf",
+        "data": {}
+    },
+    "/etc/ld.so.conf.d/opencryptoki-x86_64.conf": {
+        "filename": "opencryptoki-x86_64.conf",
+        "path": "/etc/ld.so.conf.d/opencryptoki-x86_64.conf",
+        "data": {}
+    },
+    "/etc/pki/ca-trust/ca-legacy.conf": {
+        "filename": "ca-legacy.conf",
+        "path": "/etc/pki/ca-trust/ca-legacy.conf",
+        "data": {
+            "legacy": "default"
+        }
+    },
+    "/etc/pki/tls/ct_log_list.cnf": {
+        "filename": "ct_log_list.cnf",
+        "path": "/etc/pki/tls/ct_log_list.cnf",
+        "data": {}
+    },
+    "/etc/pki/tls/openssl.cnf": {
+        "filename": "openssl.cnf",
+        "path": "/etc/pki/tls/openssl.cnf",
+        "data": {
+            "HOME": " .",
+            "oid_section": " new_oids",
+            "tsa_policy1 ": " 1.2.3.4.1",
+            "tsa_policy2 ": " 1.2.3.4.5.6",
+            "tsa_policy3 ": " 1.2.3.4.5.7",
+            "default_ca": " CA_default# The default ca section",
+            "dir": " ./demoCA# Where everything is kept",
+            "certs": " $dir/certs# Where the issued certs are kept",
+            "crl_dir": " $dir/crl# Where the issued crl are kept",
+            "database": " $dir/index.txt# database index file.",
+            "new_certs_dir": " $dir/newcerts# default place for new certs.",
+            "certificate": " $dir/cacert.pem # The CA certificate",
+            "serial": " $dir/serial # The current serial number",
+            "crlnumber": " $dir/crlnumber# the current crl number",
+            "crl": " $dir/crl.pem # The current CRL",
+            "private_key": " $dir/private/cakey.pem# The private key",
+            "x509_extensions": " usr_cert# The extensions to add to the cert",
+            "name_opt ": " ca_default# Subject Name options",
+            "cert_opt ": " ca_default# Certificate field options",
+            "default_days": " 365# how long to certify for",
+            "default_crl_days": " 30# how long before next CRL",
+            "default_md": " default# use public key default MD",
+            "preserve": " no# keep passed DN ordering",
+            "policy": " policy_match",
+            "countryName": " match",
+            "stateOrProvinceName": " match",
+            "organizationName": " match",
+            "organizationalUnitName": " optional",
+            "commonName": " supplied",
+            "emailAddress": " optional",
+            "localityName": " optional",
+            "default_bits": " 2048",
+            "default_keyfile ": " privkey.pem",
+            "distinguished_name": " req_distinguished_name",
+            "attributes": " req_attributes",
+            "string_mask ": " utf8only",
+            "countryName_default": " AU",
+            "countryName_min": " 2",
+            "countryName_max": " 2",
+            "stateOrProvinceName_default": " Some-State",
+            "0.organizationName": " Organization Name (eg, company)",
+            "0.organizationName_default": " Internet Widgits Pty Ltd",
+            "commonName_max": " 64",
+            "emailAddress_max": " 64",
+            "challengePassword": " A challenge password",
+            "challengePassword_min": " 4",
+            "challengePassword_max": " 20",
+            "unstructuredName": " An optional company name",
+            "basicConstraints": "CA:FALSE",
+            "nsComment": " \"OpenSSL Generated Certificate\"",
+            "subjectKeyIdentifier": "hash",
+            "authorityKeyIdentifier": "keyid,issuer",
+            "basicConstraints ": " CA:FALSE",
+            "keyUsage ": " nonRepudiation, digitalSignature, keyEncipherment",
+            "proxyCertInfo": "critical,language:id-ppl-anyLanguage,pathlen:3,policy:foo",
+            "default_tsa ": " tsa_config1# the default TSA section",
+            "crypto_device": " builtin# OpenSSL engine to use for signing",
+            "signer_cert": " $dir/tsacert.pem # The TSA signing certificate",
+            "signer_key": " $dir/private/tsakey.pem # The TSA private key (optional)",
+            "signer_digest  ": " sha256# Signing digest to use. (Optional)",
+            "default_policy": " tsa_policy1# Policy if request did not specify it",
+            "other_policies": " tsa_policy2, tsa_policy3# acceptable policies (optional)",
+            "digests     ": " sha1, sha256, sha384, sha512  # Acceptable message digests (mandatory)",
+            "accuracy": " secs:1, millisecs:500, microsecs:100# (optional)",
+            "clock_precision_digits  ": " 0# number of digits after dot. (optional)",
+            "ordering": " yes# Is ordering defined for timestamps?",
+            "tsa_name": " yes# Must the TSA name be included in the reply?",
+            "ess_cert_id_chain": " no# Must the ESS cert id chain be included?",
+            "ess_cert_id_alg": " sha1# algorithm to compute certificate"
+        }
+    },
+    "/etc/request-key.d/cifs.spnego.conf": {
+        "filename": "cifs.spnego.conf",
+        "path": "/etc/request-key.d/cifs.spnego.conf",
+        "data": {}
+    },
+    "/etc/request-key.d/id_resolver.conf": {
+        "filename": "id_resolver.conf",
+        "path": "/etc/request-key.d/id_resolver.conf",
+        "data": {}
+    },
+    "/etc/request-key.d/cifs.idmap.conf": {
+        "filename": "cifs.idmap.conf",
+        "path": "/etc/request-key.d/cifs.idmap.conf",
+        "data": {}
+    },
+    "/etc/kylin_security/usr-security.conf": {
+        "filename": "usr-security.conf",
+        "path": "/etc/kylin_security/usr-security.conf",
+        "data": {}
+    },
+    "/etc/kylin_security/security.conf": {
+        "filename": "security.conf",
+        "path": "/etc/kylin_security/security.conf",
+        "data": {
+            "204@m@/etc/sysctl.conf@kernel.sysrq@": "0",
+            "217@m@/etc/sysconfig/init@PROMPT": "@no",
+            "301@m@/etc/sysctl.conf@net.ipv4.ip_forward": "@0",
+            "302@m@/etc/sysctl.conf@net.ipv4.conf.all.send_redirects": "@0",
+            "302@m@/etc/sysctl.conf@net.ipv4.conf.default.send_redirects": "@0",
+            "303@m@/etc/sysctl.conf@net.ipv4.conf.all.accept_source_route": "@0",
+            "303@m@/etc/sysctl.conf@net.ipv4.conf.default.accept_source_route": "@0",
+            "304@m@/etc/sysctl.conf@net.ipv4.conf.all.accept_redirects": "@0",
+            "304@m@/etc/sysctl.conf@net.ipv4.conf.default.accept_redirects": "@0",
+            "305@m@/etc/sysctl.conf@net.ipv4.conf.all.secure_redirects": "@0",
+            "305@m@/etc/sysctl.conf@net.ipv4.conf.default.secure_redirects": "@0",
+            "306@m@/etc/sysctl.conf@net.ipv4.icmp_echo_ignore_broadcasts": "@1",
+            "307@m@/etc/sysctl.conf@net.ipv4.icmp_ignore_bogus_error_responses": "@1",
+            "308@m@/etc/sysctl.conf@net.ipv4.conf.all.rp_filter": "@1",
+            "308@m@/etc/sysctl.conf@net.ipv4.conf.default.rp_filter": "@1",
+            "309@m@/etc/sysctl.conf@net.ipv4.tcp_syncookies": "@1",
+            "310@m@/etc/sysctl.conf@kernel.dmesg_restrict": "@1",
+            "401@m@/usr/lib/systemd/system/kylin-security.service@Wants": "@NetworkManager.service",
+            "403@m@/etc/login.defs@ALWAYS_SET_PATH": "@yes",
+            "407@m@/etc/sysctl.conf@net.ipv6.conf.all.accept_redirects": "@0",
+            "407@m@/etc/sysctl.conf@net.ipv6.conf.default.accept_redirects": "@0"
+        }
+    },
+    "/etc/ntp.conf": {
+        "filename": "ntp.conf",
+        "path": "/etc/ntp.conf",
+        "data": {}
+    },
+    "/etc/pulse/daemon.conf": {
+        "filename": "daemon.conf",
+        "path": "/etc/pulse/daemon.conf",
+        "data": {
+            "; daemonize ": " no",
+            "; fail ": " yes",
+            "; allow-module-loading ": " yes",
+            "; allow-exit ": " yes",
+            "; use-pid-file ": " yes",
+            "; system-instance ": " no",
+            "; local-server-type ": " user",
+            "; enable-shm ": " yes",
+            "; enable-memfd ": " yes",
+            "; shm-size-bytes ": " 0 # setting this 0 will use the system-default, usually 64 MiB",
+            "; lock-memory ": " no",
+            "; cpu-limit ": " no",
+            "; high-priority ": " yes",
+            "; nice-level ": " -11",
+            "; realtime-scheduling ": " yes",
+            "; realtime-priority ": " 5",
+            "; exit-idle-time ": " 20",
+            "; scache-idle-time ": " 20",
+            "; dl-search-path ": " (depends on architecture)",
+            "; load-default-script-file ": " yes",
+            "; default-script-file ": " /etc/pulse/default.pa",
+            "; log-target ": " auto",
+            "; log-level ": " notice",
+            "; log-meta ": " no",
+            "; log-time ": " no",
+            "; log-backtrace ": " 0",
+            "; resample-method ": " speex-float-1",
+            "; avoid-resampling ": " false",
+            "; enable-remixing ": " yes",
+            "; remixing-use-all-sink-channels ": " yes",
+            "; enable-lfe-remixing ": " no",
+            "; lfe-crossover-freq ": " 0",
+            "; flat-volumes ": " no",
+            "; rlimit-fsize ": " -1",
+            "; rlimit-data ": " -1",
+            "; rlimit-stack ": " -1",
+            "; rlimit-core ": " -1",
+            "; rlimit-as ": " -1",
+            "; rlimit-rss ": " -1",
+            "; rlimit-nproc ": " -1",
+            "; rlimit-nofile ": " 256",
+            "; rlimit-memlock ": " -1",
+            "; rlimit-locks ": " -1",
+            "; rlimit-sigpending ": " -1",
+            "; rlimit-msgqueue ": " -1",
+            "; rlimit-nice ": " 31",
+            "; rlimit-rtprio ": " 9",
+            "; rlimit-rttime ": " 200000",
+            "; default-sample-format ": " s16le",
+            "; default-sample-rate ": " 44100",
+            "; alternate-sample-rate ": " 48000",
+            "; default-sample-channels ": " 2",
+            "; default-channel-map ": " front-left,front-right",
+            "; default-fragments ": " 4",
+            "; default-fragment-size-msec ": " 25",
+            "; enable-deferred-volume ": " yes",
+            "; deferred-volume-safety-margin-usec ": " 8000",
+            "; deferred-volume-extra-delay-usec ": " 0"
+        }
+    },
+    "/etc/pulse/client.conf": {
+        "filename": "client.conf",
+        "path": "/etc/pulse/client.conf",
+        "data": {
+            "; default-sink ": "",
+            "; default-source ": "",
+            "; default-server ": "",
+            "; default-dbus-server ": "",
+            "; autospawn ": " yes",
+            "; daemon-binary ": " /usr/bin/pulseaudio",
+            "; extra-arguments ": " --log-target=syslog",
+            "; cookie-file ": "",
+            "; enable-shm ": " yes",
+            "; shm-size-bytes ": " 0 # setting this 0 will use the system-default, usually 64 MiB",
+            "; auto-connect-localhost ": " no",
+            "; auto-connect-display ": " no"
+        }
+    },
+    "/etc/asound.conf": {
+        "filename": "asound.conf",
+        "path": "/etc/asound.conf",
+        "data": {}
+    },
+    "/etc/geoclue/geoclue.conf": {
+        "filename": "geoclue.conf",
+        "path": "/etc/geoclue/geoclue.conf",
+        "data": {
+            "whitelist": "geoclue-demo-agent;gnome-shell",
+            "enable": "true",
+            "url": "https://location.services.mozilla.com/v1/geolocate?key=geoclue",
+            "submit-data": "false",
+            "submission-url": "https://location.services.mozilla.com/v1/submit?key=geoclue",
+            "submission-nick": "geoclue",
+            "allowed": "true",
+            "system": "true",
+            "users": ""
+        }
+    },
+    "/etc/nsswitch.conf": {
+        "filename": "nsswitch.conf",
+        "path": "/etc/nsswitch.conf",
+        "data": {}
+    },
+    "/etc/plymouth/plymouthd.conf": {
+        "filename": "plymouthd.conf",
+        "path": "/etc/plymouth/plymouthd.conf",
+        "data": {
+            "Theme": "kylin-logo"
+        }
+    },
+    "/etc/xdg/user-dirs.conf": {
+        "filename": "user-dirs.conf",
+        "path": "/etc/xdg/user-dirs.conf",
+        "data": {
+            "enabled": "True",
+            "filename_encoding": "UTF-8"
+        }
+    },
+    "/etc/xdg/qtchooser/5-64.conf": {
+        "filename": "5-64.conf",
+        "path": "/etc/xdg/qtchooser/5-64.conf",
+        "data": {}
+    },
+    "/etc/xdg/qtchooser/4.conf": {
+        "filename": "4.conf",
+        "path": "/etc/xdg/qtchooser/4.conf",
+        "data": {}
+    },
+    "/etc/xdg/qtchooser/4-64.conf": {
+        "filename": "4-64.conf",
+        "path": "/etc/xdg/qtchooser/4-64.conf",
+        "data": {}
+    },
+    "/etc/xdg/qtchooser/5.conf": {
+        "filename": "5.conf",
+        "path": "/etc/xdg/qtchooser/5.conf",
+        "data": {}
+    },
+    "/etc/xdg/qtchooser/default.conf": {
+        "filename": "default.conf",
+        "path": "/etc/xdg/qtchooser/default.conf",
+        "data": {}
+    },
+    "/etc/libuser.conf": {
+        "filename": "libuser.conf",
+        "path": "/etc/libuser.conf",
+        "data": {
+            "login_defs ": " /etc/login.defs",
+            "default_useradd ": " /etc/default/useradd",
+            "crypt_style ": " sha512",
+            "modules ": " files shadow",
+            "create_modules ": " files shadow",
+            "LU_USERNAME ": " %n",
+            "LU_GIDNUMBER ": " %u",
+            "LU_GROUPNAME ": " %n"
+        }
+    },
+    "/etc/ld.so.conf": {
+        "filename": "ld.so.conf",
+        "path": "/etc/ld.so.conf",
+        "data": {}
+    },
+    "/etc/Trolltech.conf": {
+        "filename": "Trolltech.conf",
+        "path": "/etc/Trolltech.conf",
+        "data": {
+            "font": "\"Sans Serif,10,-1,5,50,0,0,0,0,0\""
+        }
+    },
+    "/etc/dnsmasq.conf": {
+        "filename": "dnsmasq.conf",
+        "path": "/etc/dnsmasq.conf",
+        "data": {
+            "user": "dnsmasq",
+            "group": "dnsmasq",
+            "conf-dir": "/etc/dnsmasq.d,.rpmnew,.rpmsave,.rpmorig"
+        }
+    },
+    "/etc/cgconfig.conf": {
+        "filename": "cgconfig.conf",
+        "path": "/etc/cgconfig.conf",
+        "data": {}
+    },
+    "/etc/dhcp/dhcpd6.conf": {
+        "filename": "dhcpd6.conf",
+        "path": "/etc/dhcp/dhcpd6.conf",
+        "data": {}
+    },
+    "/etc/dhcp/dhcpd.conf": {
+        "filename": "dhcpd.conf",
+        "path": "/etc/dhcp/dhcpd.conf",
+        "data": {}
+    },
+    "/etc/e2scrub.conf": {
+        "filename": "e2scrub.conf",
+        "path": "/etc/e2scrub.conf",
+        "data": {}
+    },
+    "/etc/idmapd.conf": {
+        "filename": "idmapd.conf",
+        "path": "/etc/idmapd.conf",
+        "data": {
+            "LDAP_server ": " ldap-server.local.domain.edu",
+            "LDAP_base ": " dc=local,dc=domain,dc=edu"
+        }
+    },
+    "/etc/lsm/lsmd.conf": {
+        "filename": "lsmd.conf",
+        "path": "/etc/lsm/lsmd.conf",
+        "data": {
+            "allow-plugin-root-privilege ": " true;"
+        }
+    },
+    "/etc/lsm/pluginconf.d/sim.conf": {
+        "filename": "sim.conf",
+        "path": "/etc/lsm/pluginconf.d/sim.conf",
+        "data": {
+            "require-root-privilege ": " false;"
+        }
+    },
+    "/etc/openldap/check_password.conf": {
+        "filename": "check_password.conf",
+        "path": "/etc/openldap/check_password.conf",
+        "data": {}
+    },
+    "/etc/openldap/ldap.conf": {
+        "filename": "ldap.conf",
+        "path": "/etc/openldap/ldap.conf",
+        "data": {}
+    },
+    "/etc/locales.conf": {
+        "filename": "locales.conf",
+        "path": "/etc/locales.conf",
+        "data": {
+            "date format ": " %b %e %Y %I:%M:%S:%z%p",
+            "language ": " us_english",
+            "charset ": " iso_1"
+        }
+    },
+    "/etc/mke2fs.conf": {
+        "filename": "mke2fs.conf",
+        "path": "/etc/mke2fs.conf",
+        "data": {
+            "base_features ": " sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr",
+            "default_mntopts ": " acl,user_xattr",
+            "enable_periodic_fsck ": " 0",
+            "blocksize ": " 4096",
+            "inode_size ": " 256",
+            "inode_ratio ": " 16384",
+            "ext3 ": " {",
+            "features ": " has_journal",
+            "ext4 ": " {",
+            "auto_64-bit_support ": " 1",
+            "small ": " {",
+            "floppy ": " {",
+            "big ": " {",
+            "huge ": " {",
+            "news ": " {",
+            "largefile ": " {",
+            "largefile4 ": " {",
+            "hurd ": " {"
+        }
+    },
+    "/etc/locale.conf": {
+        "filename": "locale.conf",
+        "path": "/etc/locale.conf",
+        "data": {
+            "LANG": "\"zh_CN.UTF-8\""
+        }
+    },
+    "/etc/lvm/lvm.conf": {
+        "filename": "lvm.conf",
+        "path": "/etc/lvm/lvm.conf",
+        "data": {
+            "checks ": " 1",
+            "abort_on_errors ": " 0",
+            "profile_dir ": " \"/etc/lvm/profile\"",
+            "dir ": " \"/dev\"",
+            "scan ": " [ \"/dev\" ]",
+            "obtain_device_list_from_udev ": " 1",
+            "external_device_info_source ": " \"none\"",
+            "preferred_names ": " [ \"^/dev/mpath/\", \"^/dev/mapper/mpath\", \"^/dev/[hs]d\" ]",
+            "types ": " [ \"hio\", 16 ]",
+            "cache_dir ": " \"/etc/lvm/cache\"",
+            "cache_file_prefix ": " \"\"",
+            "write_cache_state ": " 1",
+            "sysfs_scan ": " 1",
+            "multipath_component_detection ": " 1",
+            "md_component_detection ": " 1",
+            "fw_raid_component_detection ": " 0",
+            "md_chunk_alignment ": " 1",
+            "data_alignment_detection ": " 1",
+            "data_alignment ": " 0",
+            "data_alignment_offset_detection ": " 1",
+            "ignore_suspended_devices ": " 0",
+            "ignore_lvm_mirrors ": " 1",
+            "disable_after_error_count ": " 0",
+            "require_restorefile_with_uuid ": " 1",
+            "pv_min_size ": " 2048",
+            "issue_discards ": " 0",
+            "allow_changes_with_duplicate_pvs ": " 1",
+            "maximise_cling ": " 1",
+            "use_blkid_wiping ": " 1",
+            "wipe_signatures_when_zeroing_new_lvs ": " 1",
+            "mirror_logs_require_separate_pvs ": " 0",
+            "cache_pool_metadata_require_separate_pvs ": " 0",
+            "thin_pool_metadata_require_separate_pvs ": " 0",
+            "verbose ": " 0",
+            "silent ": " 0",
+            "syslog ": " 1",
+            "overwrite ": " 0",
+            "level ": " 3",
+            "log_unless_silent ": " 1",
+            "indent ": " 1",
+            "command_names ": " 0",
+            "prefix ": " \"  \"",
+            "activation ": " 0",
+            "debug_classes ": " [ \"memory\", \"devices\", \"io\", \"activation\", \"allocation\", \"lvmetad\", \"metadata\", \"cache\", \"locking\", \"lvmpolld\", \"dbus\" ]",
+            "backup ": " 1",
+            "backup_dir ": " \"/etc/lvm/backup\"",
+            "archive ": " 1",
+            "archive_dir ": " \"/etc/lvm/archive\"",
+            "retain_min ": " 10",
+            "retain_days ": " 30",
+            "history_size ": " 100",
+            "umask ": " 077",
+            "test ": " 0",
+            "units ": " \"r\"",
+            "si_unit_consistency ": " 1",
+            "suffix ": " 1",
+            "proc ": " \"/proc\"",
+            "etc ": " \"/etc\"",
+            "locking_type ": " 1",
+            "wait_for_locks ": " 1",
+            "fallback_to_clustered_locking ": " 1",
+            "fallback_to_local_locking ": " 1",
+            "locking_dir ": " \"/run/lock/lvm\"",
+            "prioritise_write_locks ": " 1",
+            "abort_on_internal_errors ": " 0",
+            "metadata_read_only ": " 0",
+            "mirror_segtype_default ": " \"raid1\"",
+            "raid10_segtype_default ": " \"raid10\"",
+            "sparse_segtype_default ": " \"thin\"",
+            "use_lvmetad ": " 1",
+            "use_lvmlockd ": " 0",
+            "system_id_source ": " \"none\"",
+            "use_lvmpolld ": " 1",
+            "notify_dbus ": " 1",
+            "udev_sync ": " 1",
+            "udev_rules ": " 1",
+            "verify_udev_operations ": " 0",
+            "retry_deactivation ": " 1",
+            "missing_stripe_filler ": " \"error\"",
+            "use_linear_target ": " 1",
+            "reserved_stack ": " 64",
+            "reserved_memory ": " 8192",
+            "process_priority ": " -18",
+            "raid_region_size ": " 2048",
+            "readahead ": " \"auto\"",
+            "raid_fault_policy ": " \"warn\"",
+            "mirror_image_fault_policy ": " \"remove\"",
+            "mirror_log_fault_policy ": " \"allocate\"",
+            "snapshot_autoextend_threshold ": " 100",
+            "snapshot_autoextend_percent ": " 20",
+            "thin_pool_autoextend_threshold ": " 100",
+            "thin_pool_autoextend_percent ": " 20",
+            "use_mlockall ": " 0",
+            "monitoring ": " 1",
+            "polling_interval ": " 15",
+            "activation_mode ": " \"degraded\"",
+            "mirror_library ": " \"libdevmapper-event-lvm2mirror.so\"",
+            "snapshot_library ": " \"libdevmapper-event-lvm2snapshot.so\"",
+            "thin_library ": " \"libdevmapper-event-lvm2thin.so\""
+        }
+    },
+    "/etc/lvm/lvmlocal.conf": {
+        "filename": "lvmlocal.conf",
+        "path": "/etc/lvm/lvmlocal.conf",
+        "data": {}
+    },
+    "/etc/krb5.conf": {
+        "filename": "krb5.conf",
+        "path": "/etc/krb5.conf",
+        "data": {
+            "default ": " FILE:/var/log/krb5libs.log",
+            "kdc ": " FILE:/var/log/krb5kdc.log",
+            "admin_server ": " FILE:/var/log/kadmind.log",
+            "dns_lookup_realm ": " false",
+            "ticket_lifetime ": " 24h",
+            "renew_lifetime ": " 7d",
+            "forwardable ": " true",
+            "rdns ": " false",
+            "default_realm ": " EXAMPLE.COM",
+            "default_ccache_name ": " KEYRING:persistent:%{uid}",
+            "EXAMPLE.COM ": " {",
+            ".example.com ": " EXAMPLE.COM",
+            "example.com ": " EXAMPLE.COM"
+        }
+    },
+    "/etc/NetworkManager/NetworkManager.conf": {
+        "filename": "NetworkManager.conf",
+        "path": "/etc/NetworkManager/NetworkManager.conf",
+        "data": {
+            "no-auto-default": ""
+        }
+    },
+    "/etc/UPower/UPower.conf": {
+        "filename": "UPower.conf",
+        "path": "/etc/UPower/UPower.conf",
+        "data": {
+            "EnableWattsUpPro": "false",
+            "NoPollBatteries": "false",
+            "IgnoreLid": "false",
+            "UsePercentageForPolicy": "true",
+            "PercentageLow": "10",
+            "PercentageCritical": "3",
+            "PercentageAction": "2",
+            "TimeLow": "1200",
+            "TimeCritical": "300",
+            "TimeAction": "120",
+            "CriticalPowerAction": "HybridSleep"
+        }
+    },
+    "/etc/selinux/restorecond.conf": {
+        "filename": "restorecond.conf",
+        "path": "/etc/selinux/restorecond.conf",
+        "data": {}
+    },
+    "/etc/selinux/restorecond_user.conf": {
+        "filename": "restorecond_user.conf",
+        "path": "/etc/selinux/restorecond_user.conf",
+        "data": {}
+    },
+    "/etc/selinux/targeted/setrans.conf": {
+        "filename": "setrans.conf",
+        "path": "/etc/selinux/targeted/setrans.conf",
+        "data": {
+            "s0": "SystemLow",
+            "s0-s0:c0.c1023": "SystemLow-SystemHigh",
+            "s0:c0.c1023": "SystemHigh"
+        }
+    },
+    "/etc/selinux/semanage.conf": {
+        "filename": "semanage.conf",
+        "path": "/etc/selinux/semanage.conf",
+        "data": {
+            "module-store ": " direct",
+            "expand-check": "0",
+            "usepasswd": "False",
+            "bzip-small": "true",
+            "bzip-blocksize": "5",
+            "ignoredirs": "/root",
+            "path ": " /usr/sbin/sefcontext_compile",
+            "args ": " -r $@"
+        }
+    },
+    "/etc/selinux/ukmcs/setrans.conf": {
+        "filename": "setrans.conf",
+        "path": "/etc/selinux/ukmcs/setrans.conf",
+        "data": {
+            "s0": "SystemLow",
+            "s0-s0:c0.c1023": "SystemLow-SystemHigh",
+            "s0:c0.c1023": "SystemHigh"
+        }
+    },
+    "/etc/uptimed.conf": {
+        "filename": "uptimed.conf",
+        "path": "/etc/uptimed.conf",
+        "data": {
+            "UPDATE_INTERVAL": "60",
+            "LOG_MAXIMUM_ENTRIES": "50",
+            "LOG_MINIMUM_UPTIMED": "1h",
+            "MAIL_MINIMUM_UPTIME": "1d",
+            "MAIL_MINIMUM_POSITION": "10",
+            "EMAIL": "root@localhost",
+            "SEND_EMAIL": "0",
+            "SENDMAIL": "/usr/lib/sendmail -t",
+            "PIDFILE": "/var/run/uptimed",
+            "MILESTONE": "5d:five days"
+        }
+    },
+    "/etc/vconsole.conf": {
+        "filename": "vconsole.conf",
+        "path": "/etc/vconsole.conf",
+        "data": {
+            "KEYMAP": "\"cn\"",
+            "FONT": "\"eurlatgr\""
+        }
+    },
+    "/etc/rsyslog.conf": {
+        "filename": "rsyslog.conf",
+        "path": "/etc/rsyslog.conf",
+        "data": {
+            "global(workDirectory": "\"/var/lib/rsyslog\")",
+            "module(load": "\"builtin:omfile\" Template=\"RSYSLOG_TraditionalFileFormat\")",
+            "SysSock.Use": "\"off\") # Turn off message reception via local log socket;",
+            "StateFile": "\"imjournal.state\") # File to store the position in the journal",
+            "include(file": "\"/etc/rsyslog.d/*.conf\" mode=\"optional\")"
+        }
+    },
+    "/etc/depmod.d/dist.conf": {
+        "filename": "dist.conf",
+        "path": "/etc/depmod.d/dist.conf",
+        "data": {}
+    },
+    "/etc/pipewire/pipewire.conf": {
+        "filename": "pipewire.conf",
+        "path": "/etc/pipewire/pipewire.conf",
+        "data": {}
+    },
+    "/etc/ipmi/lan.conf": {
+        "filename": "lan.conf",
+        "path": "/etc/ipmi/lan.conf",
+        "data": {
+            "startcmd \"qemu-system-x86_64 --enable-kvm -drive file": "/opt/qemu/cge-complete-image-x86-generic-64-1.ext2,format=raw -nographic -kernel /opt/qemu/bzImage-1 -append 'root=/dev/sdb console=ttyS0,115200' -net nic,model=e1000,macaddr=52:54:00:12:34:59 -net user,hostfwd=tcp::5556-10.0.2.15:22 -chardev socket,id=ipmi0,host=localhost,port=9002,reconnect=10 -device ipmi-bmc-extern,id=bmc0,chardev=ipmi0 -device isa-ipmi-bt,bmc=bmc0 -serial mon:telnet::9003,server,telnet,nowait\""
+        }
+    },
+    "/etc/rsyncd.conf": {
+        "filename": "rsyncd.conf",
+        "path": "/etc/rsyncd.conf",
+        "data": {}
+    },
+    "/etc/ndctl/monitor.conf": {
+        "filename": "monitor.conf",
+        "path": "/etc/ndctl/monitor.conf",
+        "data": {}
+    },
+    "/etc/libaudit.conf": {
+        "filename": "libaudit.conf",
+        "path": "/etc/libaudit.conf",
+        "data": {
+            "failure_action ": " ignore"
+        }
+    },
+    "/etc/man_db.conf": {
+        "filename": "man_db.conf",
+        "path": "/etc/man_db.conf",
+        "data": {}
+    },
+    "/etc/ssh/ssh_config.d/05-redhat.conf": {
+        "filename": "05-redhat.conf",
+        "path": "/etc/ssh/ssh_config.d/05-redhat.conf",
+        "data": {}
+    },
+    "/etc/audit/auditd.conf": {
+        "filename": "auditd.conf",
+        "path": "/etc/audit/auditd.conf",
+        "data": {
+            "local_events ": " yes",
+            "write_logs ": " yes",
+            "log_file ": " /var/log/audit/audit.log",
+            "log_group ": " root",
+            "log_format ": " ENRICHED",
+            "flush ": " INCREMENTAL_ASYNC",
+            "freq ": " 50",
+            "max_log_file ": " 8",
+            "num_logs ": " 5",
+            "priority_boost ": " 4",
+            "name_format ": " NONE",
+            "max_log_file_action ": " ROTATE",
+            "space_left ": " 75",
+            "space_left_action ": " SYSLOG",
+            "verify_email ": " yes",
+            "action_mail_acct ": " root",
+            "admin_space_left ": " 50",
+            "admin_space_left_action ": " SUSPEND",
+            "disk_full_action ": " SUSPEND",
+            "disk_error_action ": " SUSPEND",
+            "use_libwrap ": " yes",
+            "tcp_listen_queue ": " 5",
+            "tcp_max_per_addr ": " 1",
+            "tcp_client_max_idle ": " 0",
+            "transport ": " TCP",
+            "krb5_principal ": " auditd",
+            "distribute_network ": " no",
+            "q_depth ": " 400",
+            "overflow_action ": " SYSLOG",
+            "max_restarts ": " 10",
+            "plugin_dir ": " /etc/audit/plugins.d"
+        }
+    },
+    "/etc/audit/plugins.d/sedispatch.conf": {
+        "filename": "sedispatch.conf",
+        "path": "/etc/audit/plugins.d/sedispatch.conf",
+        "data": {
+            "active ": " yes",
+            "direction ": " out",
+            "path ": " /usr/sbin/sedispatch",
+            "type ": " always",
+            "format ": " string"
+        }
+    },
+    "/etc/audit/plugins.d/af_unix.conf": {
+        "filename": "af_unix.conf",
+        "path": "/etc/audit/plugins.d/af_unix.conf",
+        "data": {
+            "active ": " no",
+            "direction ": " out",
+            "path ": " builtin_af_unix",
+            "type ": " builtin",
+            "args ": " 0640 /var/run/audispd_events",
+            "format ": " string"
+        }
+    },
+    "/etc/sudo.conf": {
+        "filename": "sudo.conf",
+        "path": "/etc/sudo.conf",
+        "data": {}
+    },
+    "/etc/smartmontools/smartd.conf": {
+        "filename": "smartd.conf",
+        "path": "/etc/smartmontools/smartd.conf",
+        "data": {}
+    },
+    "/etc/gcrypt/random.conf": {
+        "filename": "random.conf",
+        "path": "/etc/gcrypt/random.conf",
+        "data": {}
+    }
+}

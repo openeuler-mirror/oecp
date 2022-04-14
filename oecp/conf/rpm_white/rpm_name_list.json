@@ -1,0 +1,7 @@
+{
+    "rpm_name_list":[
+        "NetworkManager",
+        "NetworkManager-libnm",
+        "NetworkManager-wwan"
+    ]
+}

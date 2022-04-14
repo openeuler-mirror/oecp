@@ -1,0 +1,21 @@
+{
+  "name": "test",
+  "plan": [
+    {
+      "name": "requires",
+      "dumper": "RequiresDumper",
+      "executor": "nvs.NVSCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_RPM_REQUIRES"
+      }
+    },
+    {
+      "name": "provides",
+      "dumper": "ProvidesDumper",
+      "executor": "nvs.NVSCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_RPM_PROVIDES"
+      }
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+    "amdgpu": [
+        "CONFIG_DRM_AMDGPU",
+        "CONFIG_DRM_AMDGPU_CIK",
+        "CONFIG_DRM_AMDGPU_USERPTR"
+    ],
+    "bnx2x": [
+        "CONFIG_SCSI_BNX2X_FCOE",
+        "CONFIG_BNX2X",
+        "CONFIG_BNX2X_SRIOV"
+    ],
+    "bnxt_en": [
+        "CONFIG_BNXT",
+        "CONFIG_BNXT_SRIOV",
+        "CONFIG_BNXT_FLOWER_OFFLOAD",
+        "CONFIG_BNXT_DCB",
+        "CONFIG_INFINIBAND_BNXT_RE"
+    ],
+    "hifc": [
+        "CONFIG_SCSI_FC_HIFC"
+    ],
+    "hinic": [
+        "CONFIG_HINIC"
+    ],
+    "hns3": [
+        "CONFIG_HNS3",
+        "CONFIG_HNS3_HCLGE",
+        "CONFIG_HNS3_DCB",
+        "CONFIG_HNS3_HCLGEVF",
+        "CONFIG_HNS3_ENET",
+        "CONFIG_HNS3_CAE"
+    ],
+    "i40e": [
+        "CONFIG_I40E",
+        "CONFIG_I40EVF"
+    ],
+    "ice": [
+        "CONFIG_ICE"
+    ],
+    "igb": [
+        "CONFIG_IGB",
+        "CONFIG_IGB_HWMON",
+        "CONFIG_IGBVF"
+    ],
+    "ixgbe": [
+        "CONFIG_IXGBE",
+        "CONFIG_IXGBE_HWMON",
+        "CONFIG_IXGBE_DCB",
+        "CONFIG_IXGBEVF"
+    ],
+    "lpfc": [
+        "CONFIG_SCSI_LPFC"
+    ],
+    "megaraid_sas": [
+        "CONFIG_MEGARAID_SAS"
+    ],
+    "mlx4_core": [
+        "CONFIG_MLX4_CORE"
+    ],
+    "mlx5_core": [
+        "CONFIG_MLX5_CORE",
+        "CONFIG_MLX5_CORE_EN",
+        "CONFIG_MLX5_EN_ARFS",
+        "CONFIG_MLX5_EN_RXNFC",
+        "CONFIG_MLX5_MPFS",
+        "CONFIG_MLX5_CORE_EN_DCB",
+        "CONFIG_MLX5_CORE_IPOIB",
+        "CONFIG_MLX5_INFINIBAND"
+    ],
+    "mpt3sas": [
+        "CONFIG_SCSI_MPT3SAS",
+        "CONFIG_SCSI_MPT3SAS_MAX_SGE"
+    ],
+    "nouveau": [
+        "CONFIG_DRM_NOUVEAU",
+        "CONFIG_NOUVEAU_LEGACY_CTX_SUPPORT",
+        "CONFIG_NOUVEAU_DEBUG",
+        "CONFIG_NOUVEAU_DEBUG_DEFAULT",
+        "CONFIG_DRM_NOUVEAU_BACKLIGHT"
+    ],
+    "nvme": [
+        "CONFIG_NVME_CORE",
+        "CONFIG_BLK_DEV_NVME",
+        "CONFIG_NVME_FABRICS",
+        "CONFIG_NVME_RDMA",
+        "CONFIG_NVME_FC",
+        "CONFIG_NVME_TARGET",
+        "CONFIG_NVME_TARGET_LOOP",
+        "CONFIG_NVME_TARGET_RDMA",
+        "CONFIG_NVME_TARGET_FC",
+        "CONFIG_NVME_TARGET_FCLOOP",
+        "CONFIG_RTC_NVMEM",
+        "CONFIG_NVMEM"
+    ],
+    "smartpqi": [
+        "CONFIG_SCSI_SMARTPQI"
+    ],
+    "annotation": [
+        "CONFIG_DRM_AMDGPU_SI",
+        "CONFIG_DRM_AMDGPU_GART_DEBUGFS",
+        "CONFIG_BNXT_HWMON",
+        "CONFIG_I40E_DCB",
+        "CONFIG_MLX5_FPGA",
+        "CONFIG_MLX5_ESWITCH",
+        "CONFIG_NOUVEAU_DEBUG_MMU",
+        "CONFIG_NET_VENDOR_NVIDIA",
+        "CONFIG_FB_NVIDIA",
+        "CONFIG_NVME_CORE",
+        "CONFIG_NVME_MULTIPATH",
+        "CONFIG_TCM_QLA2XXX",
+        "CONFIG_TXGBE",
+        "NVME Support"
+    ]
+}

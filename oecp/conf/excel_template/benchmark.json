@@ -1,0 +1,73 @@
+[
+  {
+    "core_pkg": {
+      "standard": 1.0,
+      "optionality": 1
+    }
+  },
+  {
+    "L1 and L2 package": [{
+      "level1 pkg": {
+      "standard": 1.0,
+      "optionality": 1}}
+    ,{
+      "level2 pkg": {
+      "standard": 0.95,
+      "optionality": 1}
+    }]
+  },
+  {
+    "kabi": {
+      "standard": 0,
+      "optionality": 1
+    }
+  },
+  {
+    "L1 and L2 rpm abi": {
+      "standard": 0.95,
+      "optionality": 1
+    }
+  },
+  {
+    "service detail": {
+      "standard": 0.9,
+      "optionality": 0
+    }
+  },
+  {
+    "rpm config": {
+      "standard": 0.9,
+      "optionality": 0
+    }
+  },
+  {
+    "kconfig": {
+      "standard": 0.9,
+      "optionality": 0
+    }
+  },
+  {
+    "rpm test": {
+      "standard": 0.9,
+      "optionality": 1
+    }
+  },
+  {
+    "AT": {
+      "standard": 1.0,
+      "optionality": 1
+    }
+  },
+  {
+    "performance": {
+      "standard": 1.0,
+      "optionality": 1
+    }
+  },
+  {
+    "ciconfig": {
+      "standard": 0.90,
+      "optionality": 0
+    }
+  }
+]
