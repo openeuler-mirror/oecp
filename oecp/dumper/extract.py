@@ -92,6 +92,11 @@ class RPMExtractDumper(AbstractDumper):
                     file_type = magic.from_file(file_path, mime=True)
                     if file_type in self._library_mime:
                         self._library_files.setdefault(extract_dir_name, []).append(file_path)
+                elif os.path.islink(file.as_posix()):
+                    link_file_name = os.readlink(file.as_posix())
+                    if link_file_name.endswith(".so") or ".so." in link_file_name:
+                        origin_file_name = os.path.basename(file.as_posix())
+                        logger.info(f"{origin_file_name} is a link file that does not exist locally")
 
     def _collect_service_files(self, extract_dir_name):
         extract_path_obj = Path(extract_dir_name)

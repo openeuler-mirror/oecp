@@ -85,6 +85,8 @@ class Plan(UserDict):
                             # load dumper
                             if name == 'drive kabi':
                                 module_name, class_name = 'kabi', item["dumper"]
+                            elif name == 'lib':
+                                module_name, class_name = 'abi', item["dumper"]
                             else:
                                 module_name, class_name = name, item["dumper"]
                             if "." in item["dumper"]:

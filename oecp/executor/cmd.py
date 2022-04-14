@@ -45,7 +45,7 @@ class CmdCompareExecutor(CompareExecutor):
         cmd_a_file = self._split_files(dump_a[self.data])
         cmd_b_file = self._split_files(dump_b[self.data])
         if not cmd_a_file and not cmd_b_file:
-            logger.debug(f"No cmd package found, ignored with {dump_b['rpm']} and {dump_b['rpm']}")
+            logger.debug(f"No {self.config.get('compare_type')} package found, ignored with {dump_b['rpm']} and {dump_b['rpm']}")
             return result
         component_results = self.format_dump(cmd_a_file, cmd_b_file)
         for component_result in component_results:

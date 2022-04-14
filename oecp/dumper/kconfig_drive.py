@@ -53,7 +53,9 @@ class KconfigDriveDumper(AbstractDumper):
     def load_kconfig_range(self):
         kconfig = get_file_by_pattern(r"^config-", self.cache_dumper)
         if not kconfig:
-            return []
+            kconfig = get_file_by_pattern(r"^config", self.cache_dumper)
+            if not kconfig:
+                return []
 
         kconfig_range_data = self._load_kconfig_json()
         # A collection of non-annotated phases in the configuration file

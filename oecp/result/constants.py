@@ -68,6 +68,7 @@ CMP_TYPE_CI_FILE_CONFIG = 'ci file config'
 CMP_TYPE_AT = 'AT'
 CMP_TYPE_CMD = 'rpm cmd'
 CMP_TYPE_RPM_HEADER = 'rpm header'
+CMP_TYPE_RPM_LIB = 'rpm lib'
 
 # COMPOSITE_CMPS which without detail report
 COMPOSITE_CMPS = {CMP_TYPE_RPM, CMP_TYPE_REPOSITORY}

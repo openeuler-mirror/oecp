@@ -21,6 +21,7 @@
             "rpm files",
             "rpm header",
             "rpm cmd",
-            "rpm service"
+            "rpm service",
+            "rpm lib"
           ]
 }
