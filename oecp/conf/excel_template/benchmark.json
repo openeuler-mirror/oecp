@@ -30,13 +30,13 @@
   },
   {
     "service detail": {
-      "standard": 0.9,
+      "standard": 0,
       "optionality": 0
     }
   },
   {
     "rpm config": {
-      "standard": 0.9,
+      "standard": 0,
       "optionality": 0
     }
   },

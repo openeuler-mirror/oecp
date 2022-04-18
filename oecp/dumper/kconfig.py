@@ -31,8 +31,11 @@ class KconfigDumper(AbstractDumper):
 
     def load_kconfig(self):
         kconfig = get_file_by_pattern(r"^config-", self.cache_dumper)
+        # CentOS-8.2.2004-aarch64-dvd1.iso 中config文件的文件名为：config
         if not kconfig:
-            return []
+            kconfig = get_file_by_pattern(r"^config", self.cache_dumper)
+            if not kconfig:
+                return []
 
         item = {}
         kernel = 'kernel'

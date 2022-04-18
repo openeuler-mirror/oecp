@@ -12,10 +12,13 @@
 # See the Mulan PSL v1 for more details.
 # **********************************************************************************
 """
+import json
 import sqlite3
 import os
 import bz2
 import gzip
+from pathlib import Path
+
 try:
     import lzma
 except ImportError:
@@ -78,6 +81,13 @@ class SQLiteMapping(RepositoryPackageMapping):
             logger.info(f"sqlite file path: {sqlite_path}")
             self._sqlite_conn = sqlite3.connect(f"{sqlite_path}")
 
+    def read_rename_kernel(self):
+        directory_json_path = os.path.join(Path(__file__).parents[1], 'conf', 'rename_kernel')
+        with open(os.path.join(directory_json_path, 'all_rename_kernel.json'), 'r') as f:
+            all_rename_kernel = json.load(f)
+
+        return all_rename_kernel
+
     def repository_of_package(self, package):
         """
 
@@ -89,10 +99,12 @@ class SQLiteMapping(RepositoryPackageMapping):
         cursor = self._sqlite_conn.cursor()
         rows = cursor.execute(f"SELECT rpm_sourcerpm from packages where name=\"{name}\"")
 
+        all_rename_kernel = self.read_rename_kernel()
         for row in rows:
-            # UniKylin-3.4-1A-2101-301101-aarch64.iso, kernel and kernel-core repo is kernel-kalt
-            if row[0].startswith('kernel-kalt'):
-                return row[0].replace('kernel-kalt', 'kernel', 1)
+            # Some iso, kernel and kernel-core repo in the rename kernel
+            for rename_kernel in all_rename_kernel:
+                if row[0].startswith(rename_kernel):
+                    return row[0].replace(rename_kernel, 'kernel', 1)
             return row[0]
 
         return package
