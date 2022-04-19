@@ -33,7 +33,7 @@ PKG_NAME = {
         '4': "less",
         '5': "more"
     }
-MARK_PKG = {'gcc', 'glibc', 'kernel', 'qemu', 'libvirt', 'docker-engine', 'java-11-openjdk', 'java-1.8.0-openjdk', 'systemd', 'openssh', 'lvm2', 'busybox', 'initscripts'}
+MARK_PKG = {'gcc', 'glibc', 'qemu', 'libvirt', 'docker-engine', 'java-11-openjdk', 'java-1.8.0-openjdk', 'systemd', 'openssh', 'lvm2', 'busybox', 'initscripts'}
 
 def get_similarity(rows, side_a, side_b):
     similarity = {}
@@ -135,6 +135,8 @@ def rpm_count(rows, side_a, side_b):
 
         pkg = result[side_a + " binary rpm package"]
         name = RPMProxy.rpm_name(pkg) if pkg else ''
+        if float(result["compare result"]) > 4:
+            continue
         if name in MARK_PKG:
             if float(result["compare result"]) > 2:
                 b = result.get(side_b + " binary rpm package")
@@ -146,14 +148,11 @@ def rpm_count(rows, side_a, side_b):
                     count["core_pkg"]["same"] += 1
                 else:
                     count["core_pkg"]["diff"] += 1
-
-        if float(result["compare result"]) > 4:
-            continue
-
-        if (result["compare result"] in RESULT_SAME) and is_same_rpm(rows.get(pkg)):
-            count[result["category level"]]["same"] += 1
         else:
-            count[result["category level"]]["diff"] += 1
+            if (result["compare result"] in RESULT_SAME) and is_same_rpm(rows.get(pkg)):
+                count[result["category level"]]["same"] += 1
+            else:
+                count[result["category level"]]["diff"] += 1
     return count, mark_pkgs
 
 def is_same_rpm(rpm_cmp_result):
