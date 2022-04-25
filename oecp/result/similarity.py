@@ -115,6 +115,15 @@ def count_single_result(count, result, cmp_type):
         count[cmp_type]['all']['diff'] += 1
 
 def rpm_count(rows, side_a, side_b):
+    '''
+    Explanation for rpm package result[compare result]:
+        1   -- same name + version + son-version + release num
+        1.1 -- same name + version + son-version
+        2   -- same name + version
+        3   -- same name
+        4   -- less
+        5   -- more
+    '''
     rpm_results = rows.get(CMP_TYPE_RPM)
     count = {
 	    1 : {"same": 0, "diff": 0},
