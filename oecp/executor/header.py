@@ -92,7 +92,7 @@ class HeaderCompareExecutor(CompareExecutor):
         verbose_diff_path = f'{dump_a["rpm"]}__diff__{dump_b["rpm"]}'
         dump_a_files = dump_a[self.data]
         dump_b_files = dump_b[self.data]
-        common_file_pairs = self.split_common_files(dump_a_files, dump_b_files)
+        common_file_pairs, only_file_a, only_file_b = self.split_common_files(dump_a_files, dump_b_files)
         base_dir = os.path.join(self._work_dir, kind, verbose_diff_path)
         for pair in common_file_pairs:
             self._exclude_comments(pair[0])
@@ -130,6 +130,16 @@ class HeaderCompareExecutor(CompareExecutor):
                 data = CompareResultComponent(
                     CMP_TYPE_RPM_HEADER, CMP_RESULT_SAME, base_a, base_b)
             result.add_component(data)
+        if only_file_a:
+            for file_a in only_file_a:
+                data = CompareResultComponent(CMP_TYPE_RPM_HEADER, CMP_RESULT_LESS, os.path.basename(file_a), '')
+                result.add_component(data)
+                count_result["less_count"] += 1
+        if only_file_b:
+            for file_b in only_file_b:
+                data = CompareResultComponent(CMP_TYPE_RPM_HEADER, CMP_RESULT_MORE, '', os.path.basename(file_b))
+                result.add_component(data)
+                count_result["more_count"] += 1
         result.add_count_info(count_result)
 
         return result

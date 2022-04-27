@@ -18,7 +18,7 @@ import os
 
 from oecp.executor.base import CompareExecutor
 from oecp.result.compare_result import CMP_RESULT_SAME, CompareResultComposite, CMP_TYPE_RPM, CMP_RESULT_DIFF, \
-    CompareResultComponent, CMP_TYPE_SERVICE,CMP_TYPE_SERVICE_DETAIL
+    CompareResultComponent, CMP_TYPE_SERVICE,CMP_TYPE_SERVICE_DETAIL, CMP_RESULT_LESS, CMP_RESULT_MORE
 from oecp.proxy.rpm_proxy import RPMProxy
 
 logger = logging.getLogger('oecp')
@@ -95,7 +95,7 @@ class ServiceCompareExecutor(CompareExecutor):
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
         dump_a_files = dump_a[self.data]
         dump_b_files = dump_b[self.data]
-        common_file_pairs = self._split_common_files(dump_a_files, dump_b_files)
+        common_file_pairs, only_file_a, only_file_b = self.split_common_files(dump_a_files, dump_b_files)
         if not common_file_pairs:
             logger.debug(f"No service package found, ignored with {dump_b['rpm']} and {dump_b['rpm']}")
             return result
@@ -107,11 +107,22 @@ class ServiceCompareExecutor(CompareExecutor):
             file_result, component_results = self.format_service_detail(details_a, details_b)
             if file_result == 'diff':
                 count_result["diff_count"] += 1
+                result.set_cmp_result(file_result)
             data = CompareResultComponent(
                 CMP_TYPE_SERVICE, file_result, base_a, base_b)
             result.add_component(data)
             result_detail = self._detail_set(dump_a, dump_b, component_results, base_a, base_b)
             result.add_component(result_detail)
+        if only_file_a:
+            for file_a in only_file_a:
+                data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_LESS, os.path.basename(file_a), '')
+                result.add_component(data)
+                count_result["less_count"] += 1
+        if only_file_b:
+            for file_b in only_file_b:
+                data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_MORE, '', os.path.basename(file_b))
+                result.add_component(data)
+                count_result["more_count"] += 1
         result.add_count_info(count_result)
         return result
 

@@ -79,24 +79,26 @@ class RPMExtractDumper(AbstractDumper):
                     self._config_files.setdefault(extract_dir_name, []).append(file_path)
 
     def _collect_library_files(self, extract_dir_name):
+        link_so_file = extract_dir_name + "_linkfile"
         if 'debuginfo' in extract_dir_name:
             return
         extract_path_obj = Path(extract_dir_name)
         all_files = [extract_path_obj.glob('lib/**/*'), extract_path_obj.glob('lib64/**/*'),
                      extract_path_obj.glob('usr/lib/**/*'), extract_path_obj.glob('usr/lib64/**/*')]
         self._library_files.setdefault(extract_dir_name, [])
+        self._library_files.setdefault(link_so_file, [])
         for glob in all_files:
             for file in glob:
                 if file.is_file():
                     file_path = file.as_posix()
                     file_type = magic.from_file(file_path, mime=True)
-                    if file_type in self._library_mime:
+                    if file_type in self._library_mime and ".so" in file_path:
                         self._library_files.setdefault(extract_dir_name, []).append(file_path)
                 elif os.path.islink(file.as_posix()):
                     link_file_name = os.readlink(file.as_posix())
                     if link_file_name.endswith(".so") or ".so." in link_file_name:
-                        origin_file_name = os.path.basename(file.as_posix())
-                        logger.info(f"{origin_file_name} is a link file that does not exist locally")
+                        self._library_files.setdefault(link_so_file, []).append(
+                            [os.path.basename(file.as_posix()), link_file_name])
 
     def _collect_service_files(self, extract_dir_name):
         extract_path_obj = Path(extract_dir_name)

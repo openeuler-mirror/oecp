@@ -22,9 +22,7 @@ from openpyxl.styles import PatternFill
 from pathlib import Path
 
 from oecp.result.compress import gen_hash_key
-from oecp.result.constants import FONT_SIZE, REQUIRED_ROW, \
-    SEVEN_COLUMN, SIX_COLUMN, TEN_ROW, \
-    THREE_ROW, TWO_COLUMN, TWO_ROW
+from oecp.result.constants import *
 
 logger = logging.getLogger("oecp")
 
@@ -112,6 +110,13 @@ class DataExcelFile:
         """
         return "%.2f%%" % (data * 100)
 
+    def obtain_base_os(self, side_a):
+        base_so = side_a.split("-")[:4]
+        for part in base_so:
+            if '.iso' in part or "aarch64" == part or "x86_64" == part:
+                base_so.remove(part)
+        return " ".join(base_so)
+
     def result_comparison(self, similarity, content, option, data, index):
         """
         Calculate whether to pass according to the result
@@ -193,12 +198,19 @@ class DataExcelFile:
             None
         """
         self.conclusion = self.read_excel_content()
+        os_name = side_a.split('-')[0]
         self.open_excel()
-        self.sheet.cell(row=6, column=SIX_COLUMN).value = " ".join(side_a.split("-")[:3])
+        self.sheet.cell(row=SIX_ROW, column=FIVE_COLUMN).value = SIX_TITLE[0] + os_name + SIX_TITLE[1]
+        self.sheet.cell(row=ELEVEN_ROW, column=FOUR_COLUMN).value = ELEVEN_TITLE[0] + os_name + ELEVEN_TITLE[1]
+        self.sheet.cell(row=TWELVE_ROW, column=FOUR_COLUMN).value = TWELVE_TITLE[0] + os_name + TWELVE_TITLE[1]
+        self.sheet.cell(row=THIRTEEN_ROW, column=FOUR_COLUMN).value = THIRTEEN_TITLE[0] + os_name + THIRTEEN_TITLE[1]
+        self.sheet.cell(row=FOURTEEN_ROW, column=FOUR_COLUMN).value = FOURTEEN_TITLE[0] + os_name + FOURTEEN_TITLE[1]
+        self.sheet.cell(row=FIFTEEN_ROW, column=FOUR_COLUMN).value = FIFTEEN_TITLE[0] + os_name + FIFTEEN_TITLE[1]
+        self.sheet.cell(row=SIX_ROW, column=SIX_COLUMN).value = self.obtain_base_os(side_a)
         self.sheet.cell(row=TWO_ROW, column=SIX_COLUMN).value = edition
         version = "aarch64" if "aarch64" in edition else "X86"
         self.sheet.cell(row=THREE_ROW, column=SIX_COLUMN).value = version
-        self.sheet.cell(row=5, column=SIX_COLUMN).value = gen_hash_key(iso_path)
+        self.sheet.cell(row=FIVE_ROW, column=SIX_COLUMN).value = gen_hash_key(iso_path)
         font_color = self.green_font if self.conclusion == "通过" else self.red_font
         self.sheet.cell(row=THREE_ROW, column=TWO_COLUMN, value=self.conclusion).font = font_color
         self.table.save(self.osv_summary_path)

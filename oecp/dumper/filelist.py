@@ -49,19 +49,15 @@ class FileListDumper(AbstractDumper):
                 for line in out.split("\n"):
                     if not line:
                         continue
-                    elif re.match(PATTERN_CONFIG, line):
+                    for filter_pattern in FILTER_PATTERN.values():
+                        if re.match(filter_pattern, line):
+                            line = "other"
+                            break
+                    if line == "other":
                         continue
-                    elif re.match(PATTERN_HEADER, line):
+                    elif "metadata_list-compact" in line:
                         continue
-                    elif re.match(PATTERN_SERVICE, line):
-                        continue
-                    elif re.match(PATTERN_CMD[0], line) or re.match(PATTERN_CMD[1], line):
-                        continue
-                    elif re.match(PATTERN_LIB[0], line):
-                        continue
-                    elif PATTERN_LIB[1] in line:
-                        continue
-                    if "metadata_list-compact" in line:
+                    elif ".so." in line and not line.endswith(".py"):
                         continue
                     if rpm_name in white_list['rpm_name_list']:
                         dump_list.append(os.path.basename(line))

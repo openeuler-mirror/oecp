@@ -38,6 +38,7 @@ class ABICompareExecutor(CompareExecutor):
         self._work_dir = self.config.get(cache_require_key, {}).get('work_dir', DETAIL_PATH)
         self.data = 'data'
         self.split_flag = '__rpm__'
+        self.link_file = 'link_file'
 
     @staticmethod
     def _set_so_mapping(library_files):
@@ -63,6 +64,15 @@ class ABICompareExecutor(CompareExecutor):
             if so_name in so_mapping_b:
                 library_pairs.append([so_mapping_a[so_name], so_mapping_b[so_name]])
         return library_pairs
+
+    def compare_link_files(self, dump_a_linkfiles, dump_b_linkfiles, rpm):
+        for file_a in dump_a_linkfiles:
+            for file_b in dump_b_linkfiles:
+                if file_a[0] == file_b[0]:
+                    if file_a[1] == file_b[1]:
+                        continue
+                    else:
+                        logger.info(f"{rpm} {file_a[0]} link file is change!")
 
     @staticmethod
     def _save_result(file_path, content):
@@ -135,6 +145,8 @@ class ABICompareExecutor(CompareExecutor):
                 count_result["diff_count"] += 1
                 result.set_cmp_result(CMP_RESULT_DIFF)
                 result.add_component(data)
+        dump_a_linkfiles, dump_b_linkfiles = dump_a[self.link_file], dump_b[self.link_file]
+        self.compare_link_files(dump_a_linkfiles, dump_b_linkfiles, rpm_a)
         result.add_count_info(count_result)
 
         return result
