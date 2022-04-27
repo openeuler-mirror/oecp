@@ -48,6 +48,15 @@ class ServiceCompareExecutor(CompareExecutor):
                     common_file_pairs.append([file_a, file_b])
         return common_file_pairs
 
+    def _intercept_file_name(self, file, pattern="full"):
+        common_path_flag = '/usr/lib/systemd/system/'
+        full_path = file.split(self.split_flag)[-1]
+        if pattern == 'half':
+            half_path = full_path.split(common_path_flag)[-1]
+            if '/' in half_path:
+                half_path = '/' + half_path
+            return half_path
+        return full_path
 
     def _load_details(self,file_path):
         """
@@ -100,8 +109,10 @@ class ServiceCompareExecutor(CompareExecutor):
             logger.debug(f"No service package found, ignored with {dump_b['rpm']} and {dump_b['rpm']}")
             return result
         for pair in common_file_pairs:
-            base_a = pair[0].split(self.split_flag)[-1]
-            base_b = pair[1].split(self.split_flag)[-1]
+            detail_filename = self._intercept_file_name(pair[0])
+            # 不显示/usr/lib/systemd/system/路径
+            base_a = self._intercept_file_name(pair[0], 'half')
+            base_b = self._intercept_file_name(pair[1], 'half')
             details_a = self._load_details(pair[0])
             details_b = self._load_details(pair[1])
             file_result, component_results = self.format_service_detail(details_a, details_b)
@@ -111,17 +122,17 @@ class ServiceCompareExecutor(CompareExecutor):
             data = CompareResultComponent(
                 CMP_TYPE_SERVICE, file_result, base_a, base_b)
             result.add_component(data)
-            result_detail = self._detail_set(dump_a, dump_b, component_results, base_a)
+            result_detail = self._detail_set(dump_a, dump_b, component_results, detail_filename)
             result.add_component(result_detail)
         if only_file_a:
             for file_a in only_file_a:
-                side_a = file_a.split(self.split_flag)[-1]
+                side_a = self._intercept_file_name(file_a, 'half')
                 data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_LESS, side_a, '')
                 result.add_component(data)
                 count_result["less_count"] += 1
         if only_file_b:
             for file_b in only_file_b:
-                side_b = file_b.split(self.split_flag)[-1]
+                side_b = self._intercept_file_name(file_b, 'half')
                 data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_MORE, '', side_b)
                 result.add_component(data)
                 count_result["more_count"] += 1
