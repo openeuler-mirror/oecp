@@ -71,7 +71,7 @@ class ServiceCompareExecutor(CompareExecutor):
                     item.setdefault(name,version)
         return item
 
-    def _detail_set(self, dump_a, dump_b, component_results, base_a, single_result=CMP_RESULT_SAME):
+    def _detail_set(self, dump_a, dump_b, component_results, detail_filename, single_result=CMP_RESULT_SAME):
         """
         格式化比较文件结果并输出对比结果
         :param component_results:side_a and side_b service 文件的对比结果
@@ -85,7 +85,7 @@ class ServiceCompareExecutor(CompareExecutor):
                 if sub_component_result[-1] != CMP_RESULT_SAME and single_result == CMP_RESULT_SAME:
                     single_result = CMP_RESULT_DIFF
                     result.set_cmp_result(single_result)
-                result._detail = {"file_name": base_a}
+                result._detail = {"file_name": detail_filename}
                 result.add_component(data)
         return result
 
@@ -100,8 +100,8 @@ class ServiceCompareExecutor(CompareExecutor):
             logger.debug(f"No service package found, ignored with {dump_b['rpm']} and {dump_b['rpm']}")
             return result
         for pair in common_file_pairs:
-            base_a = os.path.basename(pair[0])
-            base_b = os.path.basename(pair[1])
+            base_a = pair[0].split(self.split_flag)[-1]
+            base_b = pair[1].split(self.split_flag)[-1]
             details_a = self._load_details(pair[0])
             details_b = self._load_details(pair[1])
             file_result, component_results = self.format_service_detail(details_a, details_b)
@@ -111,16 +111,18 @@ class ServiceCompareExecutor(CompareExecutor):
             data = CompareResultComponent(
                 CMP_TYPE_SERVICE, file_result, base_a, base_b)
             result.add_component(data)
-            result_detail = self._detail_set(dump_a, dump_b, component_results, base_a, base_b)
+            result_detail = self._detail_set(dump_a, dump_b, component_results, base_a)
             result.add_component(result_detail)
         if only_file_a:
             for file_a in only_file_a:
-                data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_LESS, os.path.basename(file_a), '')
+                side_a = file_a.split(self.split_flag)[-1]
+                data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_LESS, side_a, '')
                 result.add_component(data)
                 count_result["less_count"] += 1
         if only_file_b:
             for file_b in only_file_b:
-                data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_MORE, '', os.path.basename(file_b))
+                side_b = file_b.split(self.split_flag)[-1]
+                data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_MORE, '', side_b)
                 result.add_component(data)
                 count_result["more_count"] += 1
         result.add_count_info(count_result)
