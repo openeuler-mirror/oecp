@@ -34,10 +34,6 @@ class ABIDumper(AbstractDumper):
         library_files = self.cache_dumper.get_library_files(rpm_extract_dir)
         return library_files
 
-    def _get_jar_files(self, rpm_extract_dir):
-        jar_files = self.cache_dumper.get_jar_files(rpm_extract_dir)
-        return jar_files
-
     def dump(self, repository):
         rpm_path = repository['path']
         debuginfo_path = repository['debuginfo_path']
@@ -53,10 +49,6 @@ class ABIDumper(AbstractDumper):
             raise
         library_files = self._get_library_files(rpm_extract_name)
         link_files = self._get_library_files(rpm_extract_linkfile)
-        # lib类型的dumper，也将jar文件取出。
-        if self.config["compare_type"] == "rpm lib":
-            jar_files = self._get_jar_files(rpm_extract_name)
-            library_files.extend(jar_files)
         item = {'rpm': os.path.basename(rpm_path),
                 'debuginfo_extract_path': debuginfo_extract_name,
                 'category': repository['category'].value, 'kind': 'abi',
