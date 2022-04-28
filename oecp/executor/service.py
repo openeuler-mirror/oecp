@@ -34,19 +34,6 @@ class ServiceCompareExecutor(CompareExecutor):
         self.data = 'data'
         self.split_flag = '__rpm__'
 
-    def _split_common_files(self, files_a, files_b):
-        """
-        split rpm service file to service pair
-        :param files_a:all rpm_a sevice files
-        :param files_b:all rpm_b sevice files
-        :return:
-        """
-        common_file_pairs = []
-        for file_a in files_a:
-            for file_b in files_b:
-                if file_a.split(self.split_flag)[-1] == file_b.split(self.split_flag)[-1]:
-                    common_file_pairs.append([file_a, file_b])
-        return common_file_pairs
 
     def _intercept_file_name(self, file, pattern="full"):
         common_path_flag = '/usr/lib/systemd/system/'
