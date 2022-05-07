@@ -95,20 +95,42 @@ PKG_SIMILARITY_SON_TYPES = {
 
 # EXCEL COMMON PARAMETERS
 REQUIRED_ROW = [9, 10, 12, 15, 16, 17, 18]
-SEVEN_COLUMN = 7
 FONT_SIZE = 18
+FIFTEEN_ROW = 15
+FOURTEEN_ROW = 14
+THIRTEEN_ROW = 13
+TWELVE_ROW = 12
+ELEVEN_ROW = 11
 TEN_ROW = 10
-SIX_COLUMN = 6
-TWO_COLUMN = 2
+SIX_ROW = 6
+FIVE_ROW = 5
 THREE_ROW = 3
 TWO_ROW = 2
+SEVEN_COLUMN = 7
+SIX_COLUMN = 6
+FIVE_COLUMN = 5
+FOUR_COLUMN = 4
+TWO_COLUMN = 2
+SIX_TITLE =["基于","的版本"]
+ELEVEN_TITLE =["OSV内核KABI接口白名单与","内核KABI接口白名单一致性比例"]
+TWELVE_TITLE =["OSV软件包ABI接口与","软件包ABI一致性比例"]
+THIRTEEN_TITLE =["OSV软件包Service文件与","软件包Service文件一致性比例"]
+FOURTEEN_TITLE =["OSV软件包配置文件与","软件包配置文件一致性比例"]
+FIFTEEN_TITLE =["OSV的内核配置与","一致性比例"]
 
 # Some file category filtering re pattern
-PATTERN_CONFIG = "^/etc/.*\.conf$"
-PATTERN_HEADER = ".*\.h$"
-PATTERN_SERVICE = "^/usr/lib/systemd/system/.*\.service$"
-PATTERN_CMD = ["^/usr/bin/.*", "^/usr/sbin/.*"]
-PATTERN_LIB = [".*\.so$", ".so."]
+FILTER_PATTERN = {
+        "config": "^/etc/.*\.conf$",
+        "header": ".*\.h$",
+        "service": "^/usr/lib/systemd/system/.*\.service$",
+        "jabi": ".*\.jar$",
+        "abi": ".*\.so$",
+        "cmd_1": "^/usr/bin/.*",
+        "cmd_2": "^/usr/sbin/.*",
+        "cmd_3": "^/usr/local/bin/.*",
+        "cmd_4": "^/usr/local/sbin/.*",
+        "cmd_5": "^/bin/.*"
+    }
 
 # The similarity item displayed in the JSON report
 TOOLS_RESULT_ITEMS= ['core_pkg', 'level2 pkg', 'kabi', 'level2 rpm abi', 'service detail',

@@ -42,12 +42,12 @@ class CmdCompareExecutor(CompareExecutor):
         count_result = {'more_count': 0, 'less_count': 0, 'diff_count': 0}
         category = dump_a['category']
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
-        cmd_a_file = self._split_files(dump_a[self.data])
-        cmd_b_file = self._split_files(dump_b[self.data])
-        if not cmd_a_file and not cmd_b_file:
+        file_a = self._split_files(dump_a[self.data])
+        file_b = self._split_files(dump_b[self.data])
+        if not file_a and not file_b:
             logger.debug(f"No {self.config.get('compare_type')} package found, ignored with {dump_b['rpm']} and {dump_b['rpm']}")
             return result
-        component_results = self.format_dump(cmd_a_file, cmd_b_file)
+        component_results = self.format_dump_file_level(file_a, file_b)
         for component_result in component_results:
             for sub_component_result in component_result:
                 if not self.config.get('show_same', False) and sub_component_result[-1] == CMP_RESULT_SAME:

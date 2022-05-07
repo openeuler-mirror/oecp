@@ -58,13 +58,46 @@ class CompareExecutor(ABC):
         return all_dump
 
     @staticmethod
+    def format_dump_file_level(data_a, data_b):
+        dump_set_a, dump_set_b = set(data_a), set(data_b)
+        common_dump = dump_set_a & dump_set_b
+        only_dump_a = dump_set_a - dump_set_b
+        only_dump_b = dump_set_b - dump_set_a
+        change_dump = []
+        for side_a_file in list(only_dump_a):
+            for side_b_file in list(only_dump_b):
+                file_a, file_b = os.path.basename(side_a_file), os.path.basename(side_b_file)
+                if file_a == file_b or file_a.split('.so.')[0] == file_b.split('.so.')[0]:
+                    change_dump.append([side_a_file, side_b_file])
+                    only_dump_a.discard(side_a_file)
+                    only_dump_b.discard(side_b_file)
+                elif file_a.endswith('.so') and file_b.endswith('.so'):
+                    if file_a.split('-')[0] == file_b.split('-')[0]:
+                        change_dump.append([side_a_file, side_b_file])
+                        only_dump_a.discard(side_a_file)
+                        only_dump_b.discard(side_b_file)
+
+        all_dump = [
+            [[x, x, CMP_RESULT_SAME] for x in common_dump],
+            [[x[0], x[1], CMP_RESULT_CHANGE] for x in change_dump],
+            [[x, '', CMP_RESULT_LESS] for x in only_dump_a],
+            [['', x, CMP_RESULT_MORE] for x in only_dump_b]
+        ]
+        return all_dump
+
+    @staticmethod
     def split_common_files(files_a, files_b):
-        common_file_pairs = []
+        common_file_pairs, common_file_a, common_file_b = [], [], []
         for file_a in files_a:
             for file_b in files_b:
                 if file_a.split('__rpm__')[-1] == file_b.split('__rpm__')[-1]:
                     common_file_pairs.append([file_a, file_b])
-        return common_file_pairs
+                    common_file_a.append(file_a)
+                    common_file_b.append(file_b)
+        only_file_a = list(set(files_a) - set(common_file_a))
+        only_file_b = list(set(files_b) - set(common_file_b))
+        return common_file_pairs, only_file_a, only_file_b
+
 
     @staticmethod
     def format_dump_kv(data_a, data_b, kind):
