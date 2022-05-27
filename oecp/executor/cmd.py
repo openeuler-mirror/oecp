@@ -34,8 +34,9 @@ class CmdCompareExecutor(CompareExecutor):
 
     def _split_files(self, cmd_file):
         split_file = []
-        for file in cmd_file:
-            split_file.append(file.split(self.split_flag)[-1])
+        if cmd_file:
+            for file in cmd_file:
+                split_file.append(file.split(self.split_flag)[-1])
         return split_file
 
     def _compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
