@@ -69,6 +69,7 @@ CMP_TYPE_AT = 'AT'
 CMP_TYPE_CMD = 'rpm cmd'
 CMP_TYPE_RPM_HEADER = 'rpm header'
 CMP_TYPE_RPM_LIB = 'rpm lib'
+CMP_TYPE_DIFFERENCES = 'differences'
 
 # COMPOSITE_CMPS which without detail report
 COMPOSITE_CMPS = {CMP_TYPE_RPM, CMP_TYPE_REPOSITORY}
@@ -129,7 +130,9 @@ FILTER_PATTERN = {
         "cmd_2": "^/usr/sbin/.*",
         "cmd_3": "^/usr/local/bin/.*",
         "cmd_4": "^/usr/local/sbin/.*",
-        "cmd_5": "^/bin/.*"
+        "cmd_5": "^/bin/.*",
+        "build": "^/usr/lib/.build-id/.*",
+        "ima": "^/etc/ima/.*"
     }
 
 # The similarity item displayed in the JSON report
@@ -139,3 +142,6 @@ PLATFORM_RESULT_ITEMS = ['rpm test', 'AT', 'performance', 'ciconfig']
 
 # DETAIL PATH
 DETAIL_PATH = '/tmp/details_analyse/'
+
+# The Column names of the Details in the RPM REPORT
+ALL_DETAILS_NAME = ['effect drivers', 'abi details']

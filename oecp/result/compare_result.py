@@ -202,10 +202,12 @@ class CompareResultComposite(CompareResultComponent):
         web_show_result = WebShowResult(excel_file.tools_result, excel_file.conclusion)
         web_show_result.write_json_result(*args)
         rows["similarity"] = [similarity]
-
         summary = assgin_summary_result(rows, base_side_a, base_side_b)
+        differences = get_differences_info(rows)
         if summary:
             rows["result"] = summary
+        if differences:
+            rows[CMP_TYPE_DIFFERENCES] = differences
 
         for node, value in rows.items():
             if node == CMP_TYPE_RPMS_TEST:
@@ -231,6 +233,11 @@ class CompareResultComposite(CompareResultComponent):
                         base_side_a + " binary rpm package": explan
                     }
                     value = [rpm_name_info] + value
+                elif node == CMP_TYPE_DIFFERENCES:
+                    for details_name in ALL_DETAILS_NAME:
+                        if details_name not in headers:
+                            headers = list(headers)
+                            headers.append(details_name)
 
                 export.create_csv_report(headers, value, report_path)
             else:
@@ -392,9 +399,9 @@ def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, 
             if result._detail:
                 row["abi details"] = result._detail
         elif result._cmp_type == CMP_TYPE_DRIVE_KABI:
-            row["effect_driver"] = ''
+            row["effect drivers"] = ''
             if result._detail:
-                row["effect_driver"] = result._detail
+                row["effect drivers"] = result._detail
     # handle kabi result
     # if is_kernel:
     #    row.pop("binary rpm package")
@@ -429,6 +436,17 @@ def assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b, parent_side_a,
     rows.setdefault(CMP_TYPE_RPM, [])
     rows[CMP_TYPE_RPM].append(row)
 
+def get_differences_info(rows):
+    differences_info = []
+    for key in rows.keys():
+        if key.endswith('.rpm') and not key.endswith('.src.rpm'):
+            for cmp_type, results in rows[key].items():
+                if cmp_type == CMP_TYPE_SERVICE_DETAIL:
+                    continue
+                for single_result in results:
+                    if single_result['compare result'] != CMP_RESULT_SAME:
+                        differences_info.append(single_result)
+    return differences_info
 
 def compare_result_name_to_attr(name):
     """
