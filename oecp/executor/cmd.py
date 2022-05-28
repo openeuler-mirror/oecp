@@ -34,8 +34,9 @@ class CmdCompareExecutor(CompareExecutor):
 
     def _split_files(self, cmd_file):
         split_file = []
-        for file in cmd_file:
-            split_file.append(file.split(self.split_flag)[-1])
+        if cmd_file:
+            for file in cmd_file:
+                split_file.append(file.split(self.split_flag)[-1])
         return split_file
 
     def _compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
@@ -47,7 +48,7 @@ class CmdCompareExecutor(CompareExecutor):
         if not file_a and not file_b:
             logger.debug(f"No {self.config.get('compare_type')} package found, ignored with {dump_b['rpm']} and {dump_b['rpm']}")
             return result
-        component_results = self.format_dump_file_level(file_a, file_b)
+        component_results = self.format_dump(file_a, file_b)
         for component_result in component_results:
             for sub_component_result in component_result:
                 if not self.config.get('show_same', False) and sub_component_result[-1] == CMP_RESULT_SAME:
