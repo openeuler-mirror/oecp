@@ -145,3 +145,7 @@ DETAIL_PATH = '/tmp/details_analyse/'
 
 # The Column names of the Details in the RPM REPORT
 ALL_DETAILS_NAME = ['effect drivers', 'abi details']
+
+# The Character in File name have changed.
+OLD_CHAR = ('oe1')
+NEW_CHAR = {'oe1':['ky10']}

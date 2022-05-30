@@ -19,6 +19,7 @@ from oecp.result.compare_result import CMP_RESULT_MORE, CMP_RESULT_LESS, CMP_RES
     CMP_RESULT_CHANGE
 
 # 两者category指定的级别不同或者未指定
+from oecp.result.constants import OLD_CHAR, NEW_CHAR
 
 CPM_CATEGORY_DIFF = 4
 
@@ -30,7 +31,7 @@ class CompareExecutor(ABC):
         self.dump_b = dump_b
         self.config = config
 
-    def get_version_change_files(self, side_a_file, side_b_file):
+    def get_version_change_files(self, side_a_file, side_b_file, o_char=None, n_char=None):
         side_a_floders = side_a_file.split('/')
         side_b_floders = side_b_file.split('/')
         compare_result = 'same'
@@ -40,7 +41,7 @@ class CompareExecutor(ABC):
                 floder_b = side_b_floders[index]
                 if floder_a == floder_b:
                     continue
-                elif floder_a.split('oe1') == floder_b.split('ky10'):
+                elif floder_a.split(o_char) == floder_b.split(n_char):
                     continue
                 elif re.search('\d+\.\d+', side_a_floders[index]) and re.search('\d+\.\d+', side_b_floders[index]):
                     compare_result = "change"
@@ -74,8 +75,10 @@ class CompareExecutor(ABC):
                     if file_a_version_2 and file_b_version_2:
                         get_result = self.get_version_change_files(side_a_file, side_b_file)
                 # 识别麒麟iso文件、文件夹命名'oe1'字样更改为'ky10'
-                elif file_a.split('oe1') == file_b.split('ky10'):
-                    get_result = self.get_version_change_files(side_a_file, side_b_file)
+                for o_char in OLD_CHAR:
+                    for n_char in NEW_CHAR[o_char]:
+                        if file_a.split(o_char) == file_b.split(NEW_CHAR[n_char]):
+                            get_result = self.get_version_change_files(side_a_file, side_b_file, o_char, n_char)
 
                 if get_result == "change":
                     change_dump.append([side_a_file, side_b_file])
