@@ -33,7 +33,6 @@ PKG_NAME = {
         '4': "less",
         '5': "more"
     }
-MARK_PKG = {'gcc', 'glibc', 'qemu', 'libvirt', 'docker-engine', 'java-11-openjdk', 'java-1.8.0-openjdk', 'systemd', 'openssh', 'lvm2', 'busybox', 'initscripts'}
 
 def get_similarity(rows, side_a, side_b):
     similarity = {}
@@ -75,10 +74,12 @@ def get_similarity(rows, side_a, side_b):
 
     for count_type, result in count.items():
         if count_type == CMP_TYPE_RPM_ABI:
+            l0_rate = count_rate(count[count_type][0]["same"], (count[count_type][0]["same"] + count[count_type][0]["diff"]))
             l1_rate = count_rate(count[count_type][1]["same"], (count[count_type][1]["same"] + count[count_type][1]["diff"]))
             l2_same = count[count_type][1]["same"] + count[count_type][2]["same"]
             l2_diff = count[count_type][1]["diff"] + count[count_type][2]["diff"]
             l2_rate = count_rate(l2_same, l2_same + l2_diff)
+            similarity["level0 " + count_type] = l0_rate
             similarity["level1 " + count_type] = l1_rate
             similarity["level2 " + count_type] = l2_rate
         rate = count_rate(count[count_type]["all"]["same"], (count[count_type]["all"]["same"] + count[count_type]["all"]["diff"]))
@@ -98,6 +99,7 @@ def get_all_pkg_simlarity(count):
 
 def count_single_result(count, result, cmp_type):
     count.setdefault(cmp_type, {
+        0 : {"same": 0, "diff": 0},
 	    1 : {"same": 0, "diff": 0},
 	    2 : {"same": 0, "diff": 0},
 	    'all' : {"same": 0, "diff": 0},
@@ -143,10 +145,9 @@ def rpm_count(rows, side_a, side_b):
             continue
 
         pkg = result[side_a + " binary rpm package"]
-        name = RPMProxy.rpm_name(pkg) if pkg else ''
         if float(result["compare result"]) > 4:
             continue
-        if name in MARK_PKG:
+        if result["category level"] == 0:
             if float(result["compare result"]) > 2:
                 b = result.get(side_b + " binary rpm package")
                 mark_pkg = b if b else pkg

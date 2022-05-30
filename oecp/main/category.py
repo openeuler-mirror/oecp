@@ -26,6 +26,7 @@ logger = logging.getLogger("oecp")
 
 @unique
 class CategoryLevel(Enum):
+    CATEGORY_LEVEL_ZERO = 0  # 核心包等级
     CATEGORY_LEVEL_ONE = 1
     CATEGORY_LEVEL_TWO = 2
     CATEGORY_LEVEL_THREE = 3
@@ -45,7 +46,8 @@ class Category(object):
         """
         self._src_categories = {}
         self._bin_categories = {}
-
+        self.CORE_PKG = {'gcc', 'glibc', 'qemu', 'libvirt', 'docker-engine', 'java-11-openjdk', 'java-1.8.0-openjdk',
+                         'systemd', 'openssh', 'lvm2', 'busybox', 'initscripts'}
         self._load(path)
 
     def _load(self, path):
@@ -88,4 +90,6 @@ class Category(object):
         :param name:
         :return:
         """
+        if name in self.CORE_PKG:
+            return CategoryLevel.CATEGORY_LEVEL_ZERO
         return self._bin_categories.get(name, CategoryLevel.CATEGORY_LEVEL_NOT_SPECIFIED)
