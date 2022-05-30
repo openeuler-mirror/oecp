@@ -33,26 +33,29 @@ class CompareExecutor(ABC):
     def get_version_change_files(self, side_a_file, side_b_file):
         side_a_floders = side_a_file.split('/')
         side_b_floders = side_b_file.split('/')
-        compare_result = 'change'
+        compare_result = 'same'
         if len(side_a_floders) == len(side_b_floders):
             for index in range(1, len(side_a_floders) - 1):
-                if side_a_floders[index] == side_b_floders[index]:
+                floder_a = side_a_floders[index]
+                floder_b = side_b_floders[index]
+                if floder_a == floder_b:
+                    continue
+                elif floder_a.split('oe1') == floder_b.split('ky10'):
+                    continue
+                elif re.search('\d+\.\d+', side_a_floders[index]) and re.search('\d+\.\d+', side_b_floders[index]):
+                    compare_result = "change"
                     continue
                 else:
-                    if re.search('\d+\.\d+', side_a_floders[index]) and re.search('\d+\.\d+', side_b_floders[index]):
-                        continue
-                    else:
-                        compare_result = 'diff'
-                        break
-            if compare_result == 'change':
-                return compare_result
+                    compare_result = 'diff'
+                    break
+            return compare_result
 
     def format_dump(self, data_a, data_b):
         dump_set_a, dump_set_b = set(data_a), set(data_b)
         common_dump = dump_set_a & dump_set_b
         only_dump_a = dump_set_a - dump_set_b
         only_dump_b = dump_set_b - dump_set_a
-        change_dump = []
+        change_dump, common_dump_add = [], []
         for side_a_file in list(only_dump_a):
             for side_b_file in list(only_dump_b):
                 get_result = ''
@@ -70,8 +73,16 @@ class CompareExecutor(ABC):
                     file_b_version_2 = re.search('\d+\.\d+\.\d+', file_a.split('.so.')[-1])
                     if file_a_version_2 and file_b_version_2:
                         get_result = self.get_version_change_files(side_a_file, side_b_file)
+                # 识别麒麟iso文件、文件夹命名'oe1'字样更改为'ky10'
+                elif file_a.split('oe1') == file_b.split('ky10'):
+                    get_result = self.get_version_change_files(side_a_file, side_b_file)
+
                 if get_result == "change":
                     change_dump.append([side_a_file, side_b_file])
+                    only_dump_a.discard(side_a_file)
+                    only_dump_b.discard(side_b_file)
+                elif get_result == "same":
+                    common_dump_add.append([side_a_file, side_b_file])
                     only_dump_a.discard(side_a_file)
                     only_dump_b.discard(side_b_file)
         all_dump = [
@@ -80,6 +91,9 @@ class CompareExecutor(ABC):
             [[x, '', CMP_RESULT_LESS] for x in only_dump_a],
             [['', x, CMP_RESULT_MORE] for x in only_dump_b]
         ]
+        if common_dump_add:
+            for common_cmp_pair in common_dump_add:
+                all_dump[0].append([common_cmp_pair[0], common_cmp_pair[1], CMP_RESULT_SAME])
         return all_dump
 
     @staticmethod
