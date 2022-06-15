@@ -325,10 +325,11 @@ class DistISO(Directory):
                     continue
                 ff = os.path.join(root, f)
                 sf = ff.split('/repodata/')[0]
-                if '/Packages/repodata/' in ff:
-                    packages2sqlite[sf] = ff
-                else:
+                if 'Packages' in os.listdir(sf):
+                    # 如果 Packages 和 repodata 文件夹在同一目录下，需要拼接路径
                     packages2sqlite[os.path.join(sf, 'Packages')] = ff
+                else:
+                    packages2sqlite[sf] = ff
         self._iso_packages_sqlite[iso] = packages2sqlite
 
     def compare(self, that, plan):
