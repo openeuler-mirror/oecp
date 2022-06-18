@@ -77,7 +77,7 @@ class CompareExecutor(ABC):
                 # 识别麒麟iso文件、文件夹命名'oe1'字样更改为'ky10'
                 for o_char in OLD_CHAR:
                     for n_char in NEW_CHAR[o_char]:
-                        if file_a.split(o_char) == file_b.split(NEW_CHAR[n_char]):
+                        if file_a.split(o_char) == file_b.split(n_char):
                             get_result = self.get_version_change_files(side_a_file, side_b_file, o_char, n_char)
 
                 if get_result == "change":
