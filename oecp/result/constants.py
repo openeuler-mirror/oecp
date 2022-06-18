@@ -147,5 +147,5 @@ DETAIL_PATH = '/tmp/details_analyse/'
 ALL_DETAILS_NAME = ['effect drivers', 'abi details']
 
 # The Character in File name have changed.
-OLD_CHAR = ('oe1')
+OLD_CHAR = ['oe1']
 NEW_CHAR = {'oe1':['ky10']}
