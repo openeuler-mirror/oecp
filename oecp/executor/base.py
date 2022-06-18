@@ -74,7 +74,7 @@ class CompareExecutor(ABC):
                     file_b_version_2 = re.search('\d+\.\d+\.\d+', file_a.split('.so.')[-1])
                     if file_a_version_2 and file_b_version_2:
                         get_result = self.get_version_change_files(side_a_file, side_b_file)
-                # 识别麒麟iso文件、文件夹命名'oe1'字样更改为'ky10'
+                # 识别rpm文件、文件夹名称中发行商字样变更
                 for o_char in OLD_CHAR:
                     for n_char in NEW_CHAR[o_char]:
                         if file_a.split(o_char) == file_b.split(n_char):
