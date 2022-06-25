@@ -19,6 +19,7 @@ from oecp.result.compare_result import CMP_RESULT_MORE, CMP_RESULT_LESS, CMP_RES
     CMP_RESULT_CHANGE
 
 # 两者category指定的级别不同或者未指定
+from oecp.result.constants import OLD_CHAR, NEW_CHAR
 
 CPM_CATEGORY_DIFF = 4
 
@@ -30,29 +31,32 @@ class CompareExecutor(ABC):
         self.dump_b = dump_b
         self.config = config
 
-    def get_version_change_files(self, side_a_file, side_b_file):
+    def get_version_change_files(self, side_a_file, side_b_file, o_char=None, n_char=None):
         side_a_floders = side_a_file.split('/')
         side_b_floders = side_b_file.split('/')
-        compare_result = 'change'
+        compare_result = 'same'
         if len(side_a_floders) == len(side_b_floders):
             for index in range(1, len(side_a_floders) - 1):
-                if side_a_floders[index] == side_b_floders[index]:
+                floder_a = side_a_floders[index]
+                floder_b = side_b_floders[index]
+                if floder_a == floder_b:
+                    continue
+                elif floder_a.split(o_char) == floder_b.split(n_char):
+                    continue
+                elif re.search('\d+\.\d+', side_a_floders[index]) and re.search('\d+\.\d+', side_b_floders[index]):
+                    compare_result = "change"
                     continue
                 else:
-                    if re.search('\d+\.\d+', side_a_floders[index]) and re.search('\d+\.\d+', side_b_floders[index]):
-                        continue
-                    else:
-                        compare_result = 'diff'
-                        break
-            if compare_result == 'change':
-                return compare_result
+                    compare_result = 'diff'
+                    break
+            return compare_result
 
     def format_dump(self, data_a, data_b):
         dump_set_a, dump_set_b = set(data_a), set(data_b)
         common_dump = dump_set_a & dump_set_b
         only_dump_a = dump_set_a - dump_set_b
         only_dump_b = dump_set_b - dump_set_a
-        change_dump = []
+        change_dump, common_dump_add = [], []
         for side_a_file in list(only_dump_a):
             for side_b_file in list(only_dump_b):
                 get_result = ''
@@ -70,8 +74,18 @@ class CompareExecutor(ABC):
                     file_b_version_2 = re.search('\d+\.\d+\.\d+', file_a.split('.so.')[-1])
                     if file_a_version_2 and file_b_version_2:
                         get_result = self.get_version_change_files(side_a_file, side_b_file)
+                # 识别rpm文件、文件夹名称中发行商字样变更
+                for o_char in OLD_CHAR:
+                    for n_char in NEW_CHAR[o_char]:
+                        if file_a.split(o_char) == file_b.split(n_char):
+                            get_result = self.get_version_change_files(side_a_file, side_b_file, o_char, n_char)
+
                 if get_result == "change":
                     change_dump.append([side_a_file, side_b_file])
+                    only_dump_a.discard(side_a_file)
+                    only_dump_b.discard(side_b_file)
+                elif get_result == "same":
+                    common_dump_add.append([side_a_file, side_b_file])
                     only_dump_a.discard(side_a_file)
                     only_dump_b.discard(side_b_file)
         all_dump = [
@@ -80,6 +94,9 @@ class CompareExecutor(ABC):
             [[x, '', CMP_RESULT_LESS] for x in only_dump_a],
             [['', x, CMP_RESULT_MORE] for x in only_dump_b]
         ]
+        if common_dump_add:
+            for common_cmp_pair in common_dump_add:
+                all_dump[0].append([common_cmp_pair[0], common_cmp_pair[1], CMP_RESULT_SAME])
         return all_dump
 
     @staticmethod
