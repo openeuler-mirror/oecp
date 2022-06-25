@@ -108,20 +108,25 @@ class ListCompareExecutor(CompareExecutor):
                 rpm_list_b.sort()
                 rpm_a, rpm_b = ', '.join(rpm_list_a), ', '.join(rpm_list_b)
                 # 多版本rpm排序后，取第一个版本进行比较
-                rpm_a_n, rpm_a_v, rpm_a_r, rpm_a_d, _ = RPMProxy.rpm_n_v_r_d_a(rpm_list_a[0])
-                rpm_b_n, rpm_b_v, rpm_b_r, rpm_b_d, _ = RPMProxy.rpm_n_v_r_d_a(rpm_list_b[0])
-                if rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r == rpm_b_r and rpm_a_d != rpm_b_d:
-                    row = [rpm_a, rpm_b, CMP_LEVEL_NEARLY_SAME]
-                elif rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r != rpm_b_r:
-                    row = [rpm_a, rpm_b, CMP_LEVEL_BIG_VERSION_SAME]
-                elif rpm_a_n == rpm_b_n and rpm_a_v != rpm_b_v:
-                    row = [rpm_a, rpm_b, CMP_LEVEL_VERSION_DIFF]
+                rpm_a_n, rpm_a_v, rpm_a_r, rpm_a_d, rpm_a_a = RPMProxy.rpm_n_v_r_d_a(rpm_list_a[0])
+                rpm_b_n, rpm_b_v, rpm_b_r, rpm_b_d, rpm_b_a = RPMProxy.rpm_n_v_r_d_a(rpm_list_b[0])
+                if rpm_a_a == rpm_b_a:
+                    if rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r == rpm_b_r and rpm_a_d != rpm_b_d:
+                        row = [rpm_a, rpm_b, CMP_LEVEL_NEARLY_SAME]
+                    elif rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r != rpm_b_r:
+                        row = [rpm_a, rpm_b, CMP_LEVEL_BIG_VERSION_SAME]
+                    elif rpm_a_n == rpm_b_n and rpm_a_v != rpm_b_v:
+                        row = [rpm_a, rpm_b, CMP_LEVEL_VERSION_DIFF]
+                    else:
+                        logger.warning(f'unknown level for {rpm_a} {rpm_b}')
+                        row = [rpm_a, rpm_b, CMP_RESULT_EXCEPTION]
+                    compare_list.append(row)
                 else:
-                    logger.warning(f'unknown level for {rpm_a} {rpm_b}')
-                    row = [rpm_a, rpm_b, CMP_RESULT_EXCEPTION]
+                    compare_list.append([rpm_a, '', CMP_LEVEL_LESS])
+                    compare_list.append(['', rpm_b, CMP_LEVEL_MORE])
             else:
                 row = [', '.join(one2more_a[rpm_n]), '', CMP_LEVEL_LESS]
-            compare_list.append(row)
+                compare_list.append(row)
         for rpm_n in one2more_b.keys():
             if rpm_n not in one2more_a.keys():
                 row = ['', ', '.join(one2more_b[rpm_n]), CMP_LEVEL_MORE]
