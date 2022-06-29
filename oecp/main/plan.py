@@ -142,7 +142,8 @@ class Plan(UserDict):
         :param name:
         :return:
         """
-        return self[name].get("config", dict())
+        if self.get(name, []):
+            return self[name].get("config", dict())
 
     def only_for_directory(self, name):
         """

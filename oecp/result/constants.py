@@ -70,6 +70,7 @@ CMP_TYPE_CMD = 'rpm cmd'
 CMP_TYPE_RPM_HEADER = 'rpm header'
 CMP_TYPE_RPM_LIB = 'rpm lib'
 CMP_TYPE_DIFFERENCES = 'differences'
+CMP_TYPE_REQUIRES = "requires"
 
 # COMPOSITE_CMPS which without detail report
 COMPOSITE_CMPS = {CMP_TYPE_RPM, CMP_TYPE_REPOSITORY}

@@ -250,6 +250,8 @@ class CompareResultComposite(CompareResultComponent):
 
 def get_title(base_side):
     if not base_side.endswith('.iso'):
+        if '/' in base_side:
+            base_side = base_side.replace('/', '-').strip('-')
         return base_side
 
     title = base_side.split('.')[:-1]

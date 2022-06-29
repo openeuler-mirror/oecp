@@ -27,5 +27,5 @@ def init_logger():
         os.makedirs(log_path)
 
     defaults = {}
-    defaults['args'] = (os.path.join(log_path, 'oecp.log'), 'a+', 50 * 1024 * 1024, 5)
+    defaults['args'] = str((os.path.join(log_path, 'oecp.log'), 'a+', 50 * 1024 * 1024, 5))
     logging.config.fileConfig(conf_path, defaults=defaults)

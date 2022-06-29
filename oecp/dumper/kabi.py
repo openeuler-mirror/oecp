@@ -38,7 +38,7 @@ class KabiDumper(AbstractDumper):
         g_file.close()
 
     def load_symvers(self):
-        symvers = get_file_by_pattern(r"^symvers", self.cache_dumper)
+        symvers, kernel = get_file_by_pattern(r"^symvers", self.cache_dumper)
         if not symvers:
             return []
 
@@ -47,9 +47,6 @@ class KabiDumper(AbstractDumper):
             symvers = symvers[0:symvers.rindex('.')]
 
         item = {}
-        kernel = 'kernel'
-        if 'kernel-core' in symvers:
-            kernel = 'kernel-core'
         item.setdefault('rpm', self.repository.get(kernel).get('verbose_path'))
         item.setdefault('kind', self._component_key)
         item.setdefault('category', self.repository.get(kernel).get('category').value)
