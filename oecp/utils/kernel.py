@@ -17,14 +17,13 @@ import os
 import re
 
 def get_file_by_pattern(pattern, cache_dumper):
-    extract_paths = []
-    extract_paths.append(cache_dumper.get_package_extract_path('kernel'))
-    extract_paths.append(cache_dumper.get_package_extract_path('kernel-core'))
-
-    for extract_path in extract_paths:
+    rpm_kernel_names = ['kernel', 'kernel-core', 'kernel-default']
+    for kernel_name in rpm_kernel_names:
+        extract_path = cache_dumper.get_package_extract_path(kernel_name)
         if not extract_path:
             continue
         for root, dirs, files in os.walk(extract_path):
             for item in files:
                 if re.match(pattern, item):
-                    return os.path.join(root, item)
+                    return os.path.join(root, item), kernel_name
+    return None, None

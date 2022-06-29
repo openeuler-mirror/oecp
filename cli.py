@@ -20,9 +20,11 @@ import sys
 import logging
 import argparse
 
+from oecp.result.compare_result import get_title
 from oecp.result.compress import compress_report
 from oecp.utils.logger import init_logger
 from oecp.main.plan import Plan
+from similar_result_calculate import calculate_similarity
 
 
 def init_args():
@@ -103,3 +105,8 @@ if __name__ == "__main__":
     result = product_a.compare(product_b, plan)
     result.export(args.output_file, args.perf_baseline_file, args.output_format, args.compare_files[1])
     args.func(args)
+    base_side_a = os.path.basename(args.compare_files[0])
+    base_side_b = os.path.basename(args.compare_files[1])
+    report = 'report-' + get_title(base_side_a) + '-' + get_title(base_side_b)
+    all_rpm_report = os.path.join(args.work_dir, report, 'all-rpm-report.csv')
+    calculate_similarity(all_rpm_report)

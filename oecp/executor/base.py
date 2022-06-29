@@ -15,6 +15,7 @@
 import os
 import re
 from abc import ABC, abstractmethod
+from oecp.proxy.rpm_proxy import RPMProxy
 from oecp.result.compare_result import CMP_RESULT_MORE, CMP_RESULT_LESS, CMP_RESULT_SAME, CMP_RESULT_DIFF, \
     CMP_RESULT_CHANGE
 
@@ -154,6 +155,26 @@ class CompareExecutor(ABC):
 
             if more:
                 all_dump.append(more)
+
+        return all_dump
+
+    @staticmethod
+    def format_rmp_name(data_a, data_b):
+        same_pairs = []
+        same_in_a, same_in_b = [], []
+        for rpm_a in data_a:
+            for rpm_b in data_b:
+                if RPMProxy.rpm_name(rpm_a) == RPMProxy.rpm_name(rpm_b):
+                    same_pairs.append([rpm_a, rpm_b, CMP_RESULT_SAME])
+                    same_in_a.append(rpm_a)
+                    same_in_b.append(rpm_b)
+        less_result = data_a - set(same_in_a)
+        more_result = data_b - set(same_in_b)
+        all_dump = [
+            same_pairs,
+            [[x, '', CMP_RESULT_LESS] for x in less_result],
+            [['', x, CMP_RESULT_MORE] for x in more_result]
+        ]
 
         return all_dump
 

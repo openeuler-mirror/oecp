@@ -39,7 +39,7 @@ class CmdDumper(AbstractDumper):
         rpm_extract_dir = self.extract_info.get(verbose_path)
         rpm_extract_name = rpm_extract_dir.name
         if not rpm_extract_name:
-            logger.exception('RPM decompression path not found')
+            logger.exception(f"RPM {verbose_path} decompression path not found.")
             raise
         cmd_files = self._get_cmd_files(rpm_extract_name)
         item = {'rpm': verbose_path, 'category': category, 'kind': self._component_key, 'data': cmd_files}

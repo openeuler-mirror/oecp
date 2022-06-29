@@ -51,9 +51,9 @@ class KconfigDriveDumper(AbstractDumper):
         return kconfig_range_data
 
     def load_kconfig_range(self):
-        kconfig = get_file_by_pattern(r"^config-", self.cache_dumper)
+        kconfig, kernel = get_file_by_pattern(r"^config-", self.cache_dumper)
         if not kconfig:
-            kconfig = get_file_by_pattern(r"^config", self.cache_dumper)
+            kconfig, kernel = get_file_by_pattern(r"^config", self.cache_dumper)
             if not kconfig:
                 return []
 
@@ -61,9 +61,6 @@ class KconfigDriveDumper(AbstractDumper):
         # A collection of non-annotated phases in the configuration file
         not_annotated_config = [config_data for driver_name, config_datas in kconfig_range_data.items()
                                 if driver_name != "annotation" for config_data in config_datas]
-        kernel = 'kernel'
-        if 'kernel-core' in kconfig:
-            kernel = 'kernel-core'
         item = {
             "rpm": self.repository.get(kernel).get('verbose_path'),
             "kind": self._component_key,

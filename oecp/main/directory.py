@@ -100,10 +100,11 @@ class Directory(UserDict):
             return {}
 
         all_rpm = {}
-        for file in os.listdir(rpm_full_path):
-            file_path = os.path.join(rpm_full_path, file)
-            if os.path.isfile(file_path) and RPMProxy.is_rpm_file(file_path) and RPMProxy.is_rpm_focus_on(file):
-                all_rpm[file] = file_path
+        for path, dirs, files in os.walk(rpm_full_path):
+            for file in files:
+                file_path = os.path.join(path, file)
+                if os.path.isfile(file_path) and RPMProxy.is_rpm_file(file_path) and RPMProxy.is_rpm_focus_on(file):
+                    all_rpm[file] = file_path
 
         return all_rpm
 
@@ -313,7 +314,7 @@ class DistISO(Directory):
             except FileNotFoundError:
                 continue
 
-    def _set_iso_packages_sqlite_paths(self, iso):
+    def _set_iso_packages_sqlite_paths(self, iso, plan=None, side=None):
         if not iso:
             return
 
@@ -324,19 +325,58 @@ class DistISO(Directory):
                 if '-primary.sqlite.' not in f:
                     continue
                 ff = os.path.join(root, f)
+                if plan and side:
+                    config = plan.config_of(CMP_TYPE_REQUIRES)
+                    if config:
+                        config.setdefault('sqlite_path', {})
+                        config['sqlite_path'].setdefault(side, []).append(ff)
                 sf = ff.split('/repodata/')[0]
                 if 'Packages' in os.listdir(sf):
                     # 如果 Packages 和 repodata 文件夹在同一目录下，需要拼接路径
                     packages2sqlite[os.path.join(sf, 'Packages')] = ff
                 else:
                     packages2sqlite[sf] = ff
+
+        if not packages2sqlite:
+            logger.info(f"{os.path.basename(iso)} not found sqlite,Prepare to create sqlite file...")
+            tem_dir_obj = tempfile.TemporaryDirectory(suffix='_repodata', prefix=os.path.basename(iso),
+                                                      dir=self._work_dir)
+            cmd = ['createrepo', '-o', tem_dir_obj.name, _mount_path]
+            code, out, err = shell_cmd(cmd)
+            if not code:
+                if err:
+                    logger.warning(err)
+                else:
+                    logger.info(f"Create {os.path.basename(iso)} sqlite success!")
+            if 'openSUSE' not in os.path.basename(iso):
+                for root, dirs, files in os.walk(_mount_path):
+                    for d in dirs:
+                        if 'Packages' != d:
+                            continue
+                        dir_package = os.path.join(root, d)
+                        packages2sqlite[dir_package] = tem_dir_obj
+            else:
+                # openSUSE iso Packages目录改为x86_64、noarch
+                dir_package_name = ['x86_64', 'noarch']
+                for root, dirs, files in os.walk(_mount_path):
+                    for d in dirs:
+                        if d not in dir_package_name:
+                            continue
+                        if root == _mount_path:
+                            dir_package = os.path.join(root, d)
+                            packages2sqlite[dir_package] = tem_dir_obj
+            if plan and side:
+                config = plan.config_of(CMP_TYPE_REQUIRES)
+                if config:
+                    config.setdefault('sqlite_path', {})
+                    config['sqlite_path'].setdefault(side, []).append(tem_dir_obj)
         self._iso_packages_sqlite[iso] = packages2sqlite
 
     def compare(self, that, plan):
         try:
             self._mount_iso(self._rpm_iso)
             self._mount_iso(self._debuginfo_iso)
-            self._set_iso_packages_sqlite_paths(self._rpm_iso)
+            self._set_iso_packages_sqlite_paths(self._rpm_iso, plan, 'side_a')
             self._set_iso_packages_sqlite_paths(self._debuginfo_iso)
             logger.debug("self _iso_packages_sqlite", self._iso_packages_sqlite)
             self_all_debuginfo_rpm = self._all_debuginfo_rpm(self._debuginfo_iso)
@@ -346,7 +386,7 @@ class DistISO(Directory):
 
             that._mount_iso(that._rpm_iso)
             that._mount_iso(that._debuginfo_iso)
-            that._set_iso_packages_sqlite_paths(that._rpm_iso)
+            that._set_iso_packages_sqlite_paths(that._rpm_iso, plan, 'side_b')
             that._set_iso_packages_sqlite_paths(that._debuginfo_iso)
             logger.debug("that _iso_packages_sqlite", that._iso_packages_sqlite)
             that_all_debuginfo_rpm = that._all_debuginfo_rpm(that._debuginfo_iso)
@@ -362,6 +402,11 @@ class DistISO(Directory):
             that._umount_iso(that._debuginfo_iso)
 
     def upsert_a_group(self, packages_path, sqlite=None, debuginfo_rpm={}):
+        if not isinstance(sqlite, str):
+            repo_path = os.path.join(sqlite.name, 'repodata')
+            for file in os.listdir(repo_path):
+                if '-primary.sqlite.' in file:
+                    sqlite = os.path.join(repo_path, file)
         mapping = SQLiteMapping(sqlite) if sqlite else RepositoryPackageMapping()
         focus_on_rpm = self._all_focus_on_rpm(packages_path)
         logger.info(f"{self.verbose_path} total {len(focus_on_rpm)} rpm packages, {len(debuginfo_rpm)} debuginfo packages")
@@ -381,10 +426,11 @@ class DistISO(Directory):
             return {}
 
         all_rpm = {}
-        for f in os.listdir(packages_path):
-            fp = os.path.join(packages_path, f)
-            if os.path.isfile(fp) and RPMProxy.is_rpm_file(fp) and RPMProxy.is_rpm_focus_on(f):
-                all_rpm[f] = fp
+        for path, dirs, files in os.walk(packages_path):
+            for f in files:
+                fp = os.path.join(path, f)
+                if os.path.isfile(fp) and RPMProxy.is_rpm_file(fp) and RPMProxy.is_rpm_focus_on(f):
+                    all_rpm[f] = fp
 
         return all_rpm
 
