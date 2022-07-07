@@ -101,7 +101,7 @@ class Directory(UserDict):
 
         all_rpm = {}
         for path, dirs, files in os.walk(rpm_full_path):
-            for file in files:
+            for file in sorted(files):
                 file_path = os.path.join(path, file)
                 if os.path.isfile(file_path) and RPMProxy.is_rpm_file(file_path) and RPMProxy.is_rpm_focus_on(file):
                     all_rpm[file] = file_path
@@ -427,7 +427,7 @@ class DistISO(Directory):
 
         all_rpm = {}
         for path, dirs, files in os.walk(packages_path):
-            for f in files:
+            for f in sorted(files):
                 fp = os.path.join(path, f)
                 if os.path.isfile(fp) and RPMProxy.is_rpm_file(fp) and RPMProxy.is_rpm_focus_on(f):
                     all_rpm[f] = fp
