@@ -78,10 +78,11 @@ def calculate_similarity(all_rpm_report):
             require_provide_num = temp_simple_reslut[2][2] + list(tmp_require["compare result"]).count("diff") \
                                   + temp_simple_reslut[2][3] + list(tmp_provide["compare result"]).count("diff")
             same_molecule = tmp_list.count('same') - temp_simple_reslut[2][2] - temp_simple_reslut[2][3]
-            if same_molecule != 0:
+            dimension_num = len(tmp_list) - 1 - require_provide_num
+            if same_molecule != 0 and dimension_num != 0:
                 temp_simple_reslut[2][1] += round(
                     same_molecule
-                    / (len(tmp_list) - 1 - require_provide_num), 2
+                    / dimension_num, 2
                 )
             else:
                 temp_simple_reslut[2][1] += 0
