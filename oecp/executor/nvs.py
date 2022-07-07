@@ -92,12 +92,10 @@ class NVSCompareExecutor(CompareExecutor):
         all_requires_rpm = []
         for mapping in all_mapping:
             for component in dump[self._data]:
-                if component['name'].startswith('rpmlib'):
-                    continue
-                name, symbol, version = component['name'].strip(), component['symbol'].strip(), component[
+                requires_name, symbol, version = component['name'].strip(), component['symbol'].strip(), component[
                     'version'].strip()
-                packages = mapping.get_provides_rpm(name, symbol, version)
-                all_requires_rpm.extend(packages)
+                packages = mapping.get_provides_rpm(requires_name, symbol, version)
+                all_requires_rpm.extend(packages) if packages else all_requires_rpm.append(requires_name)
 
         return set(all_requires_rpm)
 
