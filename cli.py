@@ -62,8 +62,8 @@ def init_args():
     return parser.parse_args()
 
 
-def do_compress(params):
-    compress_report(params.output_file, params.output_file)
+def do_compress(report_dir, params):
+    compress_report(report_dir, params.output_file)
 
 
 if __name__ == "__main__":
@@ -103,12 +103,7 @@ if __name__ == "__main__":
         product_b = Factory.create(args.compare_files[1], args, "none")
 
     result = product_a.compare(product_b, plan)
-    result.export(args.output_file, args.perf_baseline_file, args.output_format, args.compare_files[1])
-    args.func(args)
-    base_side_a = os.path.basename(args.compare_files[0]) if args.compare_files[0].endswith('.iso') \
-        else args.compare_files[0]
-    base_side_b = os.path.basename(args.compare_files[1]) if args.compare_files[1].endswith('.iso') \
-        else args.compare_files[1]
-    report = 'report-' + get_title(base_side_a) + '-' + get_title(base_side_b)
-    all_rpm_report = os.path.join(args.output_file, report, 'all-rpm-report.csv')
+    osv_title = result.export(args.output_file, args.perf_baseline_file, args.output_format, args.compare_files[1])
+    args.func(osv_title, args)
+    all_rpm_report = os.path.join(args.output_file, osv_title, 'all-rpm-report.csv')
     calculate_similarity(all_rpm_report)

@@ -247,6 +247,7 @@ class CompareResultComposite(CompareResultComponent):
             f"all results have compare done, please check: {os.path.join(os.path.realpath(root_path), osv_title)}")
         logger.info(f"all similatity are: {similarity}")
 
+        return osv_title
 
 def get_title(base_side):
     if not base_side.endswith('.iso'):
