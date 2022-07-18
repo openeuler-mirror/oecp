@@ -104,6 +104,7 @@ if __name__ == "__main__":
 
     result = product_a.compare(product_b, plan)
     osv_title = result.export(args.output_file, args.perf_baseline_file, args.output_format, args.compare_files[1])
-    args.func(osv_title, args)
     all_rpm_report = os.path.join(args.output_file, osv_title, 'all-rpm-report.csv')
     calculate_similarity(all_rpm_report)
+    args.func(osv_title, args)
+
