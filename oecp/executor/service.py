@@ -81,7 +81,7 @@ class ServiceCompareExecutor(CompareExecutor):
                 if sub_component_result[-1] != CMP_RESULT_SAME and single_result == CMP_RESULT_SAME:
                     single_result = CMP_RESULT_DIFF
                     result.set_cmp_result(single_result)
-                result._detail = {"file_name": detail_filename}
+                result.detail = {"file_name": detail_filename}
                 result.add_component(data)
         return result
 
