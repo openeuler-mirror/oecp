@@ -36,6 +36,7 @@ def filter_general(item):
         return None
     return item
 
+
 def gen_hash_key(file):
     """
     Args:
@@ -49,6 +50,7 @@ def gen_hash_key(file):
         return
     else:
         return hash_obj.hexdigest()
+
 
 def compress_report(osv_title, output_path):
     """

@@ -249,6 +249,7 @@ class CompareResultComposite(CompareResultComponent):
 
         return osv_title
 
+
 def get_title(base_side):
     if not base_side.endswith('.iso'):
         if '/' in base_side:
@@ -313,8 +314,8 @@ def assgin_summary_result(rows, side_a, side_b):
         if rpm["compare type"] == CMP_TYPE_RPM_LEVEL:
             cmp_result = pkg_name.get(cmp_result)
 
-        summary[level].setdefault(rpm_name, "same")
-        if summary[level][rpm_name] == "same" and cmp_result:
+        summary.get(level).setdefault(rpm_name, "same")
+        if summary.get(level).get(rpm_name) == "same" and cmp_result:
             summary[level][rpm_name] = cmp_result
 
     summary_dict = {}
@@ -369,7 +370,7 @@ def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_
         "more": "N/A",
         "less": "N/A",
         "diff": "N/A"
-        }
+    }
     if hasattr(result, '_count_result'):
         row["more"] = result._count_result['more_count']
         row["less"] = result._count_result['less_count']
@@ -380,12 +381,6 @@ def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_
 
 def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail):
     parent_side = parent_side_a if parent_side_a else parent_side_b
-    # is_kernel = False
-    # if result._cmp_type == CMP_TYPE_KABI or result._cmp_type == CMP_TYPE_KCONFIG:
-    #    is_kernel = True
-    #    base_side_a = base_side_a + ' ' + '-'.join(parent_side_a.split('-')[:2])
-    #    base_side_b = base_side_b + ' ' + '-'.join(parent_side_b.split('-')[:2])
-
     row = {
         "binary rpm package": parent_side,
         base_side_a: result._cmp_side_a.strip(),
@@ -430,14 +425,10 @@ def assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b, parent_side_a,
         "diff": 'N/A'
     }
 
-    # single rpm package name report seem useless,
-    # because we will merge them to all-rpm-report.csv
-    # rows.setdefault(result._cmp_type, [])
-    # rows[result._cmp_type].append(row)
-
     # add rpm_pkg_result to rpm list
     rows.setdefault(CMP_TYPE_RPM, [])
     rows[CMP_TYPE_RPM].append(row)
+
 
 def get_differences_info(rows):
     differences_info = []
@@ -450,6 +441,7 @@ def get_differences_info(rows):
                     if single_result['compare result'] != CMP_RESULT_SAME:
                         differences_info.append(single_result)
     return differences_info
+
 
 def compare_result_name_to_attr(name):
     """
