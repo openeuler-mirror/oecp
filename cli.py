@@ -107,4 +107,3 @@ if __name__ == "__main__":
     all_rpm_report = os.path.join(args.output_file, osv_title, 'all-rpm-report.csv')
     calculate_similarity(all_rpm_report)
     args.func(osv_title, args)
-
