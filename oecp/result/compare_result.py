@@ -125,10 +125,10 @@ class CompareResultComposite(CompareResultComponent):
             return
         for diff_component in self.diff_components:
             if diff_component.cmp_result == CMP_RESULT_DIFF:
-                self._cmp_result = CMP_RESULT_DIFF
+                self.cmp_result = CMP_RESULT_DIFF
                 break
         else:
-            self._cmp_result = CMP_RESULT_SAME
+            self.cmp_result = CMP_RESULT_SAME
 
     def __str__(self):
         """
@@ -136,7 +136,7 @@ class CompareResultComposite(CompareResultComponent):
         :return:
         """
         string = ["{} {} {} {} {}".format(
-            self.cmp_type, self._cmp_result, self.cmp_side_a, self.cmp_side_b, self.detail)] + \
+            self.cmp_type, self.cmp_result, self.cmp_side_a, self.cmp_side_b, self.detail)] + \
                  [str(component) for component in self.diff_components]
         return "\n".join(string)
 
