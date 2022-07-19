@@ -113,32 +113,32 @@ SIX_COLUMN = 6
 FIVE_COLUMN = 5
 FOUR_COLUMN = 4
 TWO_COLUMN = 2
-SIX_TITLE =["基于","的版本"]
-ELEVEN_TITLE =["OSV内核KABI接口白名单与","内核KABI接口白名单一致性比例"]
-TWELVE_TITLE =["OSV软件包ABI接口与","软件包ABI一致性比例"]
-THIRTEEN_TITLE =["OSV软件包Service文件与","软件包Service文件一致性比例"]
-FOURTEEN_TITLE =["OSV软件包配置文件与","软件包配置文件一致性比例"]
-FIFTEEN_TITLE =["OSV的内核配置与","一致性比例"]
+SIX_TITLE = ["基于", "的版本"]
+ELEVEN_TITLE = ["OSV内核KABI接口白名单与", "内核KABI接口白名单一致性比例"]
+TWELVE_TITLE = ["OSV软件包ABI接口与", "软件包ABI一致性比例"]
+THIRTEEN_TITLE = ["OSV软件包Service文件与", "软件包Service文件一致性比例"]
+FOURTEEN_TITLE = ["OSV软件包配置文件与", "软件包配置文件一致性比例"]
+FIFTEEN_TITLE = ["OSV的内核配置与", "一致性比例"]
 
 # Some file category filtering re pattern
 FILTER_PATTERN = {
-        "config": "^/etc/.*\.conf$",
-        "header": ".*\.h$",
-        "service": "^/usr/lib/systemd/system/.*\.service$",
-        "jabi": ".*\.jar$",
-        "abi": ".*\.so$",
-        "cmd_1": "^/usr/bin/.*",
-        "cmd_2": "^/usr/sbin/.*",
-        "cmd_3": "^/usr/local/bin/.*",
-        "cmd_4": "^/usr/local/sbin/.*",
-        "cmd_5": "^/bin/.*",
-        "build": "^/usr/lib/.build-id/.*",
-        "ima": "^/etc/ima/.*"
-    }
+    "config": "^/etc/.*\.conf$",
+    "header": ".*\.h$",
+    "service": "^/usr/lib/systemd/system/.*\.service$",
+    "jabi": ".*\.jar$",
+    "abi": ".*\.so$",
+    "cmd_1": "^/usr/bin/.*",
+    "cmd_2": "^/usr/sbin/.*",
+    "cmd_3": "^/usr/local/bin/.*",
+    "cmd_4": "^/usr/local/sbin/.*",
+    "cmd_5": "^/bin/.*",
+    "build": "^/usr/lib/.build-id/.*",
+    "ima": "^/etc/ima/.*"
+}
 
 # The similarity item displayed in the JSON report
-TOOLS_RESULT_ITEMS= ['core_pkg', 'level2 pkg', 'kabi', 'level2 rpm abi', 'service detail',
-                                     'rpm config', 'kconfig']
+TOOLS_RESULT_ITEMS = ['core_pkg', 'level2 pkg', 'kabi', 'level2 rpm abi', 'service detail',
+                      'rpm config', 'kconfig']
 PLATFORM_RESULT_ITEMS = ['rpm test', 'AT', 'performance', 'ciconfig']
 
 # DETAIL PATH
@@ -149,4 +149,4 @@ ALL_DETAILS_NAME = ['effect drivers', 'abi details']
 
 # The Character in File name have changed.
 OLD_CHAR = ('oe1',)
-NEW_CHAR = {'oe1':['ky10']}
+NEW_CHAR = {'oe1': ['ky10']}

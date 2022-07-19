@@ -17,9 +17,12 @@
 """
 
 import hashlib
+import logging
 import os
 import time
 import tarfile
+
+logger = logging.getLogger("oecp")
 
 
 def filter_general(item):
@@ -32,6 +35,7 @@ def filter_general(item):
     if "tar.gz" in item.name:
         return None
     return item
+
 
 def gen_hash_key(file):
     """
@@ -47,16 +51,21 @@ def gen_hash_key(file):
     else:
         return hash_obj.hexdigest()
 
-def compress_report(input_path, output_path):
+
+def compress_report(osv_title, output_path):
     """
     Description: Compress the final report file
 
     Args:
-        input_path: File path to be compressed
+        osv_title: Report name
         output_path: Compressed file storage path
 
     Returns:
     """
     timestamp = time.strftime("%Y%m%d%H%M%S", time.localtime())
-    with tarfile.open(f"{output_path}/report{timestamp}.tar.gz", "w:gz") as tar:
-        tar.add(input_path, arcname=os.path.basename(input_path), filter=filter_general)
+    report_dir = os.path.join(output_path, osv_title)
+    if os.path.exists(report_dir):
+        with tarfile.open(f"{output_path}/report{timestamp}.tar.gz", "w:gz") as tar:
+            tar.add(report_dir, arcname=osv_title, filter=filter_general)
+    else:
+        logger.warning(f"report {report_dir} lost.")

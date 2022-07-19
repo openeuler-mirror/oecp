@@ -45,11 +45,11 @@ class CompareResultComponent(object):
         :param cmp_side_b: 比较对象
         :param detail: 比较结果详细内容
         """
-        self._cmp_type = cmp_type
-        self._cmp_result = cmp_result
-        self._cmp_side_a = cmp_side_a
-        self._cmp_side_b = cmp_side_b
-        self._detail = detail
+        self.cmp_type = cmp_type
+        self.cmp_result = cmp_result
+        self.cmp_side_a = cmp_side_a
+        self.cmp_side_b = cmp_side_b
+        self.detail = detail
         self._binary_rpm_package = None
         self._source_package = None
         self._level = None
@@ -60,7 +60,7 @@ class CompareResultComponent(object):
         :param cmp_type:
         :return:
         """
-        self._cmp_type = cmp_type
+        self.cmp_type = cmp_type
 
     def set_binary_rpm_package(self, binary_rpm_package):
         self._binary_rpm_package = binary_rpm_package
@@ -71,7 +71,7 @@ class CompareResultComponent(object):
         @param cmp_result:
         @return:
         """
-        self._cmp_result = cmp_result
+        self.cmp_result = cmp_result
 
     def set_source_package(self, source_package):
         self._source_package = source_package
@@ -84,7 +84,7 @@ class CompareResultComponent(object):
 
     def __str__(self):
         return "{} {} {} {} {}".format(
-            self._cmp_type, self._cmp_result, self._cmp_side_a, self._cmp_side_b, self._detail)
+            self.cmp_type, self.cmp_result, self.cmp_side_a, self.cmp_side_b, self.detail)
 
 
 class CompareResultComposite(CompareResultComponent):
@@ -104,9 +104,9 @@ class CompareResultComposite(CompareResultComponent):
         super(CompareResultComposite, self).__init__(cmp_type, cmp_result, cmp_side_a, cmp_side_b)
 
         # 复合比较结果为rpm层时，需要加上category信息
-        self._detail = detail
-        self._diff_components = []  # 比较结果对象列表
-        self._count_result = count_result
+        self.detail = detail
+        self.diff_components = []  # 比较结果对象列表
+        self.count_result = count_result
 
     def add_component(self, *diff_components):
         """
@@ -114,21 +114,21 @@ class CompareResultComposite(CompareResultComponent):
         :param diff_components:
         :return:
         """
-        self._diff_components.extend(diff_components)
+        self.diff_components.extend(diff_components)
 
     def add_count_info(self, count_result):
-        self._count_result = count_result
+        self.count_result = count_result
 
     def set_cmp_result(self, cmp_result=None):
         if cmp_result:
             super(CompareResultComposite, self).set_cmp_result(cmp_result)
             return
-        for diff_component in self._diff_components:
-            if diff_component._cmp_result == CMP_RESULT_DIFF:
-                self._cmp_result = CMP_RESULT_DIFF
+        for diff_component in self.diff_components:
+            if diff_component.cmp_result == CMP_RESULT_DIFF:
+                self.cmp_result = CMP_RESULT_DIFF
                 break
         else:
-            self._cmp_result = CMP_RESULT_SAME
+            self.cmp_result = CMP_RESULT_SAME
 
     def __str__(self):
         """
@@ -136,13 +136,13 @@ class CompareResultComposite(CompareResultComponent):
         :return:
         """
         string = ["{} {} {} {} {}".format(
-            self._cmp_type, self._cmp_result, self._cmp_side_a, self._cmp_side_b, self._detail)] + \
-                 [str(component) for component in self._diff_components]
+            self.cmp_type, self.cmp_result, self.cmp_side_a, self.cmp_side_b, self.detail)] + \
+                 [str(component) for component in self.diff_components]
         return "\n".join(string)
 
     def export(self, root_path, baseline, result_format, iso_path):
-        base_side_a = self._cmp_side_a
-        base_side_b = self._cmp_side_b
+        base_side_a = self.cmp_side_a
+        base_side_b = self.cmp_side_b
         osv_title = 'report-' + get_title(base_side_a) + '-' + get_title(base_side_b)
 
         # performance_rows = performance_result_parser(base_side_a, base_side_b, root_path, baseline)
@@ -247,6 +247,8 @@ class CompareResultComposite(CompareResultComponent):
             f"all results have compare done, please check: {os.path.join(os.path.realpath(root_path), osv_title)}")
         logger.info(f"all similatity are: {similarity}")
 
+        return osv_title
+
 
 def get_title(base_side):
     if not base_side.endswith('.iso'):
@@ -274,16 +276,16 @@ def export_single_report(node, single_result, root_path, osv_title):
 
 def parse_result(result, base_side_a, base_side_b, rows, parent_side_a=None, parent_side_b=None, cmp_type=None,
                  detail=None):
-    if hasattr(result, '_diff_components') and result._diff_components:
-        if result._cmp_type == CMP_TYPE_RPM:
+    if hasattr(result, 'diff_components') and result.diff_components:
+        if result.cmp_type == CMP_TYPE_RPM:
             assgin_composite_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b)
 
-        for son_result in result._diff_components:
-            parse_result(son_result, base_side_a, base_side_b, rows, result._cmp_side_a, result._cmp_side_b,
-                         result._cmp_type, result._detail)
+        for son_result in result.diff_components:
+            parse_result(son_result, base_side_a, base_side_b, rows, result.cmp_side_a, result.cmp_side_b,
+                         result.cmp_type, result.detail)
     else:
-        if result._cmp_type == CMP_TYPE_RPM_LEVEL:
-            assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b, result._cmp_side_a, result._cmp_side_b)
+        if result.cmp_type == CMP_TYPE_RPM_LEVEL:
+            assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b, result.cmp_side_a, result.cmp_side_b)
         else:
             assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail)
 
@@ -312,8 +314,8 @@ def assgin_summary_result(rows, side_a, side_b):
         if rpm["compare type"] == CMP_TYPE_RPM_LEVEL:
             cmp_result = pkg_name.get(cmp_result)
 
-        summary[level].setdefault(rpm_name, "same")
-        if summary[level][rpm_name] == "same" and cmp_result:
+        summary.get(level).setdefault(rpm_name, "same")
+        if summary.get(level).get(rpm_name) == "same" and cmp_result:
             summary[level][rpm_name] = cmp_result
 
     summary_dict = {}
@@ -350,93 +352,83 @@ def assgin_end_result(summary_dict):
 
 
 def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_side_b):
-    side = result._cmp_side_a if result._cmp_side_a else result._cmp_side_b
-    category_level = result._detail
-    compare_type = result._diff_components[0]._cmp_type
+    side = result.cmp_side_a if result.cmp_side_a else result.cmp_side_b
+    category_level = result.detail
+    compare_type = result.diff_components[0].cmp_type
     second_path = get_second_path(compare_type)
     compare_detail = ' ' + second_path + '/' + side + '.csv ' if side else ''
 
     row = {
-        side_a + " binary rpm package": result._cmp_side_a,
+        side_a + " binary rpm package": result.cmp_side_a,
         side_a + " source package": parent_side_a,
-        side_b + " binary rpm package": result._cmp_side_b,
+        side_b + " binary rpm package": result.cmp_side_b,
         side_b + " source package": parent_side_b,
-        "compare result": result._cmp_result,
+        "compare result": result.cmp_result,
         "compare detail": compare_detail,
         "compare type": compare_type,
         "category level": category_level,
         "more": "N/A",
         "less": "N/A",
         "diff": "N/A"
-        }
+    }
     if hasattr(result, '_count_result'):
-        row["more"] = result._count_result['more_count']
-        row["less"] = result._count_result['less_count']
-        row["diff"] = result._count_result['diff_count']
-    rows.setdefault(result._cmp_type, [])
-    rows[result._cmp_type].append(row)
+        row["more"] = result.count_result['more_count']
+        row["less"] = result.count_result['less_count']
+        row["diff"] = result.count_result['diff_count']
+    rows.setdefault(result.cmp_type, [])
+    rows[result.cmp_type].append(row)
 
 
 def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail):
     parent_side = parent_side_a if parent_side_a else parent_side_b
-    # is_kernel = False
-    # if result._cmp_type == CMP_TYPE_KABI or result._cmp_type == CMP_TYPE_KCONFIG:
-    #    is_kernel = True
-    #    base_side_a = base_side_a + ' ' + '-'.join(parent_side_a.split('-')[:2])
-    #    base_side_b = base_side_b + ' ' + '-'.join(parent_side_b.split('-')[:2])
-
     row = {
         "binary rpm package": parent_side,
-        base_side_a: result._cmp_side_a.strip(),
-        base_side_b: result._cmp_side_b.strip(),
-        "compare result": result._cmp_result,
-        "compare type": result._cmp_type,
+        base_side_a: result.cmp_side_a.strip(),
+        base_side_b: result.cmp_side_b.strip(),
+        "compare result": result.cmp_result,
+        "compare type": result.cmp_type,
     }
-    if result._cmp_type == CMP_TYPE_SERVICE_DETAIL:
+    if result.cmp_type == CMP_TYPE_SERVICE_DETAIL:
         row["file_name"] = detail.get("file_name")
     else:
         row["category level"] = detail
-        if result._cmp_type == CMP_TYPE_RPM_ABI:
+        if result.cmp_type == CMP_TYPE_RPM_ABI:
             row["abi details"] = ''
-            if result._detail:
-                row["abi details"] = result._detail
-        elif result._cmp_type == CMP_TYPE_DRIVE_KABI:
+            if result.detail:
+                row["abi details"] = result.detail
+        elif result.cmp_type == CMP_TYPE_DRIVE_KABI:
             row["effect drivers"] = ''
-            if result._detail:
-                row["effect drivers"] = result._detail
+            if result.detail:
+                row["effect drivers"] = result.detail
     # handle kabi result
     # if is_kernel:
     #    row.pop("binary rpm package")
 
     rows.setdefault(parent_side, {})
-    rows[parent_side].setdefault(result._cmp_type, [])
-    rows[parent_side][result._cmp_type].append(row)
+    rows[parent_side].setdefault(result.cmp_type, [])
+    rows[parent_side][result.cmp_type].append(row)
 
 
 def assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b):
-    category_level = result._detail['category']
+    category_level = result.detail['category']
     row = {
-        base_side_a + " binary rpm package": result._cmp_side_a,
-        base_side_a + " source package": result._detail['source_package_a'],
-        base_side_b + " binary rpm package": result._cmp_side_b,
-        base_side_b + " source package": result._detail['source_package_b'],
-        "compare result": result._cmp_result,
+        base_side_a + " binary rpm package": result.cmp_side_a,
+        base_side_a + " source package": result.detail['source_package_a'],
+        base_side_b + " binary rpm package": result.cmp_side_b,
+        base_side_b + " source package": result.detail['source_package_b'],
+        "compare result": result.cmp_result,
         "compare detail": '',
-        "compare type": result._cmp_type,
+        "compare type": result.cmp_type,
         "category level": category_level,
         "more": 'N/A',
         "less": 'N/A',
         "diff": 'N/A'
     }
 
-    # single rpm package name report seem useless,
-    # because we will merge them to all-rpm-report.csv
-    # rows.setdefault(result._cmp_type, [])
-    # rows[result._cmp_type].append(row)
-
     # add rpm_pkg_result to rpm list
     rows.setdefault(CMP_TYPE_RPM, [])
     rows[CMP_TYPE_RPM].append(row)
+
 
 def get_differences_info(rows):
     differences_info = []
@@ -449,6 +441,7 @@ def get_differences_info(rows):
                     if single_result['compare result'] != CMP_RESULT_SAME:
                         differences_info.append(single_result)
     return differences_info
+
 
 def compare_result_name_to_attr(name):
     """

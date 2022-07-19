@@ -135,7 +135,7 @@ class CompareExecutor(ABC):
 
         for k, va in h_a.items():
             vb = h_b.get(k, None)
-            if vb == None:
+            if vb is None:
                 less.append([va, '', 'less'])
             elif va == vb:
                 same.append([va, vb, 'same'])
@@ -150,7 +150,7 @@ class CompareExecutor(ABC):
             more = []
             for k, vb, in h_b.items():
                 va = h_a.get(k, None)
-                if va == None:
+                if va is None:
                     more.append(['', vb, 'more'])
 
             if more:
@@ -187,7 +187,7 @@ class CompareExecutor(ABC):
         file_result = CMP_RESULT_SAME
         for k, va in data_a.items():
             vb = data_b.get(k, None)
-            if vb == None:
+            if vb is None:
                 losted.append([' '.join([k, "=", va]), '', 'losted'])
             elif va == vb:
                 same.append([' '.join([k, "=", va]), ' '.join([k, "=", vb]), 'same'])
