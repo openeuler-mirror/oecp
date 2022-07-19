@@ -276,7 +276,7 @@ def export_single_report(node, single_result, root_path, osv_title):
 
 def parse_result(result, base_side_a, base_side_b, rows, parent_side_a=None, parent_side_b=None, cmp_type=None,
                  detail=None):
-    if hasattr(result, '_diff_components') and result.diff_components:
+    if hasattr(result, 'diff_components') and result.diff_components:
         if result.cmp_type == CMP_TYPE_RPM:
             assgin_composite_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b)
 
