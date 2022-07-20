@@ -158,11 +158,12 @@ class Directory(UserDict):
                 if repository not in that:
                     logger.warning(f"{repository} not in {that.verbose_path}")
                     continue
-                jobs.append(pool.apply_async(self.compare_job, (self[repository], that[repository], plan)))
+                pool.apply_async(self.compare_job, (self[repository], that[repository], plan), callback=jobs.append)
         except KeyboardInterrupt:
             pool.terminate()
         pool.close()
-        return [job.get() for job in jobs]
+        pool.join()
+        return jobs
 
     @staticmethod
     def compare_job(side_a, side_b, plan):
