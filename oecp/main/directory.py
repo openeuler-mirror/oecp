@@ -20,9 +20,6 @@ import re
 import tempfile
 from multiprocessing import Pool, cpu_count
 
-from .repository import Repository
-from .mapping import RepositoryPackageMapping, SQLiteMapping
-
 from oecp.result.compare_result import *
 from oecp.proxy.rpm_proxy import RPMProxy
 from oecp.proxy.requests_proxy import do_download
@@ -30,6 +27,9 @@ from oecp.utils.shell import shell_cmd
 
 from bs4 import BeautifulSoup as bs
 from defusedxml.ElementTree import parse
+
+from .repository import Repository
+from .mapping import RepositoryPackageMapping, SQLiteMapping
 
 logger = logging.getLogger("oecp")
 
@@ -59,19 +59,6 @@ class Directory(UserDict):
         if not self._lazy:
             self.upsert_a_group(".", ".")
 
-    def _all_debuginfo_rpm(self, debuginfo_path):
-        """
-
-        :param debuginfo_path: debuginfo包所在的子路径
-        :return:
-        """
-        if not debuginfo_path:
-            logger.info("debuginfo path not specify")
-            return {}
-
-        debug_info_full_path = os.path.realpath(os.path.join(self._path, debuginfo_path))
-        return self._get_debug_info_rpm(debug_info_full_path)
-
     @staticmethod
     def _get_debug_info_rpm(debug_info_full_path):
         logger.info(f'debug info path is {debug_info_full_path}')
@@ -86,6 +73,19 @@ class Directory(UserDict):
                 all_debug_info_rpm[file] = file_path
 
         return all_debug_info_rpm
+
+    def _all_debuginfo_rpm(self, debuginfo_path):
+        """
+
+        :param debuginfo_path: debuginfo包所在的子路径
+        :return:
+        """
+        if not debuginfo_path:
+            logger.info("debuginfo path not specify")
+            return {}
+
+        debug_info_full_path = os.path.realpath(os.path.join(self._path, debuginfo_path))
+        return self._get_debug_info_rpm(debug_info_full_path)
 
     def _all_focus_on_rpm(self, path):
         """
@@ -615,8 +615,8 @@ class OEDistRepo(Directory):
         # package_full_path = os.path.join(self._path, package_path)
         package_full_path = package_path
         _sqlite_path = self._sqlite_paths.get(package_path, None)
-        logger.debug(
-            f"package_path={package_path},package_full_path={package_full_path},sqlite_path={_sqlite_path},sqlite_paths={self._sqlite_paths}")
+        logger.debug(f"package_path={package_path},package_full_path={package_full_path},sqlite_path={_sqlite_path},"
+                     f"sqlite_paths={self._sqlite_paths}")
         if not _sqlite_path:
             return {}
 
