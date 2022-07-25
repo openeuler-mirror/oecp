@@ -333,56 +333,38 @@ class DistISO(Directory):
 
         _mount_path = self._mount_paths.get(iso).name
         packages2sqlite = {}
-        for root, dirs, files in os.walk(_mount_path):
-            for f in files:
-                if '-primary.sqlite.' not in f:
-                    continue
-                ff = os.path.join(root, f)
-                if plan and side:
-                    config = plan.config_of(CMP_TYPE_REQUIRES)
-                    if config:
-                        config.setdefault('sqlite_path', {})
-                        config['sqlite_path'].setdefault(side, []).append(ff)
-                sf = ff.split('/repodata/')[0]
-                if 'Packages' in os.listdir(sf):
-                    # 如果 Packages 和 repodata 文件夹在同一目录下，需要拼接路径
-                    packages2sqlite[os.path.join(sf, 'Packages')] = ff
-                else:
-                    packages2sqlite[sf] = ff
-
-        if not packages2sqlite:
-            logger.info(f"{os.path.basename(iso)} not found sqlite,Prepare to create sqlite file...")
-            tem_dir_obj = tempfile.TemporaryDirectory(suffix='_repodata', prefix=os.path.basename(iso),
-                                                      dir=self._work_dir)
-            cmd = ['createrepo', '-o', tem_dir_obj.name, _mount_path]
-            code, out, err = shell_cmd(cmd)
-            if not code:
-                if err:
-                    logger.warning(err)
-                else:
-                    logger.info(f"Create {os.path.basename(iso)} sqlite success!")
-            if 'openSUSE' not in os.path.basename(iso):
-                for root, dirs, files in os.walk(_mount_path):
-                    for d in dirs:
-                        if 'Packages' != d:
-                            continue
+        logger.info(f"{os.path.basename(iso)},Prepare to create sqlite file...")
+        tem_dir_obj = tempfile.TemporaryDirectory(suffix='_repodata', prefix=os.path.basename(iso),
+                                                  dir=self._work_dir)
+        cmd = ['createrepo', '-o', tem_dir_obj.name, _mount_path]
+        code, out, err = shell_cmd(cmd)
+        if not code:
+            if err:
+                logger.warning(err)
+            else:
+                logger.info(f"Create {os.path.basename(iso)} sqlite success!")
+        if 'openSUSE' not in os.path.basename(iso):
+            for root, dirs, files in os.walk(_mount_path):
+                for d in dirs:
+                    if 'Packages' != d:
+                        continue
+                    dir_package = os.path.join(root, d)
+                    packages2sqlite[dir_package] = tem_dir_obj
+        else:
+            # openSUSE iso Packages目录改为x86_64、noarch
+            dir_package_name = ['x86_64', 'noarch']
+            for root, dirs, files in os.walk(_mount_path):
+                for d in dirs:
+                    if d not in dir_package_name:
+                        continue
+                    if root == _mount_path:
                         dir_package = os.path.join(root, d)
                         packages2sqlite[dir_package] = tem_dir_obj
-            else:
-                # openSUSE iso Packages目录改为x86_64、noarch
-                dir_package_name = ['x86_64', 'noarch']
-                for root, dirs, files in os.walk(_mount_path):
-                    for d in dirs:
-                        if d not in dir_package_name:
-                            continue
-                        if root == _mount_path:
-                            dir_package = os.path.join(root, d)
-                            packages2sqlite[dir_package] = tem_dir_obj
-            if plan and side:
-                config = plan.config_of(CMP_TYPE_REQUIRES)
-                if config:
-                    config.setdefault('sqlite_path', {})
-                    config['sqlite_path'].setdefault(side, []).append(tem_dir_obj)
+        if plan and side:
+            config = plan.config_of(CMP_TYPE_REQUIRES)
+            if config:
+                config.setdefault('sqlite_path', {})
+                config['sqlite_path'].setdefault(side, []).append(tem_dir_obj)
         self._iso_packages_sqlite[iso] = packages2sqlite
 
     def compare(self, that, plan):
