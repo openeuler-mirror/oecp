@@ -273,8 +273,20 @@ def export_single_report(node, single_result, root_path, osv_title):
 
         uid = str(uuid.uuid4())
         uid = ''.join(uid.split('-'))
-        report_path = export.create_directory(root_path, node.replace(' ', '-'), osv_title, cmp_type, uid)
+        report_path = None
+        if cmp_type == CMP_TYPE_SERVICE_DETAIL:
+            for result in results:
+                report_path = result.get("detail_path", None)
+                if report_path:
+                    break
+        if not report_path:
+            report_path = export.create_directory(root_path, node.replace(' ', '-'), osv_title, cmp_type, uid)
         headers = results[0].keys()
+        headers = list(headers)
+        if cmp_type == CMP_TYPE_DRIVE_KABI and "effect drivers" not in headers:
+            headers.append("effect drivers")
+        if "details path" not in headers:
+            headers.append("details path")
         export.create_csv_report(headers, results, report_path)
 
 
@@ -393,17 +405,15 @@ def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, 
         "compare type": result.cmp_type,
     }
     if result.cmp_type == CMP_TYPE_SERVICE_DETAIL:
-        row["file_name"] = detail.get("file_name")
+        if detail:
+            row["file_name"] = detail.get("file_name")
+            row["detail_path"] = detail.get("detail_path")
     else:
         row["category level"] = detail
-        if result.cmp_type == CMP_TYPE_RPM_ABI:
-            row["abi details"] = ''
-            if result.detail:
-                row["abi details"] = result.detail
-        elif result.cmp_type == CMP_TYPE_DRIVE_KABI:
+        if result.cmp_type == CMP_TYPE_DRIVE_KABI:
             row["effect drivers"] = ''
-            if result.detail:
-                row["effect drivers"] = result.detail
+        if result.detail:
+            row["details path"] = result.detail
     # handle kabi result
     # if is_kernel:
     #    row.pop("binary rpm package")

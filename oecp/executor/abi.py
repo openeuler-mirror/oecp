@@ -132,19 +132,21 @@ class ABICompareExecutor(CompareExecutor):
                 data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_SAME, base_a, base_b)
                 result.add_component(data)
             else:
-                abi = defaultdict(list)
                 if not os.path.exists(base_dir):
                     os.makedirs(base_dir)
                 file_path = os.path.join(base_dir, f'{base_a}__cmp__{base_b}.md')
                 self._save_result(file_path, out)
                 logger.debug("check abi diff")
                 changed_abi, deleted_abi = self._extract_changed_abi(out), self._extract_deleted_abi(out)
-                abi["changed_abi"] = changed_abi
-                abi["deleted_abi"] = deleted_abi
-                data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_DIFF, base_a, base_b, {file_path: abi})
-                count_result["diff_count"] += 1
-                result.set_cmp_result(CMP_RESULT_DIFF)
-                result.add_component(data)
+                if not changed_abi and not deleted_abi:
+                    logger.debug("check abi functions that are not deleted or changed.")
+                    data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_SAME, base_a, base_b)
+                    result.add_component(data)
+                else:
+                    data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_DIFF, base_a, base_b, file_path)
+                    count_result["diff_count"] += 1
+                    result.set_cmp_result(CMP_RESULT_DIFF)
+                    result.add_component(data)
         dump_a_linkfiles, dump_b_linkfiles = dump_a[self.link_file], dump_b[self.link_file]
         self.compare_link_files(dump_a_linkfiles, dump_b_linkfiles, rpm_a)
         result.add_count_info(count_result)
