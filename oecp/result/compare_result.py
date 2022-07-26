@@ -18,6 +18,7 @@
 import sys
 import logging
 import uuid
+import shutil
 
 from oecp.excel.create_web_show_result import WebShowResult
 from oecp.excel.osv_data_summary import DataExcelFile
@@ -144,6 +145,9 @@ class CompareResultComposite(CompareResultComponent):
         base_side_a = self.cmp_side_a
         base_side_b = self.cmp_side_b
         osv_title = 'report-' + get_title(base_side_a) + '-' + get_title(base_side_b)
+        export_floder = os.path.join(root_path, osv_title)
+        if os.path.exists(export_floder):
+            shutil.rmtree(export_floder)
 
         # performance_rows = performance_result_parser(base_side_a, base_side_b, root_path, baseline)
         # rpm_test_rows, rpm_test_details = test_result_parser(base_side_a, base_side_b, root_path)
