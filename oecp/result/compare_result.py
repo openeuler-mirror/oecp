@@ -271,16 +271,7 @@ def export_single_report(node, single_result, root_path, osv_title):
         if cmp_type in COMPOSITE_CMPS:
             continue
 
-        uid = str(uuid.uuid4())
-        uid = ''.join(uid.split('-'))
-        report_path = None
-        if cmp_type == CMP_TYPE_SERVICE_DETAIL:
-            for result in results:
-                report_path = result.get("detail_path", None)
-                if report_path:
-                    break
-        if not report_path:
-            report_path = export.create_directory(root_path, node.replace(' ', '-'), osv_title, cmp_type, uid)
+        report_path = export.create_directory(root_path, node.replace(' ', '-'), osv_title, cmp_type)
         headers = results[0].keys()
         headers = list(headers)
         if cmp_type == CMP_TYPE_DRIVE_KABI and "effect drivers" not in headers:
@@ -407,7 +398,6 @@ def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, 
     if result.cmp_type == CMP_TYPE_SERVICE_DETAIL:
         if detail:
             row["file_name"] = detail.get("file_name")
-            row["detail_path"] = detail.get("detail_path")
     else:
         row["category level"] = detail
         if result.cmp_type == CMP_TYPE_DRIVE_KABI:
