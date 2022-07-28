@@ -119,9 +119,9 @@ def calculate_similarity(all_rpm_report):
             denominator += tmp[4]
             line += 1
 
-    section1_result = round(len(common_rpm_list) / len(total_rmp_list) * 100, 2)
-    section2_result = round(molecule_section2 / len(common_rpm_list) * 100, 2)
-    section3_result = round(molecule_section3 / (2 * denominator) * 100, 2)
+    section1_result = round(len(common_rpm_list) / len(total_rmp_list) * 100, 2) if not total_rmp_list.empty else 0
+    section2_result = round(molecule_section2 / len(common_rpm_list) * 100, 2) if not common_rpm_list.empty else 0
+    section3_result = round(molecule_section3 / (2 * denominator) * 100, 2) if denominator else 0
     total_result = round(section1_result * 0.1 + section2_result * 0.6 + section3_result * 0.3, 2)
     total_list = []
     section1_list = ['软件包范围', '10%', '{}%'.format(section1_result)]
@@ -136,10 +136,3 @@ def calculate_similarity(all_rpm_report):
     result_df = pd.DataFrame(columns=column, data=total_list, )
     result_df.to_csv(os.path.join(os.path.dirname(all_rpm_report), 'similar_calculate_result.csv'), index=False,
                      encoding='utf_8_sig')
-
-    # print('软件包交集数量：{} 并集数量：{}'.format(len(common_rpm_list), len(total_rmp_list)))
-    # print("过程数据: {}".format(temp_simple_reslut))
-    # print('软件范围相似度:',round(len(common_rpm_list) / len(total_rmp_list), 3) * 10,'%')
-    # print('软件范围相似度(situation1:分母为oecp比对项第二个全量软件包):',round(len(common_rpm_list)/len(centos_rpm_list),2)*0.1)
-    # print('软件内容相似度:',round(sum(result_dict.values())/len(result_dict), 3) * 80,'%')
-    # print('similar_result_one--->',similar_result_one)
