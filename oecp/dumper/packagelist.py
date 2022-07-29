@@ -36,7 +36,7 @@ class PackageListDumper:
                 source_package = repo_item.verbose_path
                 if not source_package.endswith('.src.rpm'):
                     fp = repo_item[rpm_name]['path']
-                    cmd = ['rpm', '-qi', '--nosignature', fp]
+                    cmd = ['rpm', '-qpi', '--nosignature', fp]
                     code, out, err = shell_cmd(cmd)
                     if err:
                         logger.warning(err)
