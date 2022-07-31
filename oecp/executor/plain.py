@@ -74,8 +74,7 @@ class PlainCompareExecutor(CompareExecutor):
                     out = re.sub("\+\+\+\s+\S+\s+", "+++ {} ".format(pair[1]), out)
                     if not os.path.exists(base_dir):
                         os.makedirs(base_dir)
-                    file_path = os.path.join(base_dir,
-                                             "%s__diff__%s" % (base_a, base_b))
+                    file_path = os.path.join(base_dir, f'{base_a}__cmp__{base_b}.md')
                     self._save_diff_result(file_path, out)
                     logger.info("plain files are diff")
                     data = CompareResultComponent(

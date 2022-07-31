@@ -58,7 +58,10 @@ def create_directory(root_path, report_name, osv_title, cmp_type=None, uid='', f
                 full_second_path = first_path + '/' + second_path
             if not os.path.exists(full_second_path):
                 os.makedirs(full_second_path)
-            report_path = full_second_path + '/' + report_name + '-' + uid + '.' + file_format
+            if uid:
+                report_path = full_second_path + '/' + report_name + '-' + uid + '.' + file_format
+            else:
+                report_path = full_second_path + '/' + report_name +  '.' + file_format
             return report_path
         else:
             return None
