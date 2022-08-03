@@ -32,7 +32,8 @@ class CompareExecutor(ABC):
         self.dump_b = dump_b
         self.config = config
 
-    def get_version_change_files(self, side_a_file, side_b_file, o_char=None, n_char=None):
+    @staticmethod
+    def get_version_change_files(side_a_file, side_b_file, o_char=None, n_char=None):
         side_a_floders = side_a_file.split('/')
         side_b_floders = side_b_file.split('/')
         compare_result = 'same'
@@ -52,20 +53,42 @@ class CompareExecutor(ABC):
                     break
             return compare_result
 
+    def find_dir_version_change_files(self, only_dump_a, only_dump_b, change_dump, common_dump_add):
+        dict_a, dict_b = {}, {}
+        for side_a_file in list(only_dump_a):
+            dict_a[os.path.basename(side_a_file)] = side_a_file
+        for side_b_file in list(only_dump_b):
+            dict_b[os.path.basename(side_b_file)] = side_b_file
+        for single_key in dict_a.keys():
+            if dict_b.get(single_key):
+                side_a_file = dict_a.get(single_key)
+                side_b_file = dict_b.get(single_key)
+                get_result = self.get_version_change_files(side_a_file, side_b_file)
+                if get_result == "change":
+                    change_dump.append([side_a_file, side_b_file])
+                    only_dump_a.discard(side_a_file)
+                    only_dump_b.discard(side_b_file)
+                elif get_result == "same":
+                    common_dump_add.append([side_a_file, side_b_file])
+                    only_dump_a.discard(side_a_file)
+                    only_dump_b.discard(side_b_file)
+        return [only_dump_a, only_dump_b, change_dump, common_dump_add]
+
     def format_dump(self, data_a, data_b):
         dump_set_a, dump_set_b = set(data_a), set(data_b)
         common_dump = dump_set_a & dump_set_b
         only_dump_a = dump_set_a - dump_set_b
         only_dump_b = dump_set_b - dump_set_a
         change_dump, common_dump_add = [], []
+        only_dump_a, only_dump_b, change_dump, common_dump_add = self.find_dir_version_change_files(
+            only_dump_a, only_dump_b, change_dump, common_dump_add)
+
         for side_a_file in list(only_dump_a):
             for side_b_file in list(only_dump_b):
                 get_result = ''
                 file_a, file_b = os.path.basename(side_a_file), os.path.basename(side_b_file)
-                if file_a == file_b:
-                    get_result = self.get_version_change_files(side_a_file, side_b_file)
                 # 识别so库文件两种版本变化形式
-                elif file_a.endswith('.so') and file_b.endswith('.so'):
+                if file_a.endswith('.so') and file_b.endswith('.so'):
                     file_a_version_1 = re.search('\d+\.\d+', file_a.split('-')[-1])
                     file_b_version_1 = re.search('\d+\.\d+', file_a.split('-')[-1])
                     if file_a_version_1 and file_b_version_1 and file_a.split('-')[0] == file_b.split('-')[0]:
@@ -85,10 +108,12 @@ class CompareExecutor(ABC):
                     change_dump.append([side_a_file, side_b_file])
                     only_dump_a.discard(side_a_file)
                     only_dump_b.discard(side_b_file)
+                    break
                 elif get_result == "same":
                     common_dump_add.append([side_a_file, side_b_file])
                     only_dump_a.discard(side_a_file)
                     only_dump_b.discard(side_b_file)
+                    break
         all_dump = [
             [[x, x, CMP_RESULT_SAME] for x in common_dump],
             [[x[0], x[1], CMP_RESULT_CHANGE] for x in change_dump],
@@ -112,7 +137,6 @@ class CompareExecutor(ABC):
         only_file_a = list(set(files_a) - set(common_file_a))
         only_file_b = list(set(files_b) - set(common_file_b))
         return common_file_pairs, only_file_a, only_file_b
-
 
     @staticmethod
     def format_dump_kv(data_a, data_b, kind):

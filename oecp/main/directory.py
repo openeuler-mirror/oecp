@@ -150,7 +150,7 @@ class Directory(UserDict):
         :return:
         """
         pool = Pool(pool_size or cpu_count())
-        jobs = []
+        result = []
 
         # 比较每一个repository
         try:
@@ -158,12 +158,30 @@ class Directory(UserDict):
                 if repository not in that:
                     logger.warning(f"{repository} not in {that.verbose_path}")
                     continue
-                pool.apply_async(self.compare_job, (self[repository], that[repository], plan), callback=jobs.append)
+                pool.apply_async(self.compare_job, (self[repository], that[repository], plan), callback=result.append)
         except KeyboardInterrupt:
             pool.terminate()
         pool.close()
+        result.extend(self.rpm_package_name_compare(that, plan))
         pool.join()
-        return jobs
+        return result
+
+    def rpm_package_name_compare(self, that, plan):
+        result = []
+        for name in plan:
+            if not plan.only_for_directory(name):
+                continue
+            logger.info(f"compare directory [{name}]")
+            dumper = plan.dumper_of(name)
+            executor = plan.executor_of(name)
+            config = plan.config_of(name)
+
+            this_dumper, that_dumper = dumper(self), dumper(that)
+            executor_ins = executor(this_dumper, that_dumper, config)
+
+            result.append(executor_ins.run())
+            logger.info(f"compare directory [{name}] done")
+        return result
 
     @staticmethod
     def compare_job(side_a, side_b, plan):
@@ -194,7 +212,7 @@ class Directory(UserDict):
             finally:
                 side_a.clean()
                 side_b.clean()
-
+        result.extend(self.rpm_package_name_compare(that, plan))
         return result
 
     def compare(self, that, plan):
@@ -206,20 +224,6 @@ class Directory(UserDict):
         """
         result = CompareResultComposite(self._cmp_type, CMP_RESULT_TO_BE_DETERMINED, self.verbose_path,
                                         that.verbose_path)
-
-        # 目录层比较
-        for name in plan:
-            if not plan.only_for_directory(name):
-                continue
-            logger.info(f"compare directory [{name}]")
-            dumper = plan.dumper_of(name)
-            executor = plan.executor_of(name)
-            config = plan.config_of(name)
-
-            this_dumper, that_dumper = dumper(self), dumper(that)
-            executor_ins = executor(this_dumper, that_dumper, config)
-
-            result.add_component(executor_ins.run())
 
         # 比较每一个repository
         if plan.parallel:
@@ -310,22 +314,6 @@ class DistISO(Directory):
             logger.error(f"umount file error: {ret}, {err}")
 
         self._mounts[iso_path] = False
-
-    def find_primary_sqlite_path(self):
-        """
-        找到repodata目录下下primary.sqlite文件
-        :return:
-        """
-        # 同源ISO的repodata放在BaseOS目录下
-        for repodata_dir in ["repodata", "BaseOS/repodata"]:
-            try:
-                repodata_path = os.path.join(self._mount_dir.name, repodata_dir)
-
-                for file in os.listdir(repodata_path):
-                    if re.match(r"^[0-9a-z]+-primary\.sqlite.(bz2|gz|xz)$", file):
-                        return os.path.join(repodata_path, file)
-            except FileNotFoundError:
-                continue
 
     def _set_iso_packages_sqlite_paths(self, iso, plan=None, side=None):
         if not iso:
@@ -441,8 +429,10 @@ class OEDistRepo(Directory):
         self._sqlite_paths = {}
 
         # paths
-        # - "https://repo.openeuler.org/openEuler-20.03-LTS-SP1/EPOL/aarch64/repodata, https://repo.openeuler.org/openEuler-20.03-LTS-SP1/debuginfo/aarch64/repodata"
-        # - "https://repo.openeuler.org/openEuler-20.03-LTS-SP1/everything/aarch64/repodata, https://repo.openeuler.org/openEuler-20.03-LTS-SP1/debuginfo/aarch64/repodata"
+        # - "https://repo.openeuler.org/openEuler-20.03-LTS-SP1/EPOL/aarch64/repodata,
+        # https://repo.openeuler.org/openEuler-20.03-LTS-SP1/debuginfo/aarch64/repodata"
+        # - "https://repo.openeuler.org/openEuler-20.03-LTS-SP1/everything/aarch64/repodata,
+        # https://repo.openeuler.org/openEuler-20.03-LTS-SP1/debuginfo/aarch64/repodata"
         self._format_paths(paths)
 
         for _path in paths:
@@ -455,12 +445,14 @@ class OEDistRepo(Directory):
     def _format_paths(paths):
         """
         # input paths
-        # - "https://repo.openeuler.org/openEuler-20.03-LTS-SP1/EPOL/aarch64/repodata/, https://repo.openeuler.org/openEuler-20.03-LTS-SP1/debuginfo/aarch64/repodata/"
-        # - "https://repo.openeuler.org/openEuler-20.03-LTS-SP1/everything/aarch64/repodata
+        # - "https://repo.openeuler.org/openEuler-20.03-LTS-SP1/EPOL/aarch64/repodata/,
+        #    https://repo.openeuler.org/openEuler-20.03-LTS-SP1/debuginfo/aarch64/repodata/,
+        #    https://repo.openeuler.org/openEuler-20.03-LTS-SP1/everything/aarch64/repodata"
 
         # output paths
-        # - "https://repo.openeuler.org/openEuler-20.03-LTS-SP1/EPOL/aarch64/repodata,https://repo.openeuler.org/openEuler-20.03-LTS-SP1/debuginfo/aarch64/repodata"
-        # - "https://repo.openeuler.org/openEuler-20.03-LTS-SP1/everything/aarch64/repodata,
+        # - "https://repo.openeuler.org/openEuler-20.03-LTS-SP1/EPOL/aarch64/repodata,
+        #    https://repo.openeuler.org/openEuler-20.03-LTS-SP1/debuginfo/aarch64/repodata,
+        #    https://repo.openeuler.org/openEuler-20.03-LTS-SP1/everything/aarch64/repodata"
         """
         for i, _path in enumerate(paths):
             if ',' not in _path:
