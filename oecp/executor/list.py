@@ -87,7 +87,7 @@ class ListCompareExecutor(CompareExecutor):
         # 使用字典保存rpm name 对应的多版本rpm包, key值为rpm name + rpm arch
         one2more_a = self.rpm_n_a_lists(rpm_diffs_a)
         one2more_b = self.rpm_n_a_lists(rpm_diffs_b)
-        rpm_levels = self._compare_rpm_level(rpm_sames, one2more_a, one2more_b)
+        rpm_levels = self.compare_rpm_level(rpm_sames, one2more_a, one2more_b)
         for rpm_level in rpm_levels:
             attr_a = dump_a.get(rpm_level[0].split(',')[0])
             attr_b = dump_b.get(rpm_level[1].split(',')[0])
@@ -102,7 +102,7 @@ class ListCompareExecutor(CompareExecutor):
                 CompareResultComponent(CMP_TYPE_RPM_LEVEL, rpm_level[-1], rpm_level[0], rpm_level[1], attr))
         return result
 
-    def _compare_rpm_level(self, rpm_sames, one2more_a, one2more_b):
+    def compare_rpm_level(self, rpm_sames, one2more_a, one2more_b):
         compare_list, row = [], []
         for rpm_same in rpm_sames:
             compare_list.append([rpm_same, rpm_same, CMP_LEVEL_SAME])

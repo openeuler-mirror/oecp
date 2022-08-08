@@ -15,12 +15,12 @@
 # Description: directory
 # **********************************************************************************
 """
+from multiprocessing import Pool, cpu_count
 from collections import UserDict
 import re
 import tempfile
 from bs4 import BeautifulSoup as bs
 from defusedxml.ElementTree import parse
-from multiprocessing import Pool, cpu_count
 
 from oecp.result.compare_result import *
 from oecp.proxy.rpm_proxy import RPMProxy
@@ -72,7 +72,7 @@ class Directory(UserDict):
 
         return all_debug_info_rpm
 
-    def _all_debuginfo_rpm(self, debuginfo_path):
+    def all_debuginfo_rpm(self, debuginfo_path):
         """
 
         :param debuginfo_path: debuginfo包所在的子路径
@@ -123,7 +123,7 @@ class Directory(UserDict):
         logger.info(
             f"{self.verbose_path} upsert a group, path: {path}, debuginfo: {debuginfo_path}")
         focus_on_rpm = self._all_focus_on_rpm(path)
-        debuginfo_rpm = self._all_debuginfo_rpm(debuginfo_path)
+        debuginfo_rpm = self.all_debuginfo_rpm(debuginfo_path)
         logger.info(
             f"{self.verbose_path} total {len(focus_on_rpm)} rpm packages, {len(debuginfo_rpm)} debuginfo packages")
         for rpm, rpm_path in focus_on_rpm.items():
@@ -250,23 +250,23 @@ class DistISO(Directory):
     # path = "/a.iso,/a-debug.iso" with_debug=True
     # path = "/a.iso"
     def __init__(self, path, work_dir, category, with_debug=False):
-        self._debuginfo_iso = ''
-        self._rpm_iso = ''
+        self.debuginfo_iso = ''
+        self.rpm_iso = ''
 
         if with_debug:
             path = self._format_path(path)
-            self._rpm_iso = path.split(',')[0]
-            self._debuginfo_iso = path.split(',')[1]
+            self.rpm_iso = path.split(',')[0]
+            self.debuginfo_iso = path.split(',')[1]
         else:
-            self._rpm_iso = path
-        super(DistISO, self).__init__(self._rpm_iso, work_dir, category)
+            self.rpm_iso = path
+        super(DistISO, self).__init__(self.rpm_iso, work_dir, category)
 
         self._cmp_type = CMP_TYPE_ISO
-        self.verbose_path = os.path.basename(self._rpm_iso)
+        self.verbose_path = os.path.basename(self.rpm_iso)
 
         self._mounts = {}
         self._mount_paths = {}
-        self._iso_packages_sqlite = {}
+        self.iso_packages_sqlite = {}
 
     @staticmethod
     def _format_path(path):
@@ -274,7 +274,7 @@ class DistISO(Directory):
             path = path + ','
         return path
 
-    def _mount_iso(self, iso_path):
+    def mount_iso(self, iso_path):
         if not iso_path or self._mounts.get(iso_path):
             return
 
@@ -300,7 +300,7 @@ class DistISO(Directory):
         self._mounts[iso_path] = True
         self._mount_paths[iso_path] = _mount_dir
 
-    def _umount_iso(self, iso_path):
+    def umount_iso(self, iso_path):
         if not self._mounts.get(iso_path):
             return
 
@@ -321,7 +321,36 @@ class DistISO(Directory):
 
         self._mounts[iso_path] = False
 
-    def _set_iso_packages_paths(self, iso, plan=None, side=None):
+    def compare(self, that, plan):
+        try:
+            self.mount_iso(self.rpm_iso)
+            self.mount_iso(self.debuginfo_iso)
+            self.set_iso_packages_paths(self.rpm_iso, plan, 'side_a')
+            self.set_iso_packages_paths(self.debuginfo_iso)
+            logger.debug("self _iso_packages_sqlite", self.iso_packages_sqlite)
+            self_all_debuginfo_rpm = self.all_debuginfo_rpm(self.debuginfo_iso)
+            _packages_sqlite = self.iso_packages_sqlite.get(self.rpm_iso)
+            for dir_package in _packages_sqlite:
+                self.upsert_a_group(dir_package, self_all_debuginfo_rpm)
+
+            that.mount_iso(that.rpm_iso)
+            that.mount_iso(that.debuginfo_iso)
+            that.set_iso_packages_paths(that.rpm_iso, plan, 'side_b')
+            that.set_iso_packages_paths(that.debuginfo_iso)
+            logger.debug("that _iso_packages_sqlite", that.iso_packages_sqlite)
+            that_all_debuginfo_rpm = that.all_debuginfo_rpm(that.debuginfo_iso)
+            _packages_sqlite = that.iso_packages_sqlite.get(that.rpm_iso)
+            for dir_package in _packages_sqlite:
+                that.upsert_a_group(dir_package, that_all_debuginfo_rpm)
+
+            return super(DistISO, self).compare(that, plan)
+        finally:
+            self.umount_iso(self.rpm_iso)
+            self.umount_iso(self.debuginfo_iso)
+            that.umount_iso(that.rpm_iso)
+            that.umount_iso(that.debuginfo_iso)
+
+    def set_iso_packages_paths(self, iso, plan=None, side=None):
         if not iso:
             return
 
@@ -359,36 +388,7 @@ class DistISO(Directory):
             if config:
                 config.setdefault('sqlite_path', {})
                 config['sqlite_path'].setdefault(side, []).append(tem_dir_obj)
-        self._iso_packages_sqlite[iso] = packages
-
-    def compare(self, that, plan):
-        try:
-            self._mount_iso(self._rpm_iso)
-            self._mount_iso(self._debuginfo_iso)
-            self._set_iso_packages_paths(self._rpm_iso, plan, 'side_a')
-            self._set_iso_packages_paths(self._debuginfo_iso)
-            logger.debug("self _iso_packages_sqlite", self._iso_packages_sqlite)
-            self_all_debuginfo_rpm = self._all_debuginfo_rpm(self._debuginfo_iso)
-            _packages_sqlite = self._iso_packages_sqlite.get(self._rpm_iso)
-            for dir_package in _packages_sqlite:
-                self.upsert_a_group(dir_package, self_all_debuginfo_rpm)
-
-            that._mount_iso(that._rpm_iso)
-            that._mount_iso(that._debuginfo_iso)
-            that._set_iso_packages_paths(that._rpm_iso, plan, 'side_b')
-            that._set_iso_packages_paths(that._debuginfo_iso)
-            logger.debug("that _iso_packages_sqlite", that._iso_packages_sqlite)
-            that_all_debuginfo_rpm = that._all_debuginfo_rpm(that._debuginfo_iso)
-            _packages_sqlite = that._iso_packages_sqlite.get(that._rpm_iso)
-            for dir_package in _packages_sqlite:
-                that.upsert_a_group(dir_package, that_all_debuginfo_rpm)
-
-            return super(DistISO, self).compare(that, plan)
-        finally:
-            self._umount_iso(self._rpm_iso)
-            self._umount_iso(self._debuginfo_iso)
-            that._umount_iso(that._rpm_iso)
-            that._umount_iso(that._debuginfo_iso)
+        self.iso_packages_sqlite[iso] = packages
 
     def upsert_a_group(self, packages_path, debuginfo_rpm=None):
         focus_on_rpm = self._all_focus_on_rpm(packages_path)
@@ -403,20 +403,20 @@ class DistISO(Directory):
                 self[repository_name] = Repository(self._work_dir, rpm, self._category)
                 self[repository_name].upsert_a_rpm(rpm_path, rpm, debuginfo_rpm.get(correspond_debuginfo_rpm))
 
-    def _all_focus_on_rpm(self, packages_path):
-        return self.collect_focus_rpm(packages_path)
-
-    def _all_debuginfo_rpm(self, debuginfo_iso):
+    def all_debuginfo_rpm(self, debuginfo_iso):
         if not debuginfo_iso:
             return {}
 
-        logger.debug(f'debuginfo iso is {debuginfo_iso}, iso packages sqlite is {self._iso_packages_sqlite}')
-        debuginfo_packages = self._iso_packages_sqlite.get(debuginfo_iso)
+        logger.debug(f'debuginfo iso is {debuginfo_iso}, iso packages sqlite is {self.iso_packages_sqlite}')
+        debuginfo_packages = self.iso_packages_sqlite.get(debuginfo_iso)
         all_debuginfo_rpm = {}
         for k, v in debuginfo_packages.items():
             all_debuginfo_rpm.update(self._get_debug_info_rpm(k))
 
         return all_debuginfo_rpm
+
+    def _all_focus_on_rpm(self, packages_path):
+        return self.collect_focus_rpm(packages_path)
 
 
 class OEDistRepo(Directory):
@@ -475,7 +475,7 @@ class OEDistRepo(Directory):
 
         mapping = SQLiteMapping(sqlite_path) if sqlite_path else RepositoryPackageMapping()
         focus_on_rpm = self._all_focus_on_rpm(path)
-        debuginfo_rpm = self._all_debuginfo_rpm(debuginfo_path)
+        debuginfo_rpm = self.all_debuginfo_rpm(debuginfo_path)
         logger.info(f"{len(focus_on_rpm)} rpm packages, {len(debuginfo_rpm)} debuginfo packages")
         for rpm, rpm_path in focus_on_rpm.items():
             repository_full_name = mapping.repository_of_package(rpm)
@@ -486,26 +486,6 @@ class OEDistRepo(Directory):
             else:
                 self[repository_name] = Repository(self._work_dir, repository_full_name, self._category)
                 self[repository_name].upsert_a_rpm(rpm_path, rpm, debuginfo_rpm.get(correspond_debuginfo_rpm))
-
-    def _set_primary_sqlite_path(self, repodata_path):
-        if not repodata_path:
-            logger.info("repodata path is not specify")
-            return
-
-        repomd_xml_url = os.path.join(repodata_path, 'repomd.xml')
-        rs = self.parse_repomd_xml(repomd_xml_url)
-
-        for f in rs:
-            if re.search(r"[0-9a-z]+-primary\.sqlite.*$", f):
-                # rs[f] = repodata/58ec880d69c9da6625ae7fa9bc07ea521e6e939b0b917fe9e227d3d1bda05e60-primary.sqlite.bz2
-                self._sqlite_paths[repodata_path] = os.path.join('/'.join(repodata_path.split('/')[:-1]), rs[f])
-
-    def _get_primary_sqlite_path(self, repodata_path):
-        if not repodata_path:
-            logger.info("repodata path is not specify")
-            return None
-
-        return self._sqlite_paths.get(repodata_path, None)
 
     def parse_repomd_xml(self, repomd_xml_url):
         if not repomd_xml_url:
@@ -544,6 +524,39 @@ class OEDistRepo(Directory):
         for file in rs:
             if re.match(r"^[0-9a-z]+-primary\.sqlite.*$", file):
                 return os.path.join(sqlite_path, rs[file])
+
+    def _set_primary_sqlite_path(self, repodata_path):
+        if not repodata_path:
+            logger.info("repodata path is not specify")
+            return
+
+        repomd_xml_url = os.path.join(repodata_path, 'repomd.xml')
+        rs = self.parse_repomd_xml(repomd_xml_url)
+
+        for f in rs:
+            if re.search(r"[0-9a-z]+-primary\.sqlite.*$", f):
+                # rs[f] = repodata/58ec880d69c9da6625ae7fa9bc07ea521e6e939b0b917fe9e227d3d1bda05e60-primary.sqlite.bz2
+                self._sqlite_paths[repodata_path] = os.path.join('/'.join(repodata_path.split('/')[:-1]), rs[f])
+
+    def _get_primary_sqlite_path(self, repodata_path):
+        if not repodata_path:
+            logger.info("repodata path is not specify")
+            return None
+
+        return self._sqlite_paths.get(repodata_path, None)
+
+    def all_debuginfo_rpm(self, debuginfo_path):
+        """
+
+        :param debuginfo_path: debuginfo包所在的子路径
+        :return:
+        """
+        if not debuginfo_path:
+            logger.info("debuginfo path not specify")
+            return {}
+
+        logger.debug(f"search all debuginfo rpm at {debuginfo_path}")
+        return self._prepare_package_info(debuginfo_path, debuginfo=True)
 
     def _prepare_package_info_old(self, package_html_url, debuginfo=False, sqlite=False):
         """
@@ -585,7 +598,6 @@ class OEDistRepo(Directory):
         if not package_path:
             return {}
 
-        # package_full_path = os.path.join(self._path, package_path)
         package_full_path = package_path
         _sqlite_path = self._sqlite_paths.get(package_path, None)
         logger.debug(f"package_path={package_path},package_full_path={package_full_path},sqlite_path={_sqlite_path},"
@@ -593,7 +605,6 @@ class OEDistRepo(Directory):
         if not _sqlite_path:
             return {}
 
-        # tmp_dir = tempfile.TemporaryDirectory(prefix="oe_dist_repo_", suffix="_Packages", dir=self._work_dir)
         sqlite = SQLiteMapping(_sqlite_path)
         packages = sqlite.get_all_packages()
         rs = {}
@@ -609,19 +620,6 @@ class OEDistRepo(Directory):
                     rs[package_name] = os.path.join('/'.join(package_path.split('/')[:-1]), location_href)
 
         return rs
-
-    def _all_debuginfo_rpm(self, debuginfo_path):
-        """
-
-        :param debuginfo_path: debuginfo包所在的子路径
-        :return:
-        """
-        if not debuginfo_path:
-            logger.info("debuginfo path not specify")
-            return {}
-
-        logger.debug(f"search all debuginfo rpm at {debuginfo_path}")
-        return self._prepare_package_info(debuginfo_path, debuginfo=True)
 
     def _all_focus_on_rpm(self, rpm_path):
         """
@@ -649,8 +647,6 @@ class OBSRepo(OEDistRepo):
 
         self._cmp_type = CMP_TYPE_DIST_REPOSITORY
 
-        # self.upsert_a_group(f"{arch}", f"{arch}", self.find_primary_sqlite_path(f"repodata"))
-        # self.upsert_a_group("noarch", "noarch", self.find_primary_sqlite_path(f"repodata"))
         self.upsert_a_group(f"{arch}", f"{arch}")
         self.upsert_a_group("noarch", "noarch")
 
@@ -677,9 +673,6 @@ class OBSRepo(OEDistRepo):
                 package = row.attrs['href']
                 if not package.endswith("rpm"):
                     continue
-                # m = re.match("(\d{4}-\d{2}-\d{2} \d{2}:\d{2})\W+(.*)", row.next_sibling.strip())
-                # date_part = m.group(1)
-                # size = m.group(2)
 
                 if sqlite:
                     rs[package] = package

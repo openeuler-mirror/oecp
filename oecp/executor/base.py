@@ -285,7 +285,7 @@ class CompareExecutor(ABC):
 
         return prase_result
 
-    def _cmp_version(self, v_a, v_b):
+    def cmp_version(self, v_a, v_b):
         va_list = self._prase_version(v_a)
         vb_list = self._prase_version(v_b)
         cmp_similar = ''
@@ -309,8 +309,8 @@ class CompareExecutor(ABC):
         _, v_a, r_a, d_a, a_a = RPMProxy.rpm_n_v_r_d_a(side_a)
         _, v_b, r_b, d_b, a_b = RPMProxy.rpm_n_v_r_d_a(side_b)
         arch_result = self._cmp_rpm_arch(a_a, a_b)
-        v_diff = self._cmp_version(v_a, v_b)
-        r_diff = self._cmp_version(r_a, r_b)
+        v_diff = self.cmp_version(v_a, v_b)
+        r_diff = self.cmp_version(r_a, r_b)
         d_similar = self.get_equal_rate(d_a, d_b)
         return arch_result, int(v_diff + r_diff) + d_similar
 

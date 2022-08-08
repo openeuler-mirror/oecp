@@ -34,16 +34,6 @@ class ServiceCompareExecutor(CompareExecutor):
         self.data = 'data'
         self.split_flag = '__rpm__'
 
-    def _intercept_file_name(self, file, pattern="full"):
-        common_path_flag = '/usr/lib/systemd/system/'
-        full_path = file.split(self.split_flag)[-1]
-        if pattern == 'half':
-            half_path = full_path.split(common_path_flag)[-1]
-            if '/' in half_path:
-                half_path = '/' + half_path
-            return half_path
-        return full_path
-
     @staticmethod
     def _load_details(file_path):
         """
@@ -86,6 +76,16 @@ class ServiceCompareExecutor(CompareExecutor):
                 result.add_component(data)
         return result
 
+    def intercept_file_name(self, file, pattern="full"):
+        common_path_flag = '/usr/lib/systemd/system/'
+        full_path = file.split(self.split_flag)[-1]
+        if pattern == 'half':
+            half_path = full_path.split(common_path_flag)[-1]
+            if '/' in half_path:
+                half_path = '/' + half_path
+            return half_path
+        return full_path
+
     def _compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
         count_result = {'more_count': 0, 'less_count': 0, 'diff_count': 0}
         category = dump_a['category']
@@ -98,10 +98,10 @@ class ServiceCompareExecutor(CompareExecutor):
             return result
         details_path = os.path.join(DETAIL_PATH, 'service-detail', dump_b['rpm']) + '.csv'
         for pair in common_file_pairs:
-            detail_filename = self._intercept_file_name(pair[0])
+            detail_filename = self.intercept_file_name(pair[0])
             # 不显示/usr/lib/systemd/system/路径
-            base_a = self._intercept_file_name(pair[0], 'half')
-            base_b = self._intercept_file_name(pair[1], 'half')
+            base_a = self.intercept_file_name(pair[0], 'half')
+            base_b = self.intercept_file_name(pair[1], 'half')
             details_a = self._load_details(pair[0])
             details_b = self._load_details(pair[1])
             file_result, component_results = self.format_service_detail(details_a, details_b)
@@ -116,13 +116,13 @@ class ServiceCompareExecutor(CompareExecutor):
             result.add_component(result_detail)
         if only_file_a:
             for file_a in only_file_a:
-                side_a = self._intercept_file_name(file_a, 'half')
+                side_a = self.intercept_file_name(file_a, 'half')
                 data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_LESS, side_a, '')
                 result.add_component(data)
                 count_result["less_count"] += 1
         if only_file_b:
             for file_b in only_file_b:
-                side_b = self._intercept_file_name(file_b, 'half')
+                side_b = self.intercept_file_name(file_b, 'half')
                 data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_MORE, '', side_b)
                 result.add_component(data)
                 count_result["more_count"] += 1

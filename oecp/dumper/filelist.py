@@ -34,8 +34,8 @@ class FileListDumper(AbstractDumper):
     def dump(self, repository):
         rpm_path = repository['path']
         rpm_name = repository['name']
-        white_file_path = os.path.dirname(
-            os.path.dirname(os.path.abspath(__file__))) + '/conf/rpm_white/rpm_name_list.json'
+        white_file = '/conf/rpm_white/rpm_name_list.json'
+        white_file_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + white_file
         with open(white_file_path, 'r') as rpm_name_list:
             white_list = json.load(rpm_name_list)
         dump_list = []

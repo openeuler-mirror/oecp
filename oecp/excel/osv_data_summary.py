@@ -47,6 +47,26 @@ class DataExcelFile:
         self.tools_result = {}
         self.conclusion = ''
 
+    @staticmethod
+    def convert_data(data):
+        """[summary]
+
+        Args:
+            data ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        return "%.2f%%" % (data * 100)
+
+    @staticmethod
+    def obtain_base_os(side_a):
+        base_so = side_a.split("-")[:4]
+        for part in base_so:
+            if '.iso' in part or "aarch64" == part or "x86_64" == part:
+                base_so.remove(part)
+        return " ".join(base_so)
+
     def create_folder(self, root_path, osv_title):
         """
         The folder where the results are stored
@@ -98,26 +118,6 @@ class DataExcelFile:
         with open(self.benchmark_json, 'r', encoding='utf8') as fp:
             benchmark_criteria = json.load(fp)
         return benchmark_criteria
-
-    @staticmethod
-    def convert_data(data):
-        """[summary]
-
-        Args:
-            data ([type]): [description]
-
-        Returns:
-            [type]: [description]
-        """
-        return "%.2f%%" % (data * 100)
-
-    @staticmethod
-    def obtain_base_os(side_a):
-        base_so = side_a.split("-")[:4]
-        for part in base_so:
-            if '.iso' in part or "aarch64" == part or "x86_64" == part:
-                base_so.remove(part)
-        return " ".join(base_so)
 
     def result_comparison(self, similarity, content, option, data, index):
         """

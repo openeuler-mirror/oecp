@@ -149,8 +149,12 @@ class RPMExtractDumper(AbstractDumper):
 
     def get_package_extract_path(self, package_name):
         for k, v in self._extract_info.items():
-            if RPMProxy.rpm_name(k) == package_name:
-                return str(v.name)
+            if RPMProxy.rpm_name(k) != package_name:
+                continue
+            else:
+                extract_path = str(v.name)
+                return extract_path
+        return ''
 
     def dump(self, repository):
         path = repository['path']

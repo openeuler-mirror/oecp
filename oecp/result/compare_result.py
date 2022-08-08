@@ -145,25 +145,7 @@ class CompareResultComposite(CompareResultComponent):
         if os.path.exists(export_floder):
             shutil.rmtree(export_floder)
 
-        # performance_rows = performance_result_parser(base_side_a, base_side_b, root_path, baseline)
-        # rpm_test_rows, rpm_test_details = test_result_parser(base_side_a, base_side_b, root_path)
-
         # all result which need to export as csv
-        # eg:
-        # {
-        #   "rpm": [
-        #     result_row1,
-        #     ...
-        #   ],
-        #   "xxx.rpm": {
-        #     "rpm require": [
-        #       single_result_row1,
-        #       ...
-        #     ],
-        #     ...
-        #   },
-        #   ...
-        # }
         rows = {}
         parse_result(self, base_side_a, base_side_b, rows)
         if result_format == 'json':
@@ -294,12 +276,6 @@ def parse_result(result, base_side_a, base_side_b, rows, parent_side_a=None, par
 
 
 def assgin_summary_result(rows, side_a, side_b):
-    # eg:
-    #   {
-    #     "1": {"xxx0_rpm": "same", "xxx1_rpm": "diff", "xxx2_rpm": "less", ... },
-    #     "2": {"xxx3_rpm": "same", "xxx4_rpm": "diff", ...},
-    #     "3": {"xxx5_rpm": "same", ...
-    #   }
     summary = {}
     pkg_name = {
         '1': "same",
@@ -401,8 +377,6 @@ def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, 
         if result.detail:
             row["details path"] = result.detail
     # handle kabi result
-    # if is_kernel:
-    #    row.pop("binary rpm package")
 
     rows.setdefault(parent_side, {})
     rows[parent_side].setdefault(result.cmp_type, [])

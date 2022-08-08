@@ -47,10 +47,7 @@ class RPMProxy(object):
     def rpm_name_version(cls, rpm):
         name = cls.rpm_name(rpm)
         m = re.match(r"-(.+)-.+", rpm.replace(name, "", 1))
-        if m:
-            return name, m.group(1)
-        else:
-            logger.error("Failed to resolve the rpm version.")
+        return name, m.group(1)
 
     @classmethod
     def rpm_n_v_r_d_a(cls, rpm, dist="openEuler"):

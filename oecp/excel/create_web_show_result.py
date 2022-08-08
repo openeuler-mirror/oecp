@@ -114,5 +114,5 @@ class WebShowResult:
                 self.create_report_json(root_path, osv_title)
             else:
                 logger.warning('The items displayed in the JSON report is empty.')
-        except(AttributeError, KeyError, IOError, OSError, FileNotFoundError, ValueError) as e:
+        except(AttributeError, KeyError, IOError, OSError, ValueError) as e:
             logger.exception(f"json statistics error, {e}")

@@ -169,9 +169,9 @@ class Repository(UserDict):
                 executor_ins = executor(this_dumper, that_dumper, config)
 
                 # set cache
-                compare_cache[name]["dumper"] = [this_dumper, that_dumper]
-                compare_cache[name]["work_dir"] = self._work_dir
-                # compare_cache[name]["executor"] = weakref.proxy(executor_ins)
+                cache_name = compare_cache.get(name)
+                cache_name.setdefault("dumper", [this_dumper, that_dumper])
+                cache_name.setdefault("work_dir", self._work_dir)
 
                 result.add_component(*executor_ins.run())
 
@@ -216,9 +216,9 @@ class Repository(UserDict):
                 executor_ins = executor(this_dumper, config)
 
                 # set cache
-                compare_cache[name]["dumper"] = [this_dumper]
-                compare_cache[name]["work_dir"] = self._work_dir
-                # compare_cache[name]["executor"] = weakref.proxy(executor_ins)
+                cache_name = compare_cache.get(name)
+                cache_name.setdefault("dumper", [this_dumper])
+                cache_name.setdefault("work_dir", self._work_dir)
 
                 res = executor_ins.run()
                 result.append(res)
@@ -261,9 +261,10 @@ class Repository(UserDict):
                 executor_ins = executor(this_dumper, config)
 
                 # set cache
-                compare_cache[name]["dumper"] = [this_dumper]
-                compare_cache[name]["work_dir"] = self._work_dir
-                # compare_cache[name]["executor"] = weakref.proxy(executor_ins)
+                cache_name = compare_cache.get(name)
+                cache_name.setdefault("dumper", [this_dumper])
+                cache_name.setdefault("work_dir", self._work_dir)
+
                 res = executor_ins.run()
                 result.append(res)
 
