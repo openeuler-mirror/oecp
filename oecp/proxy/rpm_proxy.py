@@ -19,6 +19,8 @@ import re
 import subprocess
 import logging
 
+from oecp.result.constants import DIST_FLAG
+
 logger = logging.getLogger('oecp')
 
 
@@ -26,6 +28,7 @@ class RPMProxy(object):
     """
     rpm包代理，实现常见的rpm操作
     """
+
     @classmethod
     def rpm_name(cls, rpm):
         """
@@ -41,6 +44,15 @@ class RPMProxy(object):
             return rpm
 
     @classmethod
+    def rpm_name_version(cls, rpm):
+        name = cls.rpm_name(rpm)
+        m = re.match(r"-(.+)-.+", rpm.replace(name, "", 1))
+        if m:
+            return name, m.group(1)
+        else:
+            logger.error("Failed to resolve the rpm version.")
+
+    @classmethod
     def rpm_n_v_r_d_a(cls, rpm, dist="openEuler"):
         """
         解析rpm包的名称、版本号、发布号、发行商、体系
@@ -52,16 +64,29 @@ class RPMProxy(object):
             if dist == "openEuler":
                 # 名称-版本号-发布号.发行商.体系.rpm
                 # eg: grpc-1.31.0-6.oe1.x86_64.rpm
-                name = cls.rpm_name(rpm)
-
-                m = re.match(r"(.+)-(.+)\.(.+)?\.(.+)\.rpm", rpm.replace(name, "", 1))
-                if m:
-                    return name, m.group(1), m.group(2), m.group(3), m.group(4)
-
-                # 名称-版本号-发布号.体系.rpm
-                # eg: grpc-1.31.0-6.x86_64.rpm
-                m = re.match(r"(.+)-(.+)\.(.+)\.rpm", rpm.replace(name, "", 1))
-                return name, m.group(1), m.group(2), None, m.group(3)
+                name, version = cls.rpm_name_version(rpm)
+                m = re.match(r"-(.+)\.rpm", rpm.replace(name + '-' + version, "", 1))
+                r_d_a = m.group(1)
+                arch = r_d_a.split('.')[-1]
+                r_d = r_d_a.rstrip(arch).rstrip('.')
+                prase = False
+                release, dist = '', ''
+                for d_flag in DIST_FLAG:
+                    if d_flag not in r_d:
+                        continue
+                    else:
+                        prase = True
+                        first_r = r_d.split(d_flag)[0]
+                        first_d = r_d.split(d_flag)[-1]
+                        release = re.sub(r'.module[_+]+', '', first_r).strip('.')
+                        dist = d_flag + first_d
+                if not prase:
+                    m = re.match(r"([\d._]+)\.(.+)", r_d)
+                    if m:
+                        return name, version, m.group(1), m.group(2), arch
+                    else:
+                        release = r_d
+                return name, version, release, dist, arch
             elif dist == "category":
                 # 名称-版本号-发布号.发行商-类型
                 # eg: texlive-base-20180414-28.oe1.oecp

@@ -15,15 +15,11 @@
 # Description: repository
 # **********************************************************************************
 """
-import os
-import logging
 from collections import UserDict
 import tempfile
-import weakref
 
 from oecp.utils.misc import path_is_remote, basename_of_path
 from oecp.proxy.requests_proxy import do_download
-from oecp.proxy.rpm_proxy import RPMProxy
 from oecp.result.compare_result import *
 
 logger = logging.getLogger("oecp")
@@ -33,6 +29,7 @@ class Repository(UserDict):
     """
     多个rpm包组成一个repository
     """
+
     def __init__(self, work_dir, name, category=None):
         """
 
@@ -63,7 +60,8 @@ class Repository(UserDict):
         :param debuginfo_path: debuginfo包完整路径
         :return:
         """
-        name = RPMProxy.rpm_name(basename_of_path(verbose_path))
+        package_name = basename_of_path(verbose_path)
+        name = RPMProxy.rpm_name(package_name)
         category_level = self._category.category_of_bin_package(name)
         logger.debug(f"repo {self._name} upsert a rpm, name: {name}, "
                      f"path: {path}, debuginfo_path: {debuginfo_path}, level: {category_level}")
@@ -78,12 +76,13 @@ class Repository(UserDict):
             "raw_debuginfo_path": debuginfo_path
         }
 
-        self[name] = rpm
+        self[package_name] = rpm
 
     @property
     def download_dir(self):
         if self._download_dir is None:
-            self._download_dir = tempfile.TemporaryDirectory(prefix="repo_", suffix=f"_{self._name}", dir=self._work_dir)
+            self._download_dir = tempfile.TemporaryDirectory(prefix="repo_", suffix=f"_{self._name}",
+                                                             dir=self._work_dir)
 
         return self._download_dir.name
 
@@ -202,7 +201,7 @@ class Repository(UserDict):
             for name in plan:
 
                 if not plan.check_sensitive_str(name):
-                    logger.debug(f"plan.{name} not support {self._name}")              
+                    logger.debug(f"plan.{name} not support {self._name}")
                     continue
 
                 logger.info(f"Analysis repo {self._name} [{name}]")
@@ -247,7 +246,7 @@ class Repository(UserDict):
         try:
             for name in plan:
                 if not plan.check_sensitive_image(name):
-                    logger.debug(f"plan.{name} not support {self._name}")              
+                    logger.debug(f"plan.{name} not support {self._name}")
                     continue
 
                 logger.info(f"compare repo {self._name} [{name}]")

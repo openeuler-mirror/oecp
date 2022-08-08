@@ -15,9 +15,11 @@
 
 import os
 import logging
-logger = logging.getLogger('oecp')
 
 from oecp.dumper.base import AbstractDumper
+
+logger = logging.getLogger('oecp')
+
 
 class HeaderDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):

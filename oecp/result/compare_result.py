@@ -16,16 +16,12 @@
 # **********************************************************************************
 """
 import sys
-import logging
-import uuid
 import shutil
 
 from oecp.excel.create_web_show_result import WebShowResult
 from oecp.excel.osv_data_summary import DataExcelFile
 from oecp.result import export
 from oecp.result.export import get_second_path
-from oecp.result.test_result import *
-from oecp.result.constants import *
 from oecp.result.similarity import *
 from oecp.result.json_result import *
 
@@ -359,7 +355,7 @@ def assgin_end_result(summary_dict):
 
 
 def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_side_b):
-    side = result.cmp_side_a if result.cmp_side_a else result.cmp_side_b
+    side = result.cmp_side_b if result.cmp_side_b else result.cmp_side_a
     category_level = result.detail
     compare_type = result.diff_components[0].cmp_type
     second_path = get_second_path(compare_type)
@@ -378,7 +374,7 @@ def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_
         "less": "N/A",
         "diff": "N/A"
     }
-    if hasattr(result, '_count_result'):
+    if hasattr(result, 'count_result'):
         row["more"] = result.count_result['more_count']
         row["less"] = result.count_result['less_count']
         row["diff"] = result.count_result['diff_count']
@@ -387,7 +383,7 @@ def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_
 
 
 def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail):
-    parent_side = parent_side_a if parent_side_a else parent_side_b
+    parent_side = parent_side_b if parent_side_b else parent_side_a
     row = {
         "binary rpm package": parent_side,
         base_side_a: result.cmp_side_a.strip(),

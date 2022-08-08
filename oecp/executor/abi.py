@@ -17,9 +17,7 @@ import logging
 import os
 import re
 
-from collections import defaultdict
 from oecp.utils.shell import shell_cmd
-from oecp.proxy.rpm_proxy import RPMProxy
 from oecp.result.compare_result import CMP_RESULT_SAME, CompareResultComposite, CMP_TYPE_RPM, CMP_TYPE_RPM_ABI, \
     CompareResultComponent, CMP_RESULT_DIFF
 from oecp.result.constants import DETAIL_PATH
@@ -65,7 +63,8 @@ class ABICompareExecutor(CompareExecutor):
                 library_pairs.append([so_mapping_a[so_name], so_mapping_b[so_name]])
         return library_pairs
 
-    def compare_link_files(self, dump_a_linkfiles, dump_b_linkfiles, rpm):
+    @staticmethod
+    def compare_link_files(dump_a_linkfiles, dump_b_linkfiles, rpm):
         for file_a in dump_a_linkfiles:
             for file_b in dump_b_linkfiles:
                 if file_a[0] == file_b[0]:
@@ -155,13 +154,13 @@ class ABICompareExecutor(CompareExecutor):
 
     def compare(self):
         compare_list = []
-        for dump_a in self.dump_a:
-            for dump_b in self.dump_b:
-                # 取rpm name 相同进行比较
-                if RPMProxy.rpm_name(dump_a['rpm']) == RPMProxy.rpm_name(dump_b['rpm']):
-                    result = self._compare_result(dump_a, dump_b)
-                    logger.debug(result)
-                    compare_list.append(result)
+        similar_dumpers = self.get_similar_rpm_pairs(self.dump_a, self.dump_b)
+        for single_pair in similar_dumpers:
+            if single_pair:
+                dump_a, dump_b = single_pair[0], single_pair[1]
+                result = self._compare_result(dump_a, dump_b)
+                logger.debug(result)
+                compare_list.append(result)
         return compare_list
 
     def run(self):

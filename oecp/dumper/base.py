@@ -80,7 +80,7 @@ class ComponentsDumper(AbstractDumper):
                 for line in out.split("\n"):
                     if not line:
                         continue
-                    r = re.match("(\S+)\s([><=]=?)\s(\S+)", line)
+                    r = re.match("(\\S+)\\s([><=]=?)\\s(\\S+)", line)
                     try:
                         if r:
                             name, symbol, version = r.groups()

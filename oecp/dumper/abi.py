@@ -51,7 +51,8 @@ class ABIDumper(AbstractDumper):
         link_files = self._get_library_files(rpm_extract_linkfile)
         item = {'rpm': os.path.basename(rpm_path),
                 'debuginfo_extract_path': debuginfo_extract_name,
-                'category': repository['category'].value, 'kind': 'abi',
+                'category': repository['category'].value,
+                'kind': 'abi',
                 'data': library_files,
                 'link_file': link_files}
         return item

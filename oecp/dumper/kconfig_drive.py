@@ -46,14 +46,15 @@ class KconfigDriveDumper(AbstractDumper):
         try:
             with open(kconfig_json_path, "r", encoding="utf-8") as file:
                 kconfig_range_data = json.load(file)
-        except (FileNotFoundError, JSONDecodeError):
-            logger.exception("Failed to read kconfig range configuration file")
+        except (FileNotFoundError, JSONDecodeError) as e:
+            logger.exception(f"Failed to read kconfig range configuration file, {e}")
         return kconfig_range_data
 
-    def load_kconfig_range(self):
-        kconfig, kernel = get_file_by_pattern(r"^config-", self.cache_dumper)
+    def load_kconfig_range(self, repository):
+        rpm_name = repository.get('verbose_path')
+        kconfig = get_file_by_pattern(r"^config-", self.cache_dumper, rpm_name)
         if not kconfig:
-            kconfig, kernel = get_file_by_pattern(r"^config", self.cache_dumper)
+            kconfig = get_file_by_pattern(r"^config", self.cache_dumper, rpm_name)
             if not kconfig:
                 return []
 
@@ -62,9 +63,9 @@ class KconfigDriveDumper(AbstractDumper):
         not_annotated_config = [config_data for driver_name, config_datas in kconfig_range_data.items()
                                 if driver_name != "annotation" for config_data in config_datas]
         item = {
-            "rpm": self.repository.get(kernel).get('verbose_path'),
+            "rpm": rpm_name,
             "kind": self._component_key,
-            "category": self.repository.get(kernel).get('category').value,
+            "category": repository.get('category').value,
             "data": []
         }
         with open(kconfig, "r") as f:
@@ -83,4 +84,7 @@ class KconfigDriveDumper(AbstractDumper):
         return [item]
 
     def run(self):
-        return self.load_kconfig_range()
+        result = []
+        for _, repository in self.repository.items():
+            result.extend(self.load_kconfig_range(repository))
+        return result

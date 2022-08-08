@@ -13,13 +13,12 @@
 # **********************************************************************************
 """
 
-import re
 import os
 import gzip
-import logging
 
 from oecp.dumper.base import AbstractDumper
 from oecp.utils.kernel import get_file_by_pattern
+
 
 class KabiDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
@@ -31,14 +30,16 @@ class KabiDumper(AbstractDumper):
         self._component_key = 'kabi'
         self.data = "data"
 
-    def _unzip_gz(self, file_path):
+    @staticmethod
+    def _unzip_gz(file_path):
         g_file = gzip.GzipFile(file_path)
         f_name = file_path[0:file_path.rindex('.')]
         open(f_name, "wb+").write(g_file.read())
         g_file.close()
 
-    def load_symvers(self):
-        symvers, kernel = get_file_by_pattern(r"^symvers", self.cache_dumper)
+    def load_symvers(self, repository):
+        rpm_name = repository.get('verbose_path')
+        symvers = get_file_by_pattern(r"^symvers", self.cache_dumper, rpm_name)
         if not symvers:
             return []
 
@@ -47,9 +48,9 @@ class KabiDumper(AbstractDumper):
             symvers = symvers[0:symvers.rindex('.')]
 
         item = {}
-        item.setdefault('rpm', self.repository.get(kernel).get('verbose_path'))
+        item.setdefault('rpm', rpm_name)
         item.setdefault('kind', self._component_key)
-        item.setdefault('category', self.repository.get(kernel).get('category').value)
+        item.setdefault('category', repository.get('category', '').value)
         with open(symvers, "r") as f:
             for line in f.readlines():
                 line = line.strip().replace("\n", "")
@@ -61,7 +62,8 @@ class KabiDumper(AbstractDumper):
                     continue
 
                 if hsdp[1] in self.white_list:
-                    item.setdefault(self.data, []).append({'name': hsdp[1], 'symbol': "=" , 'version': "%s %s %s"%(hsdp[0], hsdp[2], hsdp[3])})
+                    item.setdefault(self.data, []).append(
+                        {'name': hsdp[1], 'symbol': "=", 'version': "%s %s %s" % (hsdp[0], hsdp[2], hsdp[3])})
         return [item]
 
     def load_white_list(self):
@@ -73,5 +75,7 @@ class KabiDumper(AbstractDumper):
                 self.white_list.append(line.strip().replace("\n", ""))
 
     def run(self):
-        return self.load_symvers()
-
+        result = []
+        for _, repository in self.repository.items():
+            result.extend(self.load_symvers(repository))
+        return result

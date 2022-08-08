@@ -13,10 +13,6 @@
 # **********************************************************************************
 """
 
-import os
-import re
-import logging
-
 from oecp.dumper.base import AbstractDumper
 from oecp.utils.kernel import get_file_by_pattern
 
@@ -29,20 +25,21 @@ class KconfigDumper(AbstractDumper):
         self._component_key = 'kconfig'
         self.data = "data"
 
-    def load_kconfig(self):
+    def load_kconfig(self, repository):
+        rpm_name = repository.get('verbose_path')
         if not self.cache_dumper:
             return []
-        kconfig, kernel = get_file_by_pattern(r"^config-", self.cache_dumper)
+        kconfig = get_file_by_pattern(r"^config-", self.cache_dumper, rpm_name)
         # CentOS-8.2.2004-aarch64-dvd1.iso 中config文件的文件名为：config
         if not kconfig:
-            kconfig, kernel = get_file_by_pattern(r"^config", self.cache_dumper)
+            kconfig = get_file_by_pattern(r"^config", self.cache_dumper, rpm_name)
             if not kconfig:
                 return []
 
         item = {}
-        item.setdefault('rpm', self.repository.get(kernel).get('verbose_path'))
+        item.setdefault('rpm', rpm_name)
         item.setdefault('kind', self._component_key)
-        item.setdefault('category', self.repository.get(kernel).get('category').value)
+        item.setdefault('category', repository.get('category', '').value)
         with open(kconfig, "r") as f:
             for line in f.readlines():
                 line = line.strip().replace("\n", "")
@@ -52,10 +49,11 @@ class KconfigDumper(AbstractDumper):
                     continue
 
                 name, version = line.split("=", 1)
-                item.setdefault(self.data, []).append({'name': name, 'symbol': "=" , 'version': version})
+                item.setdefault(self.data, []).append({'name': name, 'symbol': '=', 'version': version})
         return [item]
 
     def run(self):
-        return self.load_kconfig()
-
-
+        result = []
+        for _, repository in self.repository.items():
+            result.extend(self.load_kconfig(repository))
+        return result
