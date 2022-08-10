@@ -101,6 +101,8 @@ class HeaderCompareExecutor(CompareExecutor):
             ret, out, err = shell_cmd(cmd.split())
             base_a = os.path.basename(pair[0])
             base_b = os.path.basename(pair[1])
+            file_a_path = pair[0].split("__rpm__")[-1]
+            file_b_path = pair[1].split("__rpm__")[-1]
             for compare_line in out.split('\n')[3:]:
                 if compare_line:
                     lack_conf = re.match('-', compare_line)
@@ -118,25 +120,25 @@ class HeaderCompareExecutor(CompareExecutor):
                     file_path = os.path.join(base_dir, f'{base_a}__cmp__{base_b}.md')
                     self._save_diff_result(file_path, out)
                     data = CompareResultComponent(
-                        CMP_TYPE_RPM_HEADER, CMP_RESULT_DIFF, pair[0], pair[1], file_path)
+                        CMP_TYPE_RPM_HEADER, CMP_RESULT_DIFF, file_a_path, file_b_path, file_path)
                     count_result["diff_count"] += 1
                     result.set_cmp_result(CMP_RESULT_DIFF)
                 except IOError:
                     logger.exception("save compare result exception")
                     data = CompareResultComponent(
-                        CMP_TYPE_RPM_HEADER, CMP_RESULT_EXCEPTION, pair[0], pair[1])
+                        CMP_TYPE_RPM_HEADER, CMP_RESULT_EXCEPTION, file_a_path, file_b_path)
             else:
                 data = CompareResultComponent(
-                    CMP_TYPE_RPM_HEADER, CMP_RESULT_SAME, pair[0], pair[1])
+                    CMP_TYPE_RPM_HEADER, CMP_RESULT_SAME, file_a_path, file_b_path)
             result.add_component(data)
         if only_file_a:
             for file_a in only_file_a:
-                data = CompareResultComponent(CMP_TYPE_RPM_HEADER, CMP_RESULT_LESS, file_a, '')
+                data = CompareResultComponent(CMP_TYPE_RPM_HEADER, CMP_RESULT_LESS, file_a.split("__rpm__")[-1], '')
                 result.add_component(data)
                 count_result["less_count"] += 1
         if only_file_b:
             for file_b in only_file_b:
-                data = CompareResultComponent(CMP_TYPE_RPM_HEADER, CMP_RESULT_MORE, '', file_b)
+                data = CompareResultComponent(CMP_TYPE_RPM_HEADER, CMP_RESULT_MORE, '', file_b.split("__rpm__")[-1])
                 result.add_component(data)
                 count_result["more_count"] += 1
         result.add_count_info(count_result)
