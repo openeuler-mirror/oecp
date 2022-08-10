@@ -101,8 +101,8 @@ class ServiceCompareExecutor(CompareExecutor):
         for pair in common_file_pairs:
             detail_filename = self._intercept_file_name(pair[0])
             # 不显示/usr/lib/systemd/system/路径
-            base_a = self._intercept_file_name(pair[0], 'half')
-            base_b = self._intercept_file_name(pair[1], 'half')
+            base_a = self._intercept_file_name(pair[0], 'full')
+            base_b = self._intercept_file_name(pair[1], 'full')
             details_a = self._load_details(pair[0])
             details_b = self._load_details(pair[1])
             file_result, component_results = self.format_service_detail(details_a, details_b)
@@ -117,13 +117,13 @@ class ServiceCompareExecutor(CompareExecutor):
             result.add_component(result_detail)
         if only_file_a:
             for file_a in only_file_a:
-                side_a = self._intercept_file_name(file_a, 'half')
+                side_a = self._intercept_file_name(file_a, 'full')
                 data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_LESS, side_a, '')
                 result.add_component(data)
                 count_result["less_count"] += 1
         if only_file_b:
             for file_b in only_file_b:
-                side_b = self._intercept_file_name(file_b, 'half')
+                side_b = self._intercept_file_name(file_b, 'full')
                 data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_MORE, '', side_b)
                 result.add_component(data)
                 count_result["more_count"] += 1

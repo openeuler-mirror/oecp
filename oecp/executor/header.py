@@ -118,25 +118,25 @@ class HeaderCompareExecutor(CompareExecutor):
                     file_path = os.path.join(base_dir, f'{base_a}__cmp__{base_b}.md')
                     self._save_diff_result(file_path, out)
                     data = CompareResultComponent(
-                        CMP_TYPE_RPM_HEADER, CMP_RESULT_DIFF, base_a, base_b, file_path)
+                        CMP_TYPE_RPM_HEADER, CMP_RESULT_DIFF, pair[0], pair[1], file_path)
                     count_result["diff_count"] += 1
                     result.set_cmp_result(CMP_RESULT_DIFF)
                 except IOError:
                     logger.exception("save compare result exception")
                     data = CompareResultComponent(
-                        CMP_TYPE_RPM_HEADER, CMP_RESULT_EXCEPTION, base_a, base_b)
+                        CMP_TYPE_RPM_HEADER, CMP_RESULT_EXCEPTION, pair[0], pair[1])
             else:
                 data = CompareResultComponent(
-                    CMP_TYPE_RPM_HEADER, CMP_RESULT_SAME, base_a, base_b)
+                    CMP_TYPE_RPM_HEADER, CMP_RESULT_SAME, pair[0], pair[1])
             result.add_component(data)
         if only_file_a:
             for file_a in only_file_a:
-                data = CompareResultComponent(CMP_TYPE_RPM_HEADER, CMP_RESULT_LESS, os.path.basename(file_a), '')
+                data = CompareResultComponent(CMP_TYPE_RPM_HEADER, CMP_RESULT_LESS, file_a, '')
                 result.add_component(data)
                 count_result["less_count"] += 1
         if only_file_b:
             for file_b in only_file_b:
-                data = CompareResultComponent(CMP_TYPE_RPM_HEADER, CMP_RESULT_MORE, '', os.path.basename(file_b))
+                data = CompareResultComponent(CMP_TYPE_RPM_HEADER, CMP_RESULT_MORE, '', file_b)
                 result.add_component(data)
                 count_result["more_count"] += 1
         result.add_count_info(count_result)
