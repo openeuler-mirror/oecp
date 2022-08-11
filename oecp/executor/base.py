@@ -252,7 +252,23 @@ class CompareExecutor(ABC):
         return False
 
     @staticmethod
-    def _prase_version(version):
+    def handle_digit_type(d):
+        """
+        @param d: Digit types in version matching, may be a time type.
+        @return:
+        """
+        t = re.match(r'(\d{8})', d)
+        if t:
+            try:
+                v = datetime.strptime(t.group(1), '%Y%m%d')
+            except ValueError:
+                # The first five digits are used for non-time types.
+                v = t.group(1)[:5]
+        else:
+            v = d[:5]
+        return v
+
+    def prase_version(self, version):
         """
         eg:java-1.8.0-openjdk-src-1.8.0.252.b09-2.el8_1.x86_64.rpm
         Compare the differences of the version number in descending order.
@@ -264,15 +280,7 @@ class CompareExecutor(ABC):
                 v = m.group(i)
                 if v:
                     if v.isdigit():
-                        t = re.match(r'(\d{8})', v)
-                        if t:
-                            try:
-                                v = datetime.strptime(t.group(1), '%Y%m%d')
-                            except ValueError:
-                                # The first five digits are used for non-time types.
-                                v = t.group(1)[:5]
-                        else:
-                            v = v[:5]
+                        v = self.handle_digit_type(v)
                     elif v.isalpha():
                         # Version for all letter type by '0'.
                         v = '0'
@@ -286,8 +294,8 @@ class CompareExecutor(ABC):
         return prase_result
 
     def cmp_version(self, v_a, v_b):
-        va_list = self._prase_version(v_a)
-        vb_list = self._prase_version(v_b)
+        va_list = self.prase_version(v_a)
+        vb_list = self.prase_version(v_b)
         cmp_similar = ''
         for i in range(5):
             differences = ''

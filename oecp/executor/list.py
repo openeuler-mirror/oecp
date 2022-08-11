@@ -139,8 +139,8 @@ class ListCompareExecutor(CompareExecutor):
             similar_dumpers = self.get_similar_rpm_pairs(self.dump_a, self.dump_b)
             for single_pair in similar_dumpers:
                 if single_pair:
-                    dump_a, dump_b = single_pair[0], single_pair[1]
-                    result = self._strict_compare(dump_a, dump_b)
+                    # dump_a: single_pair[0], dump_b: single_pair[1]
+                    result = self._strict_compare(single_pair[0], single_pair[1])
                     compare_list.append(result)
             return compare_list
         if self.config.get('only_directory', False):

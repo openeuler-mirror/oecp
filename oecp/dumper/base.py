@@ -40,12 +40,13 @@ class AbstractDumper(ABC):
         cache_dumpers = self.cache.get(cache_require_key, {}).get('dumper')
         if not cache_dumpers:
             logger.exception(f'No cache {cache_require_key} dumper')
-        for cache_dumper in cache_dumpers:
-            if cache_dumper.repository is not self.repository:
-                continue
-            else:
-                tar_dumper = cache_dumper
-                break
+        else:
+            for cache_dumper in cache_dumpers:
+                if cache_dumper.repository is not self.repository:
+                    continue
+                else:
+                    tar_dumper = cache_dumper
+                    break
         return tar_dumper
 
     def clean(self):

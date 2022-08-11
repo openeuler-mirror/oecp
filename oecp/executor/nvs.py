@@ -55,8 +55,8 @@ class NVSCompareExecutor(CompareExecutor):
                                       "conf/kabi_whitelist/aarch64_kind_drive_kabi")
         with open(kind_kabi_file, 'r') as fd:
             dict_kind_driver = json.load(fd)
-        for driver in dict_kind_driver.keys():
-            if kabi in dict_kind_driver[driver]:
+        for driver, kabi_lists in dict_kind_driver.items():
+            if kabi in kabi_lists:
                 drivers.append(driver)
         return ','.join(drivers)
 
