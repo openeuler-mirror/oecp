@@ -19,7 +19,6 @@ import re
 import chardet
 
 from oecp.executor.base import CompareExecutor, CPM_CATEGORY_DIFF
-from oecp.proxy.rpm_proxy import RPMProxy
 from oecp.result.compare_result import CompareResultComposite, CompareResultComponent
 from oecp.result.constants import *
 from oecp.utils.shell import shell_cmd
@@ -43,7 +42,8 @@ class HeaderCompareExecutor(CompareExecutor):
         with open(file_path, "w") as f:
             f.write(content)
 
-    def _get_file_encoding_format(self, file_path):
+    @staticmethod
+    def _get_file_encoding_format(file_path):
         """
         get the encoding format of the file
         Args:
@@ -76,7 +76,7 @@ class HeaderCompareExecutor(CompareExecutor):
                 contents = file.read()
                 # use regex to exclude comments in matching header files
                 # comment examples /* xxxxxx*/ and //
-                new_contents = re.sub("/\*[\s\S]*?\*/|//.*", "", contents)
+                new_contents = re.sub("/\\*[\\s\\S]*?\\*/|//.*", "", contents)
                 file_bak.write(new_contents)
                 os.remove(file_path)
                 os.rename("%s.bak" % file_path, file_path)
@@ -104,15 +104,15 @@ class HeaderCompareExecutor(CompareExecutor):
             for compare_line in out.split('\n')[3:]:
                 if compare_line:
                     lack_conf = re.match('-', compare_line)
-                    openEuler_conf = re.search('openEuler', compare_line)
-                    if lack_conf and not openEuler_conf:
+                    openeuler_conf = re.search('openEuler', compare_line)
+                    if lack_conf and not openeuler_conf:
                         self.lack_conf_flag = True
                         break
             if ret and out and self.lack_conf_flag:
                 try:
                     # 替换diff中的文件名
-                    out = re.sub("---\s+\S+\s+", "--- {} ".format(pair[0]), out)
-                    out = re.sub("\+\+\+\s+\S+\s+", "+++ {} ".format(pair[1]), out)
+                    out = re.sub("---\\s+\\S+\\s+", "--- {} ".format(pair[0]), out)
+                    out = re.sub("\\+\\+\\+\\s+\\S+\\s+", "+++ {} ".format(pair[1]), out)
                     if not os.path.exists(base_dir):
                         os.makedirs(base_dir)
                     file_path = os.path.join(base_dir, f'{base_a}__cmp__{base_b}.md')
@@ -145,12 +145,12 @@ class HeaderCompareExecutor(CompareExecutor):
 
     def compare(self):
         compare_list = []
-        for dump_a in self.dump_a:
-            for dump_b in self.dump_b:
-                # 取rpm name 相同进行比较
-                if RPMProxy.rpm_name(dump_a['rpm']) == RPMProxy.rpm_name(dump_b['rpm']):
-                    result = self._compare_result(dump_a, dump_b)
-                    compare_list.append(result)
+        similar_dumpers = self.get_similar_rpm_pairs(self.dump_a, self.dump_b)
+        for single_pair in similar_dumpers:
+            if single_pair:
+                dump_a, dump_b = single_pair[0], single_pair[1]
+                result = self._compare_result(dump_a, dump_b)
+                compare_list.append(result)
         return compare_list
 
     def run(self):

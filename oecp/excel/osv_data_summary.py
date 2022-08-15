@@ -47,6 +47,26 @@ class DataExcelFile:
         self.tools_result = {}
         self.conclusion = ''
 
+    @staticmethod
+    def convert_data(data):
+        """[summary]
+
+        Args:
+            data ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        return "%.2f%%" % (data * 100)
+
+    @staticmethod
+    def obtain_base_os(side_a):
+        base_so = side_a.split("-")[:4]
+        for part in base_so:
+            if '.iso' in part or "aarch64" == part or "x86_64" == part:
+                base_so.remove(part)
+        return " ".join(base_so)
+
     def create_folder(self, root_path, osv_title):
         """
         The folder where the results are stored
@@ -95,27 +115,9 @@ class DataExcelFile:
         read benchmark json
         """
 
-        with open(self.benchmark_json, 'r', encoding='utf8')as fp:
+        with open(self.benchmark_json, 'r', encoding='utf8') as fp:
             benchmark_criteria = json.load(fp)
         return benchmark_criteria
-
-    def convert_data(self, data):
-        """[summary]
-
-        Args:
-            data ([type]): [description]
-
-        Returns:
-            [type]: [description]
-        """
-        return "%.2f%%" % (data * 100)
-
-    def obtain_base_os(self, side_a):
-        base_so = side_a.split("-")[:4]
-        for part in base_so:
-            if '.iso' in part or "aarch64" == part or "x86_64" == part:
-                base_so.remove(part)
-        return " ".join(base_so)
 
     def result_comparison(self, similarity, content, option, data, index):
         """
@@ -135,8 +137,7 @@ class DataExcelFile:
                 lo_pkg = similarity.get("level1 pkg")
                 lt_pkg = similarity.get("level2 pkg")
                 result = "PASS" if lo_pkg >= benchmark[0]["level1 pkg"]["standard"] and lt_pkg >= \
-                                   benchmark[1]["level2 pkg"]["standard"] \
-                    else "NO PASS"
+                                   benchmark[1]["level2 pkg"]["standard"] else "NO PASS"
                 color = self.green if result == "PASS" else self.red
                 self.sheet.cell(row=TEN_ROW, column=5).value = f"{self.convert_data(lt_pkg)}"
                 self.sheet.cell(row=TEN_ROW, column=7).fill = color

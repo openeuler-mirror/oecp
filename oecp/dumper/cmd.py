@@ -13,12 +13,13 @@
 # **********************************************************************************
 """
 
-
 import os
 import logging
-logger = logging.getLogger('oecp')
 
 from oecp.dumper.base import AbstractDumper
+
+logger = logging.getLogger('oecp')
+
 
 class CmdDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
@@ -28,10 +29,6 @@ class CmdDumper(AbstractDumper):
         self.extract_info = self.cache_dumper.get_extract_info()
         self._component_key = 'cmd'
 
-    def _get_cmd_files(self, rpm_extract_dir):
-        cmd_files = self.cache_dumper.get_cmd_files(rpm_extract_dir)
-        return cmd_files
-
     def dump(self, repository):
         rpm_path = repository['path']
         category = repository['category'].value
@@ -40,8 +37,7 @@ class CmdDumper(AbstractDumper):
         rpm_extract_name = rpm_extract_dir.name
         if not rpm_extract_name:
             logger.exception(f"RPM {verbose_path} decompression path not found.")
-            raise
-        cmd_files = self._get_cmd_files(rpm_extract_name)
+        cmd_files = self.cache_dumper.get_cmd_files(rpm_extract_name)
         item = {'rpm': verbose_path, 'category': category, 'kind': self._component_key, 'data': cmd_files}
         return item
 

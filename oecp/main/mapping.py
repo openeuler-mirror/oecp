@@ -39,8 +39,14 @@ class RepositoryPackageMapping(object):
     def __init__(self):
         pass
 
+    def read_rename_kernel(self):
+        directory_json_path = os.path.join(Path(__file__).parents[1], 'conf', 'rename_kernel')
+        with open(os.path.join(directory_json_path, 'all_rename_kernel.json'), 'r') as f:
+            all_rename_kernel = json.load(f)
+
+        return all_rename_kernel
+
     def repository_of_package(self, package):
-        #return RPMProxy.rpm_name(package)
         return package
 
 
@@ -82,34 +88,6 @@ class SQLiteMapping(RepositoryPackageMapping):
         else:
             logger.info(f"sqlite file path: {sqlite_path}")
             self._sqlite_conn = sqlite3.connect(f"{sqlite_path}")
-
-    def read_rename_kernel(self):
-        directory_json_path = os.path.join(Path(__file__).parents[1], 'conf', 'rename_kernel')
-        with open(os.path.join(directory_json_path, 'all_rename_kernel.json'), 'r') as f:
-            all_rename_kernel = json.load(f)
-
-        return all_rename_kernel
-
-    def repository_of_package(self, package):
-        """
-
-        :param package:
-        :return:
-        """
-        name = RPMProxy.rpm_name(package)
-
-        cursor = self._sqlite_conn.cursor()
-        rows = cursor.execute(f"SELECT rpm_sourcerpm from packages where name=\"{name}\"")
-
-        all_rename_kernel = self.read_rename_kernel()
-        for row in rows:
-            # Some iso, kernel and kernel-core repo in the rename kernel
-            for rename_kernel in all_rename_kernel:
-                if row[0].startswith(rename_kernel):
-                    return row[0].replace(rename_kernel, 'kernel', 1)
-            return row[0]
-
-        return package
 
     def get_all_packages(self):
         cursor = self._sqlite_conn.cursor()

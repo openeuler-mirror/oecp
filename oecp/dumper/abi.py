@@ -30,10 +30,6 @@ class ABIDumper(AbstractDumper):
         self.cache_dumper = self.get_cache_dumper(cache_require_key)
         self.extract_info = self.cache_dumper.get_extract_info()
 
-    def _get_library_files(self, rpm_extract_dir):
-        library_files = self.cache_dumper.get_library_files(rpm_extract_dir)
-        return library_files
-
     def dump(self, repository):
         rpm_path = repository['path']
         debuginfo_path = repository['debuginfo_path']
@@ -46,12 +42,12 @@ class ABIDumper(AbstractDumper):
             debuginfo_extract_name = None
         if not rpm_extract_name:
             logger.exception('RPM decompression path not found')
-            raise
-        library_files = self._get_library_files(rpm_extract_name)
-        link_files = self._get_library_files(rpm_extract_linkfile)
+        library_files = self.cache_dumper.get_library_files(rpm_extract_name)
+        link_files = self.cache_dumper.get_library_files(rpm_extract_linkfile)
         item = {'rpm': os.path.basename(rpm_path),
                 'debuginfo_extract_path': debuginfo_extract_name,
-                'category': repository['category'].value, 'kind': 'abi',
+                'category': repository['category'].value,
+                'kind': 'abi',
                 'data': library_files,
                 'link_file': link_files}
         return item

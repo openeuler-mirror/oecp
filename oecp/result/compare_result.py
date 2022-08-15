@@ -16,16 +16,12 @@
 # **********************************************************************************
 """
 import sys
-import logging
-import uuid
 import shutil
 
 from oecp.excel.create_web_show_result import WebShowResult
 from oecp.excel.osv_data_summary import DataExcelFile
 from oecp.result import export
 from oecp.result.export import get_second_path
-from oecp.result.test_result import *
-from oecp.result.constants import *
 from oecp.result.similarity import *
 from oecp.result.json_result import *
 
@@ -149,25 +145,7 @@ class CompareResultComposite(CompareResultComponent):
         if os.path.exists(export_floder):
             shutil.rmtree(export_floder)
 
-        # performance_rows = performance_result_parser(base_side_a, base_side_b, root_path, baseline)
-        # rpm_test_rows, rpm_test_details = test_result_parser(base_side_a, base_side_b, root_path)
-
         # all result which need to export as csv
-        # eg:
-        # {
-        #   "rpm": [
-        #     result_row1,
-        #     ...
-        #   ],
-        #   "xxx.rpm": {
-        #     "rpm require": [
-        #       single_result_row1,
-        #       ...
-        #     ],
-        #     ...
-        #   },
-        #   ...
-        # }
         rows = {}
         parse_result(self, base_side_a, base_side_b, rows)
         if result_format == 'json':
@@ -298,12 +276,6 @@ def parse_result(result, base_side_a, base_side_b, rows, parent_side_a=None, par
 
 
 def assgin_summary_result(rows, side_a, side_b):
-    # eg:
-    #   {
-    #     "1": {"xxx0_rpm": "same", "xxx1_rpm": "diff", "xxx2_rpm": "less", ... },
-    #     "2": {"xxx3_rpm": "same", "xxx4_rpm": "diff", ...},
-    #     "3": {"xxx5_rpm": "same", ...
-    #   }
     summary = {}
     pkg_name = {
         '1': "same",
@@ -359,7 +331,7 @@ def assgin_end_result(summary_dict):
 
 
 def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_side_b):
-    side = result.cmp_side_a if result.cmp_side_a else result.cmp_side_b
+    side = result.cmp_side_b if result.cmp_side_b else result.cmp_side_a
     category_level = result.detail
     compare_type = result.diff_components[0].cmp_type
     second_path = get_second_path(compare_type)
@@ -378,7 +350,7 @@ def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_
         "less": "N/A",
         "diff": "N/A"
     }
-    if hasattr(result, '_count_result'):
+    if hasattr(result, 'count_result'):
         row["more"] = result.count_result['more_count']
         row["less"] = result.count_result['less_count']
         row["diff"] = result.count_result['diff_count']
@@ -387,7 +359,7 @@ def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_
 
 
 def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail):
-    parent_side = parent_side_a if parent_side_a else parent_side_b
+    parent_side = parent_side_b if parent_side_b else parent_side_a
     row = {
         "binary rpm package": parent_side,
         base_side_a: result.cmp_side_a.strip(),
@@ -405,8 +377,6 @@ def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, 
         if result.detail:
             row["details path"] = result.detail
     # handle kabi result
-    # if is_kernel:
-    #    row.pop("binary rpm package")
 
     rows.setdefault(parent_side, {})
     rows[parent_side].setdefault(result.cmp_type, [])

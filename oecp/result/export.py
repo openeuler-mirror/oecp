@@ -61,7 +61,7 @@ def create_directory(root_path, report_name, osv_title, cmp_type=None, uid='', f
             if uid:
                 report_path = full_second_path + '/' + report_name + '-' + uid + '.' + file_format
             else:
-                report_path = full_second_path + '/' + report_name +  '.' + file_format
+                report_path = full_second_path + '/' + report_name + '.' + file_format
             return report_path
         else:
             return None

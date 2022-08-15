@@ -29,11 +29,13 @@ class WebShowResult:
         self.tools_result = tools_result
         self.conclusion = conclusion
 
-    def to_a_percentage(self, date):
+    @staticmethod
+    def to_a_percentage(date):
         percent_data = format(round(date, 4), '.2%')
         return percent_data
 
-    def get_exists_item(self, similarity, items):
+    @staticmethod
+    def get_exists_item(similarity, items):
         items_result = []
         for item in items:
             for single_check_result in similarity.keys():
@@ -81,7 +83,6 @@ class WebShowResult:
             platform_result_data.append(result_details)
         return platform_result_data
 
-
     def create_report_json(self, root_path, osv_title):
         floder_path = os.path.join(root_path, osv_title)
         if not floder_path:
@@ -113,5 +114,5 @@ class WebShowResult:
                 self.create_report_json(root_path, osv_title)
             else:
                 logger.warning('The items displayed in the JSON report is empty.')
-        except(AttributeError, KeyError, IOError, OSError, FileNotFoundError, ValueError):
-            logger.exception("json statistics error")
+        except(AttributeError, KeyError, IOError, OSError, ValueError) as e:
+            logger.exception(f"json statistics error, {e}")
