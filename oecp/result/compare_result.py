@@ -401,9 +401,7 @@ def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, 
     else:
         row["category level"] = detail
         if result.cmp_type == CMP_TYPE_DRIVE_KABI:
-            row["effect drivers"] = ''
-        if result.detail:
-            row["details path"] = result.detail
+            row["effect drivers"] = result.detail
     # handle kabi result
     # if is_kernel:
     #    row.pop("binary rpm package")
