@@ -32,6 +32,14 @@ class KconfigDriveDumper(AbstractDumper):
         self._component_key = 'kconfig'
 
     @staticmethod
+    def get_config_data(kconfig_range_data):
+        all_config_datas = []
+        for driver_name, config_datas in kconfig_range_data.items():
+            if driver_name != "annotation":
+                all_config_datas.extend(config_datas)
+        return all_config_datas
+
+    @staticmethod
     def _load_kconfig_json():
         """
         Read the json file of the key kernel driver range
@@ -46,25 +54,25 @@ class KconfigDriveDumper(AbstractDumper):
         try:
             with open(kconfig_json_path, "r", encoding="utf-8") as file:
                 kconfig_range_data = json.load(file)
-        except (FileNotFoundError, JSONDecodeError):
-            logger.exception("Failed to read kconfig range configuration file")
+        except (FileNotFoundError, JSONDecodeError) as e:
+            logger.exception(f"Failed to read kconfig range configuration file, {e}")
         return kconfig_range_data
 
-    def load_kconfig_range(self):
-        kconfig, kernel = get_file_by_pattern(r"^config-", self.cache_dumper)
+    def load_kconfig_range(self, repository):
+        rpm_name = repository.get('verbose_path')
+        kconfig = get_file_by_pattern(r"^config-", self.cache_dumper, rpm_name)
         if not kconfig:
-            kconfig, kernel = get_file_by_pattern(r"^config", self.cache_dumper)
+            kconfig = get_file_by_pattern(r"^config", self.cache_dumper, rpm_name)
             if not kconfig:
                 return []
 
         kconfig_range_data = self._load_kconfig_json()
         # A collection of non-annotated phases in the configuration file
-        not_annotated_config = [config_data for driver_name, config_datas in kconfig_range_data.items()
-                                if driver_name != "annotation" for config_data in config_datas]
+        not_annotated_config = self.get_config_data(kconfig_range_data)
         item = {
-            "rpm": self.repository.get(kernel).get('verbose_path'),
+            "rpm": rpm_name,
             "kind": self._component_key,
-            "category": self.repository.get(kernel).get('category').value,
+            "category": repository.get('category').value,
             "data": []
         }
         with open(kconfig, "r") as f:
@@ -83,4 +91,7 @@ class KconfigDriveDumper(AbstractDumper):
         return [item]
 
     def run(self):
-        return self.load_kconfig_range()
+        result = []
+        for _, repository in self.repository.items():
+            result.extend(self.load_kconfig_range(repository))
+        return result

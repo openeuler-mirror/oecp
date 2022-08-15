@@ -18,7 +18,6 @@ import logging
 from oecp.executor.base import CompareExecutor
 from oecp.result.compare_result import CompareResultComposite, CompareResultComponent
 from oecp.result.constants import *
-from oecp.proxy.rpm_proxy import RPMProxy
 
 logger = logging.getLogger('oecp')
 
@@ -46,7 +45,8 @@ class CmdCompareExecutor(CompareExecutor):
         file_a = self._split_files(dump_a[self.data])
         file_b = self._split_files(dump_b[self.data])
         if not file_a and not file_b:
-            logger.debug(f"No {self.config.get('compare_type')} package found, ignored with {dump_b['rpm']} and {dump_b['rpm']}")
+            logger.debug(
+                f"No {self.config.get('compare_type')} package found, ignored with {dump_b['rpm']} and {dump_b['rpm']}")
             return result
         component_results = self.format_dump(file_a, file_b)
         for component_result in component_results:
@@ -70,12 +70,12 @@ class CmdCompareExecutor(CompareExecutor):
 
     def compare(self):
         compare_list = []
-        for dump_a in self.dump_a:
-            for dump_b in self.dump_b:
-                # 取rpm name 相同进行比较
-                if RPMProxy.rpm_name(dump_a['rpm']) == RPMProxy.rpm_name(dump_b['rpm']):
-                    result = self._compare_result(dump_a, dump_b)
-                    compare_list.append(result)
+        similar_dumpers = self.get_similar_rpm_pairs(self.dump_a, self.dump_b)
+        for single_pair in similar_dumpers:
+            if single_pair:
+                dump_a, dump_b = single_pair[0], single_pair[1]
+                result = self._compare_result(dump_a, dump_b)
+                compare_list.append(result)
         return compare_list
 
     def run(self):

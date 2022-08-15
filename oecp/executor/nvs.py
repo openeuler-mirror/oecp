@@ -48,6 +48,18 @@ class NVSCompareExecutor(CompareExecutor):
         elif cmp_result == 'diff':
             count_result["diff_count"] += 1
 
+    @staticmethod
+    def _kabi_get_driver(kabi):
+        drivers = []
+        kind_kabi_file = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                      "conf/kabi_whitelist/aarch64_kind_drive_kabi")
+        with open(kind_kabi_file, 'r') as fd:
+            dict_kind_driver = json.load(fd)
+        for driver, kabi_lists in dict_kind_driver.items():
+            if kabi in kabi_lists:
+                drivers.append(driver)
+        return ','.join(drivers)
+
     def instantiation_mapping(self):
         for side in self.config.get('sqlite_path', {}).keys():
             for sqlite_a in self.config['sqlite_path'].get(side, []):
@@ -59,7 +71,7 @@ class NVSCompareExecutor(CompareExecutor):
                 self.mapping.setdefault(side, [])
                 self.mapping[side].append(SQLiteMapping(sqlite_a))
 
-    def _to_pretty_dump(self, dump):
+    def to_pretty_dump(self, dump):
         """
         以provides为例， 去除rpm和provide的release转化为{'rpm': [provide1, provide2]}在进行比较
         @param dump: 原始dump
@@ -77,18 +89,7 @@ class NVSCompareExecutor(CompareExecutor):
             pretty_dump.setdefault(rpm_n, []).append(new_component)
         return rpm_n, pretty_dump
 
-    def _kabi_get_driver(self, kabi):
-        drivers = []
-        kind_kabi_file = os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                                      "conf/kabi_whitelist/aarch64_kind_drive_kabi")
-        with open(kind_kabi_file, 'r') as fd:
-            dict_kind_driver = json.load(fd)
-        for driver in dict_kind_driver.keys():
-            if kabi in dict_kind_driver[driver]:
-                drivers.append(driver)
-        return ','.join(drivers)
-
-    def _get_all_requires_rpm(self, dump, all_mapping):
+    def get_all_requires_rpm(self, dump, all_mapping):
         all_requires_rpm = []
         for mapping in all_mapping:
             for component in dump[self._data]:
@@ -99,7 +100,7 @@ class NVSCompareExecutor(CompareExecutor):
 
         return set(all_requires_rpm)
 
-    def _cmp_component_set(self, dump_a, dump_b, components_a, components_b, single_result=CMP_RESULT_SAME):
+    def cmp_component_set(self, dump_a, dump_b, components_a, components_b):
         """
         providers或者requires组件比较
         @param components_a: 集合组件a
@@ -107,17 +108,16 @@ class NVSCompareExecutor(CompareExecutor):
         @param single_result: 初始结果为same，集合组件遍历若有一项差异设为diff
         @return:
         """
+        single_result = CMP_RESULT_SAME
         count_result = {'more_count': 0, 'less_count': 0, 'diff_count': 0}
-        assert isinstance(components_a, set), '%s should be a set type' % components_a
-        assert isinstance(components_b, set), '%s should be a set type' % components_b
         category = dump_a['category'] if dump_a['category'] == dump_b[
             'category'] else CPM_CATEGORY_DIFF
         if dump_a['kind'] == 'kabi' or dump_a['kind'] == 'kconfig':
             component_results = self.format_dump_kv(components_a, components_b, dump_a['kind'])
-        elif dump_a['kind'] == CMP_TYPE_REQUIRES:
+        elif dump_a['kind'] == CMP_TYPE_REQUIRES and self.mapping:
             component_results = self.format_rmp_name(components_a, components_b)
         else:
-            component_results = self.format_dump(components_a, components_b)
+            component_results = self.format_dump_file(components_a, components_b)
 
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
         for component_result in component_results:
@@ -142,20 +142,19 @@ class NVSCompareExecutor(CompareExecutor):
 
     def compare(self):
         compare_list = []
-        for dump_a in self.dump_a:
-            for dump_b in self.dump_b:
-                # 取rpm name 相同进行比较
-                if RPMProxy.rpm_name(dump_a['rpm']) == RPMProxy.rpm_name(dump_b['rpm']) or dump_a['kind'] == 'kabi' \
-                     or dump_a['kind'] == 'kconfig':
-                    if self.mapping:
-                        components_a = self._get_all_requires_rpm(dump_a, self.mapping['side_a'])
-                        components_b = self._get_all_requires_rpm(dump_b, self.mapping['side_b'])
-                    else:
-                        rpm_v_a, pretty_dump_a = self._to_pretty_dump(dump_a)
-                        rpm_v_b, pretty_dump_b = self._to_pretty_dump(dump_b)
-                        components_a, components_b = set(pretty_dump_a[rpm_v_a]), set(pretty_dump_b[rpm_v_b])
-                    result = self._cmp_component_set(dump_a, dump_b, components_a, components_b)
-                    compare_list.append(result)
+        similar_dumpers = self.get_similar_rpm_pairs(self.dump_a, self.dump_b)
+        for single_pair in similar_dumpers:
+            if single_pair:
+                dump_a, dump_b = single_pair[0], single_pair[1]
+                if self.mapping:
+                    components_a = self.get_all_requires_rpm(dump_a, self.mapping.get('side_a'))
+                    components_b = self.get_all_requires_rpm(dump_b, self.mapping.get('side_b'))
+                else:
+                    rpm_v_a, pretty_dump_a = self.to_pretty_dump(dump_a)
+                    rpm_v_b, pretty_dump_b = self.to_pretty_dump(dump_b)
+                    components_a, components_b = set(pretty_dump_a[rpm_v_a]), set(pretty_dump_b[rpm_v_b])
+                result = self.cmp_component_set(dump_a, dump_b, components_a, components_b)
+                compare_list.append(result)
         return compare_list
 
     def run(self):

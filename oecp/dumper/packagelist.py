@@ -44,7 +44,7 @@ class PackageListDumper:
                         for line in out.split("\n"):
                             if not line:
                                 continue
-                            r = re.match("Source RPM\s+:\s+(.*)", line)
+                            r = re.match("Source RPM\\s+:\\s+(.*)", line)
                             if r:
                                 source_package = r.group(1)
                                 break

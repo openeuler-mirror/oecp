@@ -16,10 +16,8 @@
 import logging
 import os
 import re
-import chardet
 
 from oecp.executor.base import CompareExecutor, CPM_CATEGORY_DIFF
-from oecp.proxy.rpm_proxy import RPMProxy
 from oecp.result.compare_result import CMP_RESULT_SAME, CompareResultComposite, CMP_TYPE_RPM, CMP_TYPE_RPM_CONFIG, \
     CompareResultComponent, CMP_RESULT_DIFF, CMP_RESULT_EXCEPTION, CMP_RESULT_LESS, CMP_RESULT_MORE
 from oecp.result.constants import DETAIL_PATH
@@ -63,15 +61,15 @@ class PlainCompareExecutor(CompareExecutor):
             for compare_line in out.split('\n')[3:]:
                 if compare_line:
                     lack_conf = re.match('-', compare_line)
-                    openEuler_conf = re.search('openEuler', compare_line)
-                    if lack_conf and not openEuler_conf:
+                    openeuler_conf = re.search('openEuler', compare_line)
+                    if lack_conf and not openeuler_conf:
                         self.lack_conf_flag = True
                         break
             if ret and out and self.lack_conf_flag:
                 try:
                     # 替换diff中的文件名
-                    out = re.sub("---\s+\S+\s+", "--- {} ".format(pair[0]), out)
-                    out = re.sub("\+\+\+\s+\S+\s+", "+++ {} ".format(pair[1]), out)
+                    out = re.sub("---\\s+\\S+\\s+", "--- {} ".format(pair[0]), out)
+                    out = re.sub("\\+\\+\\+\\s+\\S+\\s+", "+++ {} ".format(pair[1]), out)
                     if not os.path.exists(base_dir):
                         os.makedirs(base_dir)
                     file_path = os.path.join(base_dir, f'{base_a}__cmp__{base_b}.md')
@@ -105,12 +103,12 @@ class PlainCompareExecutor(CompareExecutor):
 
     def compare(self):
         compare_list = []
-        for dump_a in self.dump_a:
-            for dump_b in self.dump_b:
-                # 取rpm name 相同进行比较
-                if RPMProxy.rpm_name(dump_a['rpm']) == RPMProxy.rpm_name(dump_b['rpm']):
-                    result = self._compare_result(dump_a, dump_b)
-                    compare_list.append(result)
+        similar_dumpers = self.get_similar_rpm_pairs(self.dump_a, self.dump_b)
+        for single_pair in similar_dumpers:
+            if single_pair:
+                dump_a, dump_b = single_pair[0], single_pair[1]
+                result = self._compare_result(dump_a, dump_b)
+                compare_list.append(result)
         return compare_list
 
     def run(self):

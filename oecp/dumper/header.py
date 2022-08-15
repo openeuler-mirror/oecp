@@ -15,9 +15,11 @@
 
 import os
 import logging
-logger = logging.getLogger('oecp')
 
 from oecp.dumper.base import AbstractDumper
+
+logger = logging.getLogger('oecp')
+
 
 class HeaderDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
@@ -27,10 +29,6 @@ class HeaderDumper(AbstractDumper):
         self.extract_info = self.cache_dumper.get_extract_info()
         self._component_key = 'header'
 
-    def _get_header_files(self, rpm_extract_dir):
-        header_files = self.cache_dumper.get_header_files(rpm_extract_dir)
-        return header_files
-
     def dump(self, repository):
         rpm_path = repository['path']
         category = repository['category'].value
@@ -39,8 +37,7 @@ class HeaderDumper(AbstractDumper):
         rpm_extract_name = rpm_extract_dir.name
         if not rpm_extract_name:
             logger.exception('RPM decompression path not found')
-            raise
-        header_files = self._get_header_files(rpm_extract_name)
+        header_files = self.cache_dumper.get_header_files(rpm_extract_name)
         item = {'rpm': verbose_path, 'category': category, 'kind': self._component_key, 'data': header_files}
         return item
 

@@ -14,12 +14,7 @@
 """
 
 import logging
-import os
-from oecp.executor.base import CompareExecutor, CPM_CATEGORY_DIFF
-from oecp.result.compare_result import CMP_TYPE_RPM, CompareResultComposite, CompareResultComponent, CMP_RESULT_SAME, \
-    CMP_RESULT_DIFF, CMP_TYPE_KABI
-from oecp.proxy.rpm_proxy import RPMProxy
-
+from oecp.executor.base import CompareExecutor
 
 logger = logging.getLogger('oecp')
 
@@ -36,5 +31,5 @@ class FindSensitiveInfoExecutor(CompareExecutor):
     def run(self):
         result = self.dump_a
         if not result:
-            logger.warning('Can not find sensitive info in %s' % (self.dump_a))
+            logger.warning(f"Can not find sensitive info in {self.dump_a}")
         return result

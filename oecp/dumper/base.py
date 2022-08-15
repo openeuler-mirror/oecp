@@ -36,15 +36,18 @@ class AbstractDumper(ABC):
         self.config = config if config else {}
 
     def get_cache_dumper(self, cache_require_key):
+        tar_dumper = None
         cache_dumpers = self.cache.get(cache_require_key, {}).get('dumper')
         if not cache_dumpers:
             logger.exception(f'No cache {cache_require_key} dumper')
-            raise
-        for cache_dumper in cache_dumpers:
-            if cache_dumper.repository is self.repository:
-                return cache_dumper
-        logger.exception(f'Get cache {cache_require_key} dumper fail')
-        raise
+        else:
+            for cache_dumper in cache_dumpers:
+                if cache_dumper.repository is not self.repository:
+                    continue
+                else:
+                    tar_dumper = cache_dumper
+                    break
+        return tar_dumper
 
     def clean(self):
         pass
@@ -80,7 +83,7 @@ class ComponentsDumper(AbstractDumper):
                 for line in out.split("\n"):
                     if not line:
                         continue
-                    r = re.match("(\S+)\s([><=]=?)\s(\S+)", line)
+                    r = re.match("(\\S+)\\s([><=]=?)\\s(\\S+)", line)
                     try:
                         if r:
                             name, symbol, version = r.groups()

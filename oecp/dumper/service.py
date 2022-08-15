@@ -15,9 +15,11 @@
 
 import os
 import logging
-logger = logging.getLogger('oecp')
 
 from oecp.dumper.base import AbstractDumper
+
+logger = logging.getLogger('oecp')
+
 
 class ServiceDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
@@ -27,10 +29,6 @@ class ServiceDumper(AbstractDumper):
         self.extract_info = self.cache_dumper.get_extract_info()
         self._component_key = 'service'
 
-    def _get_service_files(self, rpm_extract_dir):
-        service_files = self.cache_dumper.get_service_files(rpm_extract_dir)
-        return service_files
-
     def dump(self, repository):
         rpm_path = repository['path']
         category = repository['category'].value
@@ -39,8 +37,7 @@ class ServiceDumper(AbstractDumper):
         rpm_extract_name = rpm_extract_dir.name
         if not rpm_extract_name:
             logger.exception('RPM decompression path not found')
-            raise
-        service_files = self._get_service_files(rpm_extract_name)
+        service_files = self.cache_dumper.get_service_files(rpm_extract_name)
         item = {'rpm': verbose_path, 'category': category, 'kind': self._component_key, 'data': service_files}
         return item
 
