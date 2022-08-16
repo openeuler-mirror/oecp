@@ -87,7 +87,7 @@ class ServiceCompareExecutor(CompareExecutor):
         return full_path
 
     def _compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
-        count_result = {'more_count': 0, 'less_count': 0, 'diff_count': 0}
+        count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         category = dump_a['category']
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
         dump_a_files = dump_a[self.data]
@@ -105,27 +105,28 @@ class ServiceCompareExecutor(CompareExecutor):
             details_a = self._load_details(pair[0])
             details_b = self._load_details(pair[1])
             file_result, component_results = self.format_service_detail(details_a, details_b)
-            if file_result == 'diff':
-                count_result["diff_count"] += 1
-                result.set_cmp_result(file_result)
+            if file_result == CMP_RESULT_DIFF:
+                self.count_cmp_result(count_result, CMP_RESULT_DIFF)
                 data = CompareResultComponent(CMP_TYPE_SERVICE, file_result, base_a, base_b, details_path)
+                result.set_cmp_result(file_result)
             else:
+                self.count_cmp_result(count_result, file_result)
                 data = CompareResultComponent(CMP_TYPE_SERVICE, file_result, base_a, base_b)
             result.add_component(data)
             result_detail = self._detail_set(dump_a, dump_b, component_results, detail_filename)
             result.add_component(result_detail)
         if only_file_a:
             for file_a in only_file_a:
+                self.count_cmp_result(count_result, CMP_RESULT_LESS)
                 side_a = self.intercept_file_name(file_a, 'full')
                 data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_LESS, side_a, '')
                 result.add_component(data)
-                count_result["less_count"] += 1
         if only_file_b:
             for file_b in only_file_b:
+                self.count_cmp_result(count_result, CMP_RESULT_MORE)
                 side_b = self.intercept_file_name(file_b, 'full')
                 data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_MORE, '', side_b)
                 result.add_component(data)
-                count_result["more_count"] += 1
         result.add_count_info(count_result)
         return result
 

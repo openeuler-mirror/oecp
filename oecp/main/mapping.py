@@ -28,7 +28,6 @@ except ImportError:
 import tempfile
 import logging
 
-from oecp.proxy.rpm_proxy import RPMProxy
 from oecp.proxy.requests_proxy import do_download
 from oecp.utils.misc import path_is_remote
 
