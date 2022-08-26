@@ -1,6 +1,5 @@
 # -*- encoding=utf-8 -*-
 import os.path
-import sys
 import pandas as pd
 
 
@@ -13,7 +12,6 @@ def calculate_similarity(all_rpm_report):
 
     # 新增两列包名
     package_name_list = []
-    # print(list(df[first_colomn_name]))
     for source_package in list(df[first_colomn_name]):
         if source_package != '':
             package_name_list.append(source_package.rsplit(".", 2)[0].rsplit("-", 2)[0])

@@ -144,14 +144,15 @@ class CompareExecutor(ABC):
 
     @staticmethod
     def split_common_files(files_a, files_b):
-        common_file_pairs, common_file = [], []
+        common_file_pairs, common_file_a, common_file_b = [], [], []
         for file_a in files_a:
             for file_b in files_b:
                 if file_a.split('__rpm__')[-1] == file_b.split('__rpm__')[-1]:
                     common_file_pairs.append([file_a, file_b])
-                    common_file.append(file_a)
-        only_file_a = list(set(files_a) - set(common_file))
-        only_file_b = list(set(files_b) - set(common_file))
+                    common_file_a.append(file_a)
+                    common_file_b.append(file_b)
+        only_file_a = list(set(files_a) - set(common_file_a))
+        only_file_b = list(set(files_b) - set(common_file_b))
         return common_file_pairs, only_file_a, only_file_b
 
     @staticmethod
