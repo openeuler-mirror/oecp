@@ -346,14 +346,16 @@ def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_
         "compare detail": compare_detail,
         "compare type": compare_type,
         "category level": category_level,
+        "same": "N/A",
         "more": "N/A",
         "less": "N/A",
         "diff": "N/A"
     }
     if hasattr(result, 'count_result'):
-        row["more"] = result.count_result['more_count']
-        row["less"] = result.count_result['less_count']
-        row["diff"] = result.count_result['diff_count']
+        row["same"] = result.count_result['same']
+        row["more"] = result.count_result['more']
+        row["less"] = result.count_result['less']
+        row["diff"] = result.count_result['diff']
     rows.setdefault(result.cmp_type, [])
     rows[result.cmp_type].append(row)
 
@@ -394,6 +396,7 @@ def assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b, parent_side_a,
         "compare detail": '',
         "compare type": result.cmp_type,
         "category level": category_level,
+        "same": 'N/A',
         "more": 'N/A',
         "less": 'N/A',
         "diff": 'N/A'
@@ -406,6 +409,8 @@ def assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b, parent_side_a,
 
 def get_differences_info(rows):
     differences_info = []
+    if not rows:
+        return []
     for key in rows.keys():
         if key.endswith('.rpm') and not key.endswith('.src.rpm'):
             for cmp_type, results in rows[key].items():

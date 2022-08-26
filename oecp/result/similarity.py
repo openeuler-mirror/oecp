@@ -16,29 +16,26 @@
 # **********************************************************************************
 """
 
-import logging
-
-from oecp.result.constants import *
-from oecp.proxy.rpm_proxy import RPMProxy
 from oecp.result.test_result import *
 from oecp.result.json_result import *
 
 logger = logging.getLogger("oecp")
 
 PKG_NAME = {
-        '1': "same",
-        '1.1': "same",
-        '2': "same",
-        '3': "diff",
-        '4': "less",
-        '5': "more"
-    }
+    '1': "same",
+    '1.1': "same",
+    '2': "same",
+    '3': "diff",
+    '4': "less",
+    '5': "more"
+}
+
 
 def get_similarity(rows, side_a, side_b):
     similarity = {}
     count = {}
-    count[CMP_TYPE_RPM_LEVEL], _ = rpm_count(rows, side_a, side_b)
-    count[CMP_TYPE_RPMS_TEST] = rpm_test_count(rows.get(CMP_TYPE_RPM))
+    count_rpm_level, _ = rpm_count(rows, side_a, side_b)
+    count_rpm_test = rpm_test_count(rows.get(CMP_TYPE_RPM))
 
     for node, results in rows.items():
         if not isinstance(results, list):
@@ -47,44 +44,50 @@ def get_similarity(rows, side_a, side_b):
                     for result in rpm_results:
                         count_single_result(count, result, rpm_type)
 
-    level1_name_rate = count_rate(count[CMP_TYPE_RPM_LEVEL][1]["same"], (count[CMP_TYPE_RPM_LEVEL][1]["same"] + count[CMP_TYPE_RPM_LEVEL][1]["diff"]))
-    level2_same = count[CMP_TYPE_RPM_LEVEL][1]["same"] + count[CMP_TYPE_RPM_LEVEL][2]["same"]
-    level2_diff = count[CMP_TYPE_RPM_LEVEL][1]["diff"] + count[CMP_TYPE_RPM_LEVEL][2]["diff"]
+    level1_name_rate = count_rate(count_rpm_level.get(1).get("same"),
+                                  count_rpm_level.get(1).get("same") + count_rpm_level.get(1).get("diff"))
+    level2_same = count_rpm_level.get(1).get("same") + count_rpm_level.get(2).get("same")
+    level2_diff = count_rpm_level.get(1).get("diff") + count_rpm_level.get(2).get("diff")
     leve2_name_rate = count_rate(level2_same, (level2_same + level2_diff))
-    core_pkg_rate = count_rate(count[CMP_TYPE_RPM_LEVEL]["core_pkg"]["same"], count[CMP_TYPE_RPM_LEVEL]["core_pkg"]["same"] + count[CMP_TYPE_RPM_LEVEL]["core_pkg"]["diff"])
+    core_pkg_rate = count_rate(count_rpm_level.get("core_pkg").get("same"),
+                               count_rpm_level.get("core_pkg").get("same") + count_rpm_level.get("core_pkg").get(
+                                   "diff"))
     similarity["core_pkg"] = core_pkg_rate
     similarity["level1 pkg"] = level1_name_rate
     similarity["level2 pkg"] = leve2_name_rate
-    similarity["all_pkg"] = get_all_pkg_simlarity(count[CMP_TYPE_RPM_LEVEL])
-    del count[CMP_TYPE_RPM_LEVEL]
+    similarity["all_pkg"] = get_all_pkg_simlarity(count_rpm_level)
 
-    rmp_test_score = count_rate(count[CMP_TYPE_RPMS_TEST]["same"], (count[CMP_TYPE_RPMS_TEST]["same"] + count[CMP_TYPE_RPMS_TEST]["diff"]))
+    rmp_test_score = count_rate(count_rpm_test.get("same"),
+                                (count_rpm_test.get("same") + count_rpm_test.get("diff")))
     similarity[CMP_TYPE_RPMS_TEST] = rmp_test_score
-    del count[CMP_TYPE_RPMS_TEST]
 
-    count[CMP_TYPE_CI_CONFIG] = ci_test_count(rows.get(CMP_TYPE_CI_CONFIG), "same")
-    similarity[CMP_TYPE_CI_CONFIG] = count_rate(count[CMP_TYPE_CI_CONFIG]["same"], (count[CMP_TYPE_CI_CONFIG]["same"] + count[CMP_TYPE_CI_CONFIG]["diff"]))
-    del count[CMP_TYPE_CI_CONFIG]
+    count_ciconfig = ci_test_count(rows.get(CMP_TYPE_CI_CONFIG), "same")
+    similarity[CMP_TYPE_CI_CONFIG] = count_rate(count_ciconfig.get("same"),
+                                                (count_ciconfig.get("same") + count_ciconfig.get("diff")))
 
-    count[CMP_TYPE_AT] = ci_test_count(rows.get(CMP_TYPE_AT), "pass")
-    similarity[CMP_TYPE_AT] = count_rate(count[CMP_TYPE_AT]["same"], count[CMP_TYPE_AT]["same"] + count[CMP_TYPE_AT]["diff"])
-    del count[CMP_TYPE_AT]
+    count_at = ci_test_count(rows.get(CMP_TYPE_AT), "pass")
+    similarity[CMP_TYPE_AT] = count_rate(count_at.get("same"), count_at.get("same") + count_at.get("diff"))
 
     similarity[CMP_TYPE_PERFORMANCE] = performance_rate(rows.get(CMP_TYPE_PERFORMANCE), side_b)
 
     for count_type, result in count.items():
         if count_type == CMP_TYPE_RPM_ABI:
-            l0_rate = count_rate(count[count_type][0]["same"], (count[count_type][0]["same"] + count[count_type][0]["diff"]))
-            l1_rate = count_rate(count[count_type][1]["same"], (count[count_type][1]["same"] + count[count_type][1]["diff"]))
-            l2_same = count[count_type][1]["same"] + count[count_type][2]["same"]
-            l2_diff = count[count_type][1]["diff"] + count[count_type][2]["diff"]
+            count_abi = count.get(count_type)
+            l0_rate = count_rate(count_abi.get(0).get("same"),
+                                 count_abi.get(0).get("same") + count_abi.get(0).get("diff"))
+            l1_rate = count_rate(count_abi.get(1).get("same"),
+                                 count_abi.get(1).get("same") + count_abi.get(1).get("diff"))
+            l2_same = count_abi.get(1).get("same") + count_abi.get(2).get("same")
+            l2_diff = count_abi.get(1).get("diff") + count_abi.get(2).get("diff")
             l2_rate = count_rate(l2_same, l2_same + l2_diff)
             similarity["level0 " + count_type] = l0_rate
             similarity["level1 " + count_type] = l1_rate
             similarity["level2 " + count_type] = l2_rate
-        rate = count_rate(count[count_type]["all"]["same"], (count[count_type]["all"]["same"] + count[count_type]["all"]["diff"]))
+        rate = count_rate(count.get(count_type).get("all").get("same"),
+                          count.get(count_type).get("all").get("same") + count.get(count_type).get("all").get("diff"))
         similarity[count_type] = rate
     return similarity
+
 
 def get_all_pkg_simlarity(count):
     same = 0
@@ -97,13 +100,14 @@ def get_all_pkg_simlarity(count):
 
     return count_rate(same, same + diff)
 
+
 def count_single_result(count, result, cmp_type):
     count.setdefault(cmp_type, {
-        0 : {"same": 0, "diff": 0},
-	    1 : {"same": 0, "diff": 0},
-	    2 : {"same": 0, "diff": 0},
-	    'all' : {"same": 0, "diff": 0},
-        })
+        0: {"same": 0, "diff": 0},
+        1: {"same": 0, "diff": 0},
+        2: {"same": 0, "diff": 0},
+        'all': {"same": 0, "diff": 0},
+    })
     if cmp_type == CMP_TYPE_RPM_ABI:
         category_level = result.get("category level", 6)
         if category_level < 3:
@@ -116,8 +120,9 @@ def count_single_result(count, result, cmp_type):
     else:
         count[cmp_type]['all']['diff'] += 1
 
+
 def rpm_count(rows, side_a, side_b):
-    '''
+    """
     Explanation for rpm package result[compare result]:
         1   -- same name + version + son-version + release num
         1.1 -- same name + version + son-version
@@ -125,16 +130,16 @@ def rpm_count(rows, side_a, side_b):
         3   -- same name
         4   -- less
         5   -- more
-    '''
+    """
     rpm_results = rows.get(CMP_TYPE_RPM)
     count = {
-	    1 : {"same": 0, "diff": 0},
-	    2 : {"same": 0, "diff": 0},
-	    3 : {"same": 0, "diff": 0},
-	    4 : {"same": 0, "diff": 0},
-	    5 : {"same": 0, "diff": 0},
-	    6 : {"same": 0, "diff": 0},
-            "core_pkg": {"same": 0, "diff": 0}
+        1: {"same": 0, "diff": 0},
+        2: {"same": 0, "diff": 0},
+        3: {"same": 0, "diff": 0},
+        4: {"same": 0, "diff": 0},
+        5: {"same": 0, "diff": 0},
+        6: {"same": 0, "diff": 0},
+        "core_pkg": {"same": 0, "diff": 0}
     }
     mark_pkgs = []
     if not rpm_results:
@@ -165,6 +170,7 @@ def rpm_count(rows, side_a, side_b):
                 count[result["category level"]]["diff"] += 1
     return count, mark_pkgs
 
+
 def is_same_rpm(rpm_cmp_result):
     if not rpm_cmp_result:
         return True
@@ -172,16 +178,18 @@ def is_same_rpm(rpm_cmp_result):
         if cmp_type not in PKG_SIMILARITY_SON_TYPES:
             continue
         for row in result:
-            if row.get("compare type") == CMP_TYPE_RPM_FILES and row.get("compare result") == CMP_RESULT_MORE:
-                continue
+            if row.get("compare type") == CMP_TYPE_RPM_FILES:
+                if row.get("compare result") == CMP_RESULT_MORE or row.get("compare result") == CMP_RESULT_CHANGE:
+                    continue
             if row.get("compare result") not in RESULT_SAME:
                 return False
     return True
 
+
 def rpm_test_count(results):
     count = {
-	"same": 0,
-	"diff": 0
+        "same": 0,
+        "diff": 0
     }
     if not results:
         return count
@@ -194,10 +202,11 @@ def rpm_test_count(results):
             count["diff"] += 1
     return count
 
+
 def ci_test_count(result_rows, pass_result):
     count = {
-	"same": 0,
-	"diff": 0
+        "same": 0,
+        "diff": 0
     }
     if not result_rows:
         return count
@@ -207,6 +216,7 @@ def ci_test_count(result_rows, pass_result):
         else:
             count["diff"] += 1
     return count
+
 
 # weight:
 #   lmbench3.*  : 15%
@@ -226,6 +236,7 @@ def performance_rate(results, side_b):
             rate += test_rate
 
     return rate
+
 
 def perfomance_count(results, side_b):
     count = {
@@ -253,11 +264,11 @@ def perfomance_count(results, side_b):
             score = 0
             if small_better(metric, small_better_reg):
                 if cmp_result == 'pass':
-                    score = (baseline_result - side_b_result)/baseline_result + 1
+                    score = (baseline_result - side_b_result) / baseline_result + 1
                 else:
-                    score = 1 - (side_b_result - baseline_result)/baseline_result
+                    score = 1 - (side_b_result - baseline_result) / baseline_result
             else:
-                score = side_b_result/baseline_result
+                score = side_b_result / baseline_result
             if 'lmbench3' in metric:
                 count['lmbench3'].append(score)
             elif 'unixbench' in metric:
@@ -266,9 +277,10 @@ def perfomance_count(results, side_b):
                 count['mysql'].append(score)
     return count
 
+
 def count_rate(a, b):
     rate = 0
     if b:
-        rate = round(a/b, 4)
+        rate = round(a / b, 4)
 
     return rate

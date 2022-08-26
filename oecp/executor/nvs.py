@@ -21,7 +21,7 @@ from oecp.executor.base import CompareExecutor, CPM_CATEGORY_DIFF
 from oecp.result.compare_result import CMP_TYPE_RPM, CompareResultComposite, CompareResultComponent, CMP_RESULT_SAME, \
     CMP_RESULT_DIFF, CMP_TYPE_DRIVE_KABI
 from oecp.proxy.rpm_proxy import RPMProxy
-from oecp.result.constants import CMP_RESULT_CHANGE, CMP_TYPE_REQUIRES
+from oecp.result.constants import CMP_TYPE_REQUIRES, CMP_SAME_RESULT
 
 logger = logging.getLogger('oecp')
 
@@ -38,15 +38,6 @@ class NVSCompareExecutor(CompareExecutor):
         self._data = 'data'
         self.config = config if config else {}
         self.instantiation_mapping()
-
-    @staticmethod
-    def _count_result(count_result, cmp_result):
-        if cmp_result == 'more':
-            count_result["more_count"] += 1
-        elif cmp_result == 'less':
-            count_result["less_count"] += 1
-        elif cmp_result == 'diff':
-            count_result["diff_count"] += 1
 
     @staticmethod
     def _kabi_get_driver(kabi):
@@ -78,7 +69,7 @@ class NVSCompareExecutor(CompareExecutor):
         @return: 比较所需的dump
         """
         pretty_dump = {}
-        rpm_n = RPMProxy.rpm_n_v_r_d_a(dump['rpm'])[0]
+        rpm_n = RPMProxy.rpm_name(dump['rpm'])
         for component in dump[self._data]:
 
             # provides 和 requires 比较忽视release版本号
@@ -109,7 +100,7 @@ class NVSCompareExecutor(CompareExecutor):
         @return:
         """
         single_result = CMP_RESULT_SAME
-        count_result = {'more_count': 0, 'less_count': 0, 'diff_count': 0}
+        count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         category = dump_a['category'] if dump_a['category'] == dump_b[
             'category'] else CPM_CATEGORY_DIFF
         if dump_a['kind'] == 'kabi' or dump_a['kind'] == 'kconfig':
@@ -122,7 +113,7 @@ class NVSCompareExecutor(CompareExecutor):
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
         for component_result in component_results:
             for sub_component_result in component_result:
-                self._count_result(count_result, sub_component_result[-1])
+                self.count_cmp_result(count_result, sub_component_result[-1])
                 if self.config.get('compare_type') == CMP_TYPE_DRIVE_KABI and sub_component_result[
                     -1] != CMP_RESULT_SAME:
                     eff_drives = self._kabi_get_driver(sub_component_result[0].split()[0])
@@ -131,8 +122,7 @@ class NVSCompareExecutor(CompareExecutor):
                 else:
                     data = CompareResultComponent(self.config.get('compare_type'), sub_component_result[-1],
                                                   sub_component_result[0], sub_component_result[1])
-                if sub_component_result[-1] not in [CMP_RESULT_SAME,
-                                                    CMP_RESULT_CHANGE] and single_result == CMP_RESULT_SAME:
+                if sub_component_result[-1] not in CMP_SAME_RESULT and single_result == CMP_RESULT_SAME:
                     single_result = CMP_RESULT_DIFF
                     result.set_cmp_result(single_result)
                 result.add_component(data)

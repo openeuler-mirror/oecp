@@ -99,7 +99,7 @@ class ABICompareExecutor(CompareExecutor):
         return deleted_abi
 
     def _compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
-        count_result = {'more_count': 0, 'less_count': 0, 'diff_count': 0}
+        count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         kind = dump_a['kind']
         rpm_a, rpm_b = dump_a['rpm'], dump_b['rpm']
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, rpm_a, rpm_b, dump_a['category'])
@@ -128,6 +128,7 @@ class ABICompareExecutor(CompareExecutor):
             ret, out, err = shell_cmd(cmd.split())
             if ret == 0:
                 logger.debug("check abi same")
+                self.count_cmp_result(count_result, CMP_RESULT_SAME)
                 data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_SAME, base_a, base_b)
                 result.add_component(data)
             else:
@@ -139,11 +140,12 @@ class ABICompareExecutor(CompareExecutor):
                 changed_abi, deleted_abi = self._extract_changed_abi(out), self._extract_deleted_abi(out)
                 if not changed_abi and not deleted_abi:
                     logger.debug("check abi functions that are not deleted or changed.")
+                    self.count_cmp_result(count_result, CMP_RESULT_SAME)
                     data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_SAME, base_a, base_b)
                     result.add_component(data)
                 else:
+                    self.count_cmp_result(count_result, CMP_RESULT_DIFF)
                     data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_DIFF, base_a, base_b, file_path)
-                    count_result["diff_count"] += 1
                     result.set_cmp_result(CMP_RESULT_DIFF)
                     result.add_component(data)
         dump_a_linkfiles, dump_b_linkfiles = dump_a[self.link_file], dump_b[self.link_file]

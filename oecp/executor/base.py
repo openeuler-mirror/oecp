@@ -23,7 +23,7 @@ from oecp.result.compare_result import CMP_RESULT_MORE, CMP_RESULT_LESS, CMP_RES
     CMP_RESULT_CHANGE
 
 # 两者category指定的级别不同或者未指定
-from oecp.result.constants import OLD_CHAR, NEW_CHAR
+from oecp.result.constants import OLD_CHAR, NEW_CHAR, CMP_SAME_RESULT, CMP_TYPE_KCONFIG
 
 CPM_CATEGORY_DIFF = 4
 
@@ -39,7 +39,7 @@ class CompareExecutor(ABC):
     def get_version_change_files(side_a_file, side_b_file, o_char=None, n_char=None):
         side_a_floders = side_a_file.split('/')
         side_b_floders = side_b_file.split('/')
-        compare_result = 'same'
+        compare_result = CMP_RESULT_SAME
         if len(side_a_floders) == len(side_b_floders):
             for index in range(1, len(side_a_floders) - 1):
                 floder_a = side_a_floders[index]
@@ -50,10 +50,10 @@ class CompareExecutor(ABC):
                     continue
                 elif re.search('\\d+\\.\\d+', side_a_floders[index]) and re.search('\\d+\\.\\d+',
                                                                                    side_b_floders[index]):
-                    compare_result = "change"
+                    compare_result = CMP_RESULT_CHANGE
                     continue
                 else:
-                    compare_result = 'diff'
+                    compare_result = CMP_RESULT_DIFF
                     break
             return compare_result
 
@@ -68,11 +68,11 @@ class CompareExecutor(ABC):
                 side_a_file = dict_a.get(single_key)
                 side_b_file = dict_b.get(single_key)
                 get_result = self.get_version_change_files(side_a_file, side_b_file)
-                if get_result == "change":
+                if get_result == CMP_RESULT_CHANGE:
                     change_dump.append([side_a_file, side_b_file])
                     only_dump_a.discard(side_a_file)
                     only_dump_b.discard(side_b_file)
-                elif get_result == "same":
+                elif get_result == CMP_RESULT_SAME:
                     common_dump_add.append([side_a_file, side_b_file])
                     only_dump_a.discard(side_a_file)
                     only_dump_b.discard(side_b_file)
@@ -108,12 +108,12 @@ class CompareExecutor(ABC):
                         if file_a.split(o_char) == file_b.split(n_char):
                             get_result = self.get_version_change_files(side_a_file, side_b_file, o_char, n_char)
 
-                if get_result == "change":
+                if get_result == CMP_RESULT_CHANGE:
                     change_dump.append([side_a_file, side_b_file])
                     only_dump_a.discard(side_a_file)
                     only_dump_b.discard(side_b_file)
                     break
-                elif get_result == "same":
+                elif get_result == CMP_RESULT_SAME:
                     common_dump_add.append([side_a_file, side_b_file])
                     only_dump_a.discard(side_a_file)
                     only_dump_b.discard(side_b_file)
@@ -176,22 +176,22 @@ class CompareExecutor(ABC):
         for k, va in h_a.items():
             vb = h_b.get(k, None)
             if vb is None:
-                less.append([va, '', 'less'])
+                less.append([va, '', CMP_RESULT_LESS])
             elif va == vb:
-                same.append([va, vb, 'same'])
+                same.append([va, vb, CMP_RESULT_SAME])
             else:
-                diff.append([va, vb, 'diff'])
+                diff.append([va, vb, CMP_RESULT_DIFF])
 
         all_dump.append(same)
         all_dump.append(diff)
         all_dump.append(less)
 
-        if kind == 'kconfig':
+        if kind == CMP_TYPE_KCONFIG:
             more = []
             for k, vb, in h_b.items():
                 va = h_a.get(k, None)
                 if va is None:
-                    more.append(['', vb, 'more'])
+                    more.append(['', vb, CMP_RESULT_MORE])
 
             if more:
                 all_dump.append(more)
@@ -349,6 +349,16 @@ class CompareExecutor(ABC):
             cmp_results.append(single_result)
 
         return cmp_results
+
+    def count_cmp_result(self, count_result, cmp_result):
+        if cmp_result in CMP_SAME_RESULT:
+            count_result["same"] += 1
+        elif cmp_result == CMP_RESULT_LESS:
+            count_result["less"] += 1
+        elif cmp_result == CMP_RESULT_MORE:
+            count_result["more"] += 1
+        elif cmp_result == CMP_RESULT_DIFF:
+            count_result["diff"] += 1
 
     @abstractmethod
     def run(self):

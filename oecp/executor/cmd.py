@@ -39,7 +39,7 @@ class CmdCompareExecutor(CompareExecutor):
         return split_file
 
     def _compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
-        count_result = {'more_count': 0, 'less_count': 0, 'diff_count': 0}
+        count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         category = dump_a['category']
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
         file_a = self._split_files(dump_a[self.data])
@@ -51,16 +51,12 @@ class CmdCompareExecutor(CompareExecutor):
         component_results = self.format_dump(file_a, file_b)
         for component_result in component_results:
             for sub_component_result in component_result:
+                self.count_cmp_result(count_result, sub_component_result[-1])
                 if not self.config.get('show_same', False) and sub_component_result[-1] == CMP_RESULT_SAME:
                     continue
-                if sub_component_result[-1] == 'more':
-                    count_result["more_count"] += 1
-                elif sub_component_result[-1] == 'less':
-                    count_result["less_count"] += 1
                 data = CompareResultComponent(self.config.get('compare_type'), sub_component_result[-1],
                                               sub_component_result[0], sub_component_result[1])
-                if sub_component_result[-1] not in [CMP_RESULT_SAME,
-                                                    CMP_RESULT_CHANGE] and single_result == CMP_RESULT_SAME:
+                if sub_component_result[-1] not in CMP_SAME_RESULT and single_result == CMP_RESULT_SAME:
                     single_result = CMP_RESULT_DIFF
                     result.set_cmp_result(single_result)
                 result.add_component(data)
