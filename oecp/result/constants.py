@@ -124,11 +124,11 @@ FIFTEEN_TITLE = ["OSV的内核配置与", "一致性比例"]
 
 # Some file category filtering re pattern
 FILTER_PATTERN = {
-    "config": "^/etc/.*\.conf$",
-    "header": ".*\.h$",
-    "service": "^/usr/lib/systemd/system/.*\.service$",
-    "jabi": ".*\.jar$",
-    "abi": ".*\.so$",
+    "config": "^/etc/.*\\.conf$",
+    "header": ".*\\.h$",
+    "service": "^/usr/lib/systemd/system/.*\\.service$",
+    "jabi": ".*\\.jar$",
+    "abi": ".*\\.so$",
     "cmd_1": "^/usr/bin/.*",
     "cmd_2": "^/usr/sbin/.*",
     "cmd_3": "^/usr/local/bin/.*",
@@ -157,5 +157,19 @@ NEW_CHAR = {'oe1': ['ky10']}
 KERNEL = 'kernel'
 OTHER_KERNEL_NAMES = ['kernel-core', 'kernel-default']
 
+# ABI DETAILS COUNT RESULT
+COUNT_ABI_DETAILS = {
+    'remove_abi': 0,
+    'change_abi': 0,
+    'add_abi': 0
+}
 # Dist name
 DIST_FLAG = ['el8', 'el7', 'oe1', 'an8', 'ky10']
+
+RPMFILE_CMP_TYPES = [CMP_TYPE_SERVICE, CMP_TYPE_RPM_CONFIG, CMP_TYPE_RPM_HEADER, CMP_TYPE_RPM_FILES,
+                     CMP_TYPE_RPM_LIB, CMP_TYPE_CMD]
+KERNEL_ANALYSE = [CMP_TYPE_DRIVE_KABI, CMP_TYPE_KCONFIG_DRIVE, CMP_TYPE_KABI, CMP_TYPE_KCONFIG]
+COUNT_RESULTS = [CMP_RESULT_MORE, CMP_RESULT_LESS, CMP_RESULT_SAME, CMP_RESULT_DIFF]
+CMP_TYPE = "compare type"
+CMP_RESULT = "compare result"
+CTG_LEVEL = "category level"

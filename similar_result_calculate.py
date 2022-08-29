@@ -1,6 +1,5 @@
 # -*- encoding=utf-8 -*-
 import os.path
-import sys
 import pandas as pd
 
 
@@ -13,7 +12,6 @@ def calculate_similarity(all_rpm_report):
 
     # 新增两列包名
     package_name_list = []
-    # print(list(df[first_colomn_name]))
     for source_package in list(df[first_colomn_name]):
         if source_package != '':
             package_name_list.append(source_package.rsplit(".", 2)[0].rsplit("-", 2)[0])
@@ -56,45 +54,46 @@ def calculate_similarity(all_rpm_report):
         if (len(list(tmp_require["compare type"])) == 0 and len(list(tmp_provide["compare type"])) == 0):
             has_require = False
         tmp_list = list(tmp_table['compare result'])
-        if '1' in tmp_list and len(tmp_list) - 1 != 0:
-            result_dict[package] = 1
-            temp_simple_reslut[0][0] += 1
-            temp_simple_reslut[0][1] += round(tmp_list.count('same') / (len(tmp_list) - 1), 2)
-            temp_simple_reslut[0][2] += list(tmp_require["compare result"]).count("same")
-            temp_simple_reslut[0][3] += list(tmp_provide["compare result"]).count("same")
-            temp_simple_reslut[0][4] += 1 if has_require else 0
-        elif '1.1' in tmp_list and len(tmp_list) - 1 != 0:
-            result_dict[package] = 0.7 + round(tmp_list.count('same') / (len(tmp_list) - 1), 2) * 0.3
-            temp_simple_reslut[1][0] += 1
-            temp_simple_reslut[1][1] += round(tmp_list.count('same') / (len(tmp_list) - 1), 2)
-            temp_simple_reslut[1][2] += list(tmp_require["compare result"]).count("same")
-            temp_simple_reslut[1][3] += list(tmp_provide["compare result"]).count("same")
-            temp_simple_reslut[1][4] += 1 if has_require else 0
-        elif '2' in tmp_list and len(tmp_list) - 1 != 0:
-            result_dict[package] = 0.3 + round(tmp_list.count('same') / (len(tmp_list) - 1), 2) * 0.7
-            temp_simple_reslut[2][0] += 1
-            temp_simple_reslut[2][2] += list(tmp_require["compare result"]).count("same")
-            temp_simple_reslut[2][3] += list(tmp_provide["compare result"]).count("same")
-            require_provide_num = temp_simple_reslut[2][2] + list(tmp_require["compare result"]).count("diff") \
-                                  + temp_simple_reslut[2][3] + list(tmp_provide["compare result"]).count("diff")
-            same_molecule = tmp_list.count('same') - temp_simple_reslut[2][2] - temp_simple_reslut[2][3]
-            dimension_num = len(tmp_list) - 1 - require_provide_num
-            if same_molecule != 0 and dimension_num != 0:
-                temp_simple_reslut[2][1] += round(
-                    same_molecule
-                    / dimension_num, 2
-                )
-            temp_simple_reslut[2][4] += 1 if has_require else 0
-        elif '3' in tmp_list and len(tmp_list) - 1 != 0:
-            result_dict[package] = round(tmp_list.count('same') / (len(tmp_list) - 1), 2)
-            temp_simple_reslut[3][0] += 1
-            temp_simple_reslut[3][1] += round(tmp_list.count('same') / (len(tmp_list) - 1), 2)
-            temp_simple_reslut[3][2] += list(tmp_require["compare result"]).count("same")
-            temp_simple_reslut[3][3] += list(tmp_provide["compare result"]).count("same")
-            temp_simple_reslut[3][4] += 1 if has_require else 0
-        else:
-            pass
-    import operator
+        divisor = len(tmp_list) - 1
+        if divisor:
+            if '1' in tmp_list:
+                result_dict[package] = 1
+                temp_simple_reslut[0][0] += 1
+                temp_simple_reslut[0][1] += round(tmp_list.count('same') / divisor, 2)
+                temp_simple_reslut[0][2] += list(tmp_require["compare result"]).count("same")
+                temp_simple_reslut[0][3] += list(tmp_provide["compare result"]).count("same")
+                temp_simple_reslut[0][4] += 1 if has_require else 0
+            elif '1.1' in tmp_list:
+                result_dict[package] = 0.7 + round(tmp_list.count('same') / divisor, 2) * 0.3
+                temp_simple_reslut[1][0] += 1
+                temp_simple_reslut[1][1] += round(tmp_list.count('same') / divisor, 2)
+                temp_simple_reslut[1][2] += list(tmp_require["compare result"]).count("same")
+                temp_simple_reslut[1][3] += list(tmp_provide["compare result"]).count("same")
+                temp_simple_reslut[1][4] += 1 if has_require else 0
+            elif '2' in tmp_list:
+                result_dict[package] = 0.3 + round(tmp_list.count('same') / divisor, 2) * 0.7
+                temp_simple_reslut[2][0] += 1
+                temp_simple_reslut[2][2] += list(tmp_require["compare result"]).count("same")
+                temp_simple_reslut[2][3] += list(tmp_provide["compare result"]).count("same")
+                require_provide_num = temp_simple_reslut[2][2] + list(tmp_require["compare result"]).count("diff") \
+                                      + temp_simple_reslut[2][3] + list(tmp_provide["compare result"]).count("diff")
+                same_molecule = tmp_list.count('same') - temp_simple_reslut[2][2] - temp_simple_reslut[2][3]
+                dimension_num = divisor - require_provide_num
+                if same_molecule != 0 and dimension_num != 0:
+                    temp_simple_reslut[2][1] += round(
+                        same_molecule
+                        / dimension_num, 2
+                    )
+                temp_simple_reslut[2][4] += 1 if has_require else 0
+            elif '3' in tmp_list:
+                result_dict[package] = round(tmp_list.count('same') / divisor, 2)
+                temp_simple_reslut[3][0] += 1
+                temp_simple_reslut[3][1] += round(tmp_list.count('same') / divisor, 2)
+                temp_simple_reslut[3][2] += list(tmp_require["compare result"]).count("same")
+                temp_simple_reslut[3][3] += list(tmp_provide["compare result"]).count("same")
+                temp_simple_reslut[3][4] += 1 if has_require else 0
+            else:
+                pass
 
     molecule_section2 = 0
     for i in range(3):

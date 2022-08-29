@@ -20,7 +20,7 @@ import re
 from oecp.utils.shell import shell_cmd
 from oecp.result.compare_result import CMP_RESULT_SAME, CompareResultComposite, CMP_TYPE_RPM, CMP_TYPE_RPM_ABI, \
     CompareResultComponent, CMP_RESULT_DIFF
-from oecp.result.constants import DETAIL_PATH
+from oecp.result.constants import DETAIL_PATH, COUNT_ABI_DETAILS
 from oecp.executor.base import CompareExecutor
 
 logger = logging.getLogger('oecp')
@@ -39,6 +39,39 @@ class ABICompareExecutor(CompareExecutor):
         self.link_file = 'link_file'
 
     @staticmethod
+    def compare_link_files(dump_a_linkfiles, dump_b_linkfiles, rpm):
+        for file_a in dump_a_linkfiles:
+            for file_b in dump_b_linkfiles:
+                if file_a[0] == file_b[0]:
+                    if file_a[1] == file_b[1]:
+                        continue
+                    else:
+                        logger.info(f"{rpm} {file_a[0]} link file is change!")
+
+    @staticmethod
+    def extract_abi_change_detail(str_content):
+        remove_abi, change_abi, add_abi = 0, 0, 0
+        pattern_db = r"Functions changes summary: (\d+) Removed(.*?), (\d+) Changed(.*?), (\d+) Added(.*?)functions?"
+        debug_match = re.finditer(pattern_db, str_content)
+        for d_match in debug_match:
+            if d_match:
+                remove_abi += int(d_match.group(1))
+                change_abi += int(d_match.group(3))
+                add_abi += int(d_match.group(5))
+        pattern_ndb = r"Function(.*?)summary: (\d+) Removed, (\d+) Added(.*?)debug info"
+        no_debug_match = re.finditer(pattern_ndb, str_content)
+        for n_match in no_debug_match:
+            if n_match:
+                remove_abi += int(n_match.group(2))
+                add_abi += int(n_match.group(3))
+        return remove_abi, change_abi, add_abi
+
+    @staticmethod
+    def _save_result(file_path, content):
+        with open(file_path, "w") as f:
+            f.write(content)
+
+    @staticmethod
     def _set_so_mapping(library_files):
         if not library_files:
             return {}
@@ -54,7 +87,7 @@ class ABICompareExecutor(CompareExecutor):
                     so_mapping.setdefault(so_name, library_file)
         return so_mapping
 
-    def _get_library_pairs(self, files_a, files_b):
+    def get_library_pairs(self, files_a, files_b):
         library_pairs = []
         so_mapping_a = self._set_so_mapping(files_a)
         so_mapping_b = self._set_so_mapping(files_b)
@@ -63,50 +96,16 @@ class ABICompareExecutor(CompareExecutor):
                 library_pairs.append([so_mapping_a[so_name], so_mapping_b[so_name]])
         return library_pairs
 
-    @staticmethod
-    def compare_link_files(dump_a_linkfiles, dump_b_linkfiles, rpm):
-        for file_a in dump_a_linkfiles:
-            for file_b in dump_b_linkfiles:
-                if file_a[0] == file_b[0]:
-                    if file_a[1] == file_b[1]:
-                        continue
-                    else:
-                        logger.info(f"{rpm} {file_a[0]} link file is change!")
-
-    @staticmethod
-    def _save_result(file_path, content):
-        with open(file_path, "w") as f:
-            f.write(content)
-
-    @staticmethod
-    def _extract_changed_abi(string_content):
-        changed_abi = []
-        pattern = r"function(.*)at(.*)changes:"
-        all_match = re.finditer(pattern, string_content)
-        for match in all_match:
-            if match:
-                changed_abi.append(match.group(1))
-        return changed_abi
-
-    @staticmethod
-    def _extract_deleted_abi(string_content):
-        deleted_abi = []
-        pattern = r"'function(.*?)'\s+{\w+@@[0-9a-zA-Z._]+}"
-        all_match = re.finditer(pattern, string_content, flags=re.S)
-        for match in all_match:
-            if match:
-                deleted_abi.append(match.group(1))
-        return deleted_abi
-
-    def _compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
+    def compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
+        count_result.update(COUNT_ABI_DETAILS)
         kind = dump_a['kind']
         rpm_a, rpm_b = dump_a['rpm'], dump_b['rpm']
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, rpm_a, rpm_b, dump_a['category'])
         debuginfo_rpm_path_a, debuginfo_rpm_path_b = dump_a['debuginfo_extract_path'], dump_b['debuginfo_extract_path']
 
         dump_a_files, dump_b_files = dump_a[self.data], dump_b[self.data]
-        library_pairs = self._get_library_pairs(dump_a_files, dump_b_files)
+        library_pairs = self.get_library_pairs(dump_a_files, dump_b_files)
         if not library_pairs:
             return result
         debuginfo_rpm_path_a = os.path.join(debuginfo_rpm_path_a, 'usr/lib/debug') if debuginfo_rpm_path_a else ''
@@ -130,24 +129,25 @@ class ABICompareExecutor(CompareExecutor):
                 logger.debug("check abi same")
                 self.count_cmp_result(count_result, CMP_RESULT_SAME)
                 data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_SAME, base_a, base_b)
-                result.add_component(data)
             else:
                 if not os.path.exists(base_dir):
                     os.makedirs(base_dir)
                 file_path = os.path.join(base_dir, f'{base_a}__cmp__{base_b}.md')
                 self._save_result(file_path, out)
                 logger.debug("check abi diff")
-                changed_abi, deleted_abi = self._extract_changed_abi(out), self._extract_deleted_abi(out)
-                if not changed_abi and not deleted_abi:
-                    logger.debug("check abi functions that are not deleted or changed.")
-                    self.count_cmp_result(count_result, CMP_RESULT_SAME)
-                    data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_SAME, base_a, base_b)
-                    result.add_component(data)
-                else:
+                removed_abi, changed_abi, added_abi = self.extract_abi_change_detail(out)
+                count_result['remove_abi'] += removed_abi
+                count_result['change_abi'] += changed_abi
+                count_result['add_abi'] += added_abi
+                if changed_abi or removed_abi:
                     self.count_cmp_result(count_result, CMP_RESULT_DIFF)
                     data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_DIFF, base_a, base_b, file_path)
                     result.set_cmp_result(CMP_RESULT_DIFF)
-                    result.add_component(data)
+                else:
+                    logger.debug("check abi functions that are not deleted or changed.")
+                    self.count_cmp_result(count_result, CMP_RESULT_SAME)
+                    data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_SAME, base_a, base_b)
+            result.add_component(data)
         dump_a_linkfiles, dump_b_linkfiles = dump_a[self.link_file], dump_b[self.link_file]
         self.compare_link_files(dump_a_linkfiles, dump_b_linkfiles, rpm_a)
         result.add_count_info(count_result)
@@ -160,7 +160,7 @@ class ABICompareExecutor(CompareExecutor):
         for single_pair in similar_dumpers:
             if single_pair:
                 # dump_a: single_pair[0], dump_b: single_pair[1]
-                result = self._compare_result(single_pair[0], single_pair[1])
+                result = self.compare_result(single_pair[0], single_pair[1])
                 logger.debug(result)
                 compare_list.append(result)
         return compare_list

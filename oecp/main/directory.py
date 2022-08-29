@@ -410,8 +410,8 @@ class DistISO(Directory):
         logger.debug(f'debuginfo iso is {debuginfo_iso}, iso packages sqlite is {self.iso_packages_sqlite}')
         debuginfo_packages = self.iso_packages_sqlite.get(debuginfo_iso)
         all_debuginfo_rpm = {}
-        for k, v in debuginfo_packages.items():
-            all_debuginfo_rpm.update(self._get_debug_info_rpm(k))
+        for package in debuginfo_packages:
+            all_debuginfo_rpm.update(self._get_debug_info_rpm(package))
 
         return all_debuginfo_rpm
 

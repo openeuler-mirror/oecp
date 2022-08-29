@@ -25,7 +25,6 @@ from oecp.main.category import Category
 
 from oecp.utils.misc import path_is_remote
 from oecp.proxy.requests_proxy import do_download_tqdm
-from oecp.proxy.rpm_proxy import RPMProxy
 from oecp.proxy.requests_proxy import do_download
 
 logger = logging.getLogger("oecp")
@@ -76,8 +75,7 @@ class Factory(object):
                 file_path = local_path
 
             not path_is_remote(file_path) and logger.info(f"treat {file_path} as local rpm file")
-            name = RPMProxy.rpm_name(verbose_path)
-            repository = Repository(work_dir, name, category)
+            repository = Repository(work_dir, verbose_path, category)
             repository.upsert_a_rpm(file_path, verbose_path)
 
             return repository

@@ -19,11 +19,13 @@ import sys
 import shutil
 
 from oecp.excel.create_web_show_result import WebShowResult
+from oecp.excel.individual_statistics import IndividualStatistics
 from oecp.excel.osv_data_summary import DataExcelFile
 from oecp.result import export
 from oecp.result.export import get_second_path
 from oecp.result.similarity import *
 from oecp.result.json_result import *
+from similar_result_calculate import calculate_similarity
 
 logger = logging.getLogger("oecp")
 
@@ -147,7 +149,12 @@ class CompareResultComposite(CompareResultComponent):
 
         # all result which need to export as csv
         rows = {}
-        parse_result(self, base_side_a, base_side_b, rows)
+        count_abi = {
+            "all_packages_abi": [0, 0, 0],
+            "l1_packages_abi": [0, 0, 0],
+            "l2_packages_abi": [0, 0, 0]
+        }
+        parse_result(self, base_side_a, base_side_b, rows, count_abi)
         if result_format == 'json':
             result = json_result(rows, base_side_a, base_side_b)
             export.export_json(root_path, 'osv', osv_title, result)
@@ -225,6 +232,15 @@ class CompareResultComposite(CompareResultComponent):
             else:
                 # eg: node just a single rpm-requires result
                 export_single_report(node, value, root_path, osv_title)
+        all_rpm_report = os.path.join(export_floder, 'all-rpm-report.csv')
+        if os.path.exists(all_rpm_report):
+            # genrate single_calculate report.
+            single_calculate = IndividualStatistics(all_rpm_report)
+            single_calculate.run_statistics(count_abi)
+            # generate similar_calculate_result report.
+            calculate_similarity(all_rpm_report)
+        else:
+            logger.info(f"Report: {os.path.basename(all_rpm_report)} not exists! unable to generate calculate report.")
         logger.info(
             f"all results have compare done, please check: {os.path.join(os.path.realpath(root_path), osv_title)}")
         logger.info(f"all similatity are: {similarity}")
@@ -259,14 +275,14 @@ def export_single_report(node, single_result, root_path, osv_title):
         export.create_csv_report(headers, results, report_path)
 
 
-def parse_result(result, base_side_a, base_side_b, rows, parent_side_a=None, parent_side_b=None, cmp_type=None,
-                 detail=None):
+def parse_result(result, base_side_a, base_side_b, rows, count_abi, parent_side_a=None, parent_side_b=None,
+                 cmp_type=None, detail=None):
     if hasattr(result, 'diff_components') and result.diff_components:
         if result.cmp_type == CMP_TYPE_RPM:
-            assgin_composite_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b)
+            assgin_composite_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, count_abi)
 
         for son_result in result.diff_components:
-            parse_result(son_result, base_side_a, base_side_b, rows, result.cmp_side_a, result.cmp_side_b,
+            parse_result(son_result, base_side_a, base_side_b, rows, count_abi, result.cmp_side_a, result.cmp_side_b,
                          result.cmp_type, result.detail)
     else:
         if result.cmp_type == CMP_TYPE_RPM_LEVEL:
@@ -314,7 +330,6 @@ def assgin_summary_result(rows, side_a, side_b):
 
 
 def assgin_end_result(summary_dict):
-    end_result = ''
     if summary_dict.get("1"):
         if summary_dict["1"]["diff"] == 0:
             end_result = "基础兼容"
@@ -330,9 +345,10 @@ def assgin_end_result(summary_dict):
     return sorted(summary_dict.values(), key=lambda i: i["category level"])
 
 
-def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_side_b):
+def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_side_b, count_abi):
     side = result.cmp_side_b if result.cmp_side_b else result.cmp_side_a
     category_level = result.detail
+    count_results = result.count_result
     compare_type = result.diff_components[0].cmp_type
     second_path = get_second_path(compare_type)
     compare_detail = ' ' + second_path + '/' + side + '.csv ' if side else ''
@@ -352,12 +368,22 @@ def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_
         "diff": "N/A"
     }
     if hasattr(result, 'count_result'):
-        row["same"] = result.count_result['same']
-        row["more"] = result.count_result['more']
-        row["less"] = result.count_result['less']
-        row["diff"] = result.count_result['diff']
+        row["same"] = count_results['same']
+        row["more"] = count_results['more']
+        row["less"] = count_results['less']
+        row["diff"] = count_results['diff']
     rows.setdefault(result.cmp_type, [])
     rows[result.cmp_type].append(row)
+
+    if compare_type == CMP_TYPE_RPM_ABI and result.cmp_result == CMP_RESULT_DIFF and hasattr(result, 'count_result'):
+        for i, type_abi in enumerate(COUNT_ABI_DETAILS):
+            count_abi["all_packages_abi"][i] += count_results[type_abi]
+        if category_level == 1:
+            for i, type_abi in enumerate(COUNT_ABI_DETAILS):
+                count_abi["l1_packages_abi"][i] += count_results[type_abi]
+        elif category_level == 2:
+            for i, type_abi in enumerate(COUNT_ABI_DETAILS):
+                count_abi["l2_packages_abi"][i] += count_results[type_abi]
 
 
 def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail):
