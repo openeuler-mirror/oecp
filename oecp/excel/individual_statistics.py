@@ -5,7 +5,8 @@ from pathlib import Path
 from openpyxl import load_workbook
 import pandas as pd
 
-from oecp.result.constants import *
+from oecp.result.constants import COUNT_RESULTS, KERNEL_ANALYSE, CMP_TYPE, CMP_RESULT_DIFF, CMP_TYPE_RPM_ABI, \
+    CMP_RESULT, CTG_LEVEL, RPMFILE_CMP_TYPES
 
 logger = logging.getLogger("oecp")
 
@@ -75,9 +76,9 @@ class IndividualStatistics:
         shutil.copy(template_path, self.single_calculate_path)
 
         self.table = load_workbook(self.single_calculate_path)
-        sheet_1 = self.table[SHEET_1]
-        sheet_2 = self.table[SHEET_2]
-        sheet_3 = self.table[SHEET_3]
+        sheet_1 = self.table["rpmfile_analyse"]
+        sheet_2 = self.table["rpmabi"]
+        sheet_3 = self.table["kernel"]
 
         return sheet_1, sheet_2, sheet_3
 
@@ -106,8 +107,8 @@ class IndividualStatistics:
         row = 1
         for single_detail in count_result.values():
             row += 1
-            for count_num in range(len(single_detail)):
-                sheet.cell(row, count_num + 2, single_detail[count_num])
+            for count_num, detail in enumerate(single_detail):
+                sheet.cell(row, count_num + 2, detail)
         self.table.save(self.single_calculate_path)
 
     def count_by_rpmfile_type(self, df, cmp_types):

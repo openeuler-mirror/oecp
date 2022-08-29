@@ -39,31 +39,6 @@ class ABICompareExecutor(CompareExecutor):
         self.link_file = 'link_file'
 
     @staticmethod
-    def _set_so_mapping(library_files):
-        if not library_files:
-            return {}
-
-        so_mapping = {}
-        for library_file in library_files:
-            cmd = f'objdump -p {library_file}'
-            ret, out, err = shell_cmd(cmd.split())
-            if not ret and out:
-                match = re.search(r'SONAME\s(.+)\s', out)
-                if match:
-                    so_name = match.groups()[0].strip()
-                    so_mapping.setdefault(so_name, library_file)
-        return so_mapping
-
-    def _get_library_pairs(self, files_a, files_b):
-        library_pairs = []
-        so_mapping_a = self._set_so_mapping(files_a)
-        so_mapping_b = self._set_so_mapping(files_b)
-        for so_name in so_mapping_a:
-            if so_name in so_mapping_b:
-                library_pairs.append([so_mapping_a[so_name], so_mapping_b[so_name]])
-        return library_pairs
-
-    @staticmethod
     def compare_link_files(dump_a_linkfiles, dump_b_linkfiles, rpm):
         for file_a in dump_a_linkfiles:
             for file_b in dump_b_linkfiles:
@@ -72,11 +47,6 @@ class ABICompareExecutor(CompareExecutor):
                         continue
                     else:
                         logger.info(f"{rpm} {file_a[0]} link file is change!")
-
-    @staticmethod
-    def _save_result(file_path, content):
-        with open(file_path, "w") as f:
-            f.write(content)
 
     @staticmethod
     def extract_abi_change_detail(str_content):
@@ -96,7 +66,37 @@ class ABICompareExecutor(CompareExecutor):
                 add_abi += int(n_match.group(3))
         return remove_abi, change_abi, add_abi
 
-    def _compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
+    @staticmethod
+    def _save_result(file_path, content):
+        with open(file_path, "w") as f:
+            f.write(content)
+
+    @staticmethod
+    def _set_so_mapping(library_files):
+        if not library_files:
+            return {}
+
+        so_mapping = {}
+        for library_file in library_files:
+            cmd = f'objdump -p {library_file}'
+            ret, out, err = shell_cmd(cmd.split())
+            if not ret and out:
+                match = re.search(r'SONAME\s(.+)\s', out)
+                if match:
+                    so_name = match.groups()[0].strip()
+                    so_mapping.setdefault(so_name, library_file)
+        return so_mapping
+
+    def get_library_pairs(self, files_a, files_b):
+        library_pairs = []
+        so_mapping_a = self._set_so_mapping(files_a)
+        so_mapping_b = self._set_so_mapping(files_b)
+        for so_name in so_mapping_a:
+            if so_name in so_mapping_b:
+                library_pairs.append([so_mapping_a[so_name], so_mapping_b[so_name]])
+        return library_pairs
+
+    def compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         count_result.update(COUNT_ABI_DETAILS)
         kind = dump_a['kind']
@@ -105,7 +105,7 @@ class ABICompareExecutor(CompareExecutor):
         debuginfo_rpm_path_a, debuginfo_rpm_path_b = dump_a['debuginfo_extract_path'], dump_b['debuginfo_extract_path']
 
         dump_a_files, dump_b_files = dump_a[self.data], dump_b[self.data]
-        library_pairs = self._get_library_pairs(dump_a_files, dump_b_files)
+        library_pairs = self.get_library_pairs(dump_a_files, dump_b_files)
         if not library_pairs:
             return result
         debuginfo_rpm_path_a = os.path.join(debuginfo_rpm_path_a, 'usr/lib/debug') if debuginfo_rpm_path_a else ''
@@ -160,7 +160,7 @@ class ABICompareExecutor(CompareExecutor):
         for single_pair in similar_dumpers:
             if single_pair:
                 # dump_a: single_pair[0], dump_b: single_pair[1]
-                result = self._compare_result(single_pair[0], single_pair[1])
+                result = self.compare_result(single_pair[0], single_pair[1])
                 logger.debug(result)
                 compare_list.append(result)
         return compare_list

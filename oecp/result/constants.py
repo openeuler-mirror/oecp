@@ -124,11 +124,11 @@ FIFTEEN_TITLE = ["OSV的内核配置与", "一致性比例"]
 
 # Some file category filtering re pattern
 FILTER_PATTERN = {
-    "config": "^/etc/.*\.conf$",
-    "header": ".*\.h$",
-    "service": "^/usr/lib/systemd/system/.*\.service$",
-    "jabi": ".*\.jar$",
-    "abi": ".*\.so$",
+    "config": "^/etc/.*\\.conf$",
+    "header": ".*\\.h$",
+    "service": "^/usr/lib/systemd/system/.*\\.service$",
+    "jabi": ".*\\.jar$",
+    "abi": ".*\\.so$",
     "cmd_1": "^/usr/bin/.*",
     "cmd_2": "^/usr/sbin/.*",
     "cmd_3": "^/usr/local/bin/.*",
@@ -173,6 +173,3 @@ COUNT_RESULTS = [CMP_RESULT_MORE, CMP_RESULT_LESS, CMP_RESULT_SAME, CMP_RESULT_D
 CMP_TYPE = "compare type"
 CMP_RESULT = "compare result"
 CTG_LEVEL = "category level"
-SHEET_1 = "rpmfile_analyse"
-SHEET_2 = "rpmabi"
-SHEET_3 = "kernel"
