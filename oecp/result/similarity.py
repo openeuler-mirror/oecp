@@ -137,8 +137,6 @@ def rpm_count(rows, side_a, side_b):
         2: {"same": 0, "diff": 0},
         3: {"same": 0, "diff": 0},
         4: {"same": 0, "diff": 0},
-        5: {"same": 0, "diff": 0},
-        6: {"same": 0, "diff": 0},
         "core_pkg": {"same": 0, "diff": 0}
     }
     mark_pkgs = []
@@ -150,8 +148,12 @@ def rpm_count(rows, side_a, side_b):
             continue
 
         pkg = result[side_a + " binary rpm package"]
-        if float(result["compare result"]) > 4:
+        if float(result["compare result"]) == 4:
+            if pkg.split(',')[0].endswith('.i686.rpm'):
+                continue
+        elif float(result["compare result"]) > 4:
             continue
+
         if result["category level"] == 0:
             if float(result["compare result"]) > 2:
                 b = result.get(side_b + " binary rpm package")
