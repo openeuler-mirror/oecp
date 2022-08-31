@@ -167,9 +167,9 @@ def rpm_count(rows, side_a, side_b):
                     count["core_pkg"]["diff"] += 1
         else:
             if (result["compare result"] in RESULT_SAME) and is_same_rpm(rows.get(pkg)):
-                count[result["category level"]]["same"] += 1
+                count.get(result.get("category level"))["same"] += 1
             else:
-                count[result["category level"]]["diff"] += 1
+                count.get(result.get("category level"))["diff"] += 1
     return count, mark_pkgs
 
 
@@ -264,13 +264,14 @@ def perfomance_count(results, side_b):
             baseline_result = result['baseline']
             cmp_result = result['compare result']
             score = 0
-            if small_better(metric, small_better_reg):
-                if cmp_result == 'pass':
-                    score = (baseline_result - side_b_result) / baseline_result + 1
+            if baseline_result != 0:
+                if small_better(metric, small_better_reg):
+                    if cmp_result == 'pass':
+                        score = (baseline_result - side_b_result) / baseline_result + 1
+                    else:
+                        score = 1 - (side_b_result - baseline_result) / baseline_result
                 else:
-                    score = 1 - (side_b_result - baseline_result) / baseline_result
-            else:
-                score = side_b_result / baseline_result
+                    score = side_b_result / baseline_result
             if 'lmbench3' in metric:
                 count['lmbench3'].append(score)
             elif 'unixbench' in metric:
