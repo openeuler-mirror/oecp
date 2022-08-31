@@ -218,10 +218,11 @@ class CompareResultComposite(CompareResultComponent):
                     3   -- same name\n\
                     4   -- less\n\
                     5   -- more"
+                    column_side_a = base_side_a + " binary rpm package"
                     rpm_name_info = {
-                        base_side_a + " binary rpm package": explan
+                        column_side_a: explan
                     }
-                    value = [rpm_name_info] + value
+                    value = [rpm_name_info] + sorted(value, key=lambda value: (value[CMP_TYPE], value[column_side_a]))
                 elif node == CMP_TYPE_DIFFERENCES:
                     for details_name in ALL_DETAILS_NAME:
                         if details_name not in headers:
