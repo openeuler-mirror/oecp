@@ -17,6 +17,7 @@
 """
 import sys
 import shutil
+import operator
 
 from oecp.excel.create_web_show_result import WebShowResult
 from oecp.excel.individual_statistics import IndividualStatistics
@@ -222,7 +223,7 @@ class CompareResultComposite(CompareResultComponent):
                     rpm_name_info = {
                         column_side_a: explan
                     }
-                    value = [rpm_name_info] + sorted(value, key=lambda value: (value[CMP_TYPE], value[column_side_a]))
+                    value = [rpm_name_info] + sorted(value, key=operator.itemgetter(CMP_TYPE, column_side_a))
                 elif node == CMP_TYPE_DIFFERENCES:
                     for details_name in ALL_DETAILS_NAME:
                         if details_name not in headers:
