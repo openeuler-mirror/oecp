@@ -17,6 +17,7 @@
 """
 import sys
 import shutil
+import operator
 
 from oecp.excel.create_web_show_result import WebShowResult
 from oecp.excel.individual_statistics import IndividualStatistics
@@ -218,10 +219,11 @@ class CompareResultComposite(CompareResultComponent):
                     3   -- same name\n\
                     4   -- less\n\
                     5   -- more"
+                    column_side_a = base_side_a + " binary rpm package"
                     rpm_name_info = {
-                        base_side_a + " binary rpm package": explan
+                        column_side_a: explan
                     }
-                    value = [rpm_name_info] + value
+                    value = [rpm_name_info] + sorted(value, key=operator.itemgetter(CMP_TYPE, column_side_a))
                 elif node == CMP_TYPE_DIFFERENCES:
                     for details_name in ALL_DETAILS_NAME:
                         if details_name not in headers:
