@@ -44,7 +44,7 @@ class ListCompareExecutor(CompareExecutor):
     @staticmethod
     def rpm_n_a_lists(rpm_diffs):
         one2more = {}
-        for rpm_a in rpm_diffs:
+        for rpm_a in sorted(rpm_diffs):
             r_n, _, _, _, r_a = RPMProxy.rpm_n_v_r_d_a(rpm_a)
             rpm_n_a = r_n + '$' + r_a
             one2more.setdefault(rpm_n_a, []).append(rpm_a)

@@ -338,15 +338,13 @@ class CompareExecutor(ABC):
                 arch_result, rpm_name_similar = self.calculate_rpm_similarity(rpm_a, rpm_b)
                 if not arch_result:
                     continue
-                if not single_result:
+                if not single_result or similarity_rate > rpm_name_similar:
                     single_result = [dump_a, dump_b]
-                elif similarity_rate > rpm_name_similar:
-                    single_result = [dump_a, dump_b]
+                    similarity_rate = rpm_name_similar
                 elif similarity_rate == rpm_name_similar:
                     for exist_result in cmp_results:
                         if single_result[0] in exist_result:
                             single_result = [dump_a, dump_b]
-                similarity_rate = rpm_name_similar
             cmp_results.append(single_result)
 
         return cmp_results
