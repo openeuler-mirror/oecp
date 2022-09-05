@@ -164,7 +164,7 @@ COUNT_ABI_DETAILS = {
     'add_abi': 0
 }
 # Dist name
-DIST_FLAG = ['el8', 'el7', 'oe1', 'an8', 'ky10']
+DIST_FLAG = ['el8', 'el7', 'oe1', 'an8', 'ctl2', 'ky10']
 
 RPMFILE_CMP_TYPES = [CMP_TYPE_SERVICE, CMP_TYPE_RPM_CONFIG, CMP_TYPE_RPM_HEADER, CMP_TYPE_RPM_FILES,
                      CMP_TYPE_RPM_LIB, CMP_TYPE_CMD]
