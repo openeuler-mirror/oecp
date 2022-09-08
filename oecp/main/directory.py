@@ -110,8 +110,8 @@ class Directory(UserDict):
                 file_path = os.path.join(path, file)
                 if os.path.isfile(file_path) and RPMProxy.is_rpm_file(file_path) and RPMProxy.is_rpm_focus_on(file):
                     all_rpm[file] = file_path
-
-        return all_rpm
+        sort_all_rpm = dict(sorted(all_rpm.items(), key=lambda x: x[1]))
+        return sort_all_rpm
 
     def upsert_a_group(self, path, debuginfo_path=None):
         """
@@ -132,7 +132,7 @@ class Directory(UserDict):
             if repository_name in self:
                 self[repository_name].upsert_a_rpm(rpm_path, rpm, debuginfo_rpm.get(correspond_debuginfo_rpm))
             else:
-                self[repository_name] = Repository(self._work_dir, rpm, self._category)
+                self[repository_name] = Repository(self._work_dir, rpm, rpm_path, self._category)
                 self[repository_name].upsert_a_rpm(rpm_path, rpm, debuginfo_rpm.get(correspond_debuginfo_rpm))
 
     def _parallel_compare(self, that, plan, pool_size=0):
@@ -400,7 +400,7 @@ class DistISO(Directory):
             if repository_name in self:
                 self[repository_name].upsert_a_rpm(rpm_path, rpm, debuginfo_rpm.get(correspond_debuginfo_rpm))
             else:
-                self[repository_name] = Repository(self._work_dir, rpm, self._category)
+                self[repository_name] = Repository(self._work_dir, rpm, rpm_path, self._category)
                 self[repository_name].upsert_a_rpm(rpm_path, rpm, debuginfo_rpm.get(correspond_debuginfo_rpm))
 
     def all_debuginfo_rpm(self, debuginfo_iso):
@@ -484,7 +484,7 @@ class OEDistRepo(Directory):
             if repository_name in self:
                 self[repository_name].upsert_a_rpm(rpm_path, rpm, debuginfo_rpm.get(correspond_debuginfo_rpm))
             else:
-                self[repository_name] = Repository(self._work_dir, repository_full_name, self._category)
+                self[repository_name] = Repository(self._work_dir, repository_full_name, rpm_path, self._category)
                 self[repository_name].upsert_a_rpm(rpm_path, rpm, debuginfo_rpm.get(correspond_debuginfo_rpm))
 
     def parse_repomd_xml(self, repomd_xml_url):
