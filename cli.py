@@ -101,5 +101,5 @@ if __name__ == "__main__":
         product_b = Factory.create(args.compare_files[1], args, "none")
 
     result = product_a.compare(product_b, plan)
-    osv_title = result.export(args.output_file, args.perf_baseline_file, args.output_format, args.compare_files[1])
+    osv_title = result.export(args.output_file, args.perf_baseline_file, args.output_format, args.compare_files)
     args.func(osv_title, args)
