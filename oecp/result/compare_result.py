@@ -473,8 +473,9 @@ def get_require_differencs_info(single_result):
         single_key = requries_key.split(" ")[0]
         requries_value = single_result.get(requries_key, None)
         if "package name" in requries_key:
-            require_differencs_info[single_key] = requries_value
-        elif "symbol name " in requries_key and requries_value and not single_result.get(single_key, None):
+            if requries_value or not require_differencs_info.get(single_key, None):
+                require_differencs_info[single_key] = requries_value
+        elif "symbol name" in requries_key and requries_value and not require_differencs_info.get(single_key, None):
             require_differencs_info[single_key] = requries_value
     return require_differencs_info
 
