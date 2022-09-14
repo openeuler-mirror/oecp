@@ -390,13 +390,26 @@ def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_
 
 def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail):
     parent_side = parent_side_b if parent_side_b else parent_side_a
-    row = {
-        "binary rpm package": parent_side,
-        base_side_a: result.cmp_side_a.strip(),
-        base_side_b: result.cmp_side_b.strip(),
-        "compare result": result.cmp_result,
-        "compare type": result.cmp_type,
-    }
+    if result.cmp_type == CMP_TYPE_RPM_REQUIRES:
+        row = {
+            "binary rpm package": parent_side,
+            base_side_a + " symbol name": result.cmp_side_a.get('name', None) if result.cmp_side_a else None,
+            base_side_a + " package name": result.cmp_side_a.get('packages', None) if result.cmp_side_a else None,
+            base_side_a + " dependence type": result.cmp_side_a.get('dependence', None) if result.cmp_side_a else None,
+            base_side_b + " symbol name": result.cmp_side_b.get('name', None) if result.cmp_side_b else None,
+            base_side_b + " package name": result.cmp_side_b.get('packages', None) if result.cmp_side_b else None,
+            base_side_b + " dependence type": result.cmp_side_b.get('dependence', None) if result.cmp_side_b else None,
+            "compare result": result.cmp_result,
+            "compare type": result.cmp_type,
+        }
+    else:
+        row = {
+            "binary rpm package": parent_side,
+            base_side_a: result.cmp_side_a.strip(),
+            base_side_b: result.cmp_side_b.strip(),
+            "compare result": result.cmp_result,
+            "compare type": result.cmp_type,
+        }
     if result.cmp_type == CMP_TYPE_SERVICE_DETAIL:
         if detail:
             row["file_name"] = detail.get("file_name")
@@ -444,8 +457,27 @@ def get_differences_info(rows):
                     continue
                 for single_result in results:
                     if single_result['compare result'] != CMP_RESULT_SAME:
+                        if cmp_type ==CMP_TYPE_RPM_REQUIRES:
+                            single_result = get_require_differencs_info(single_result)
                         differences_info.append(single_result)
     return differences_info
+
+
+def get_require_differencs_info(single_result):
+    require_differencs_info = {}
+    require_differencs_info['binary rpm package'] = single_result['binary rpm package']
+    require_differencs_info['compare result'] = single_result['compare result']
+    require_differencs_info['compare type'] = single_result['compare type']
+    require_differencs_info['category level'] = single_result['category level']
+    for requries_key in list(single_result.keys()):
+        single_key = requries_key.split(" ")[0]
+        requries_value = single_result.get(requries_key, None)
+        if "package name" in requries_key:
+            if requries_value or not require_differencs_info.get(single_key, None):
+                require_differencs_info[single_key] = requries_value
+        elif "symbol name" in requries_key and requries_value and not require_differencs_info.get(single_key, None):
+            require_differencs_info[single_key] = requries_value
+    return require_differencs_info
 
 
 def compare_result_name_to_attr(name):

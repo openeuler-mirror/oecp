@@ -20,6 +20,7 @@ import bz2
 import gzip
 from pathlib import Path
 from itertools import groupby
+from oecp.proxy.rpm_proxy import RPMProxy
 
 try:
     import lzma
@@ -175,9 +176,29 @@ class SQLiteMapping(RepositoryPackageMapping):
         version['version'] = self._split_version(tmp_version)
         return version
 
+    def is_package_name(self, name):
+        regex = re.compile('[\w-]*')
+        sub_name = regex.sub('', name)
+        return False if sub_name else True
+
     def get_provides_rpm(self, name, symbol, version):
         package_name = []
         cursor = self._sqlite_conn.cursor()
+        if self.is_package_name(name):
+            try:
+                cursor.execute(f"select location_href from packages where location_href like '%/{name}%'")
+                rpm_result = cursor.fetchall()
+                if rpm_result:
+                    rpm_name = rpm_result[0][0].split('/')[-1]
+                else:
+                    rpm_name = None
+            except Exception as e:
+                rpm_name = None
+                logger.error(f'query location_href from packages error,packages name={name}, error={e}')
+            if rpm_name and rpm_name == RPMProxy.rpm_name(rpm_name):
+                package_name.append(rpm_name)
+                return package_name
+
         cursor.execute(f"select pkgKey from provides where name='{name}'")
         result = cursor.fetchall()
         if not result and name.startswith('/'):
