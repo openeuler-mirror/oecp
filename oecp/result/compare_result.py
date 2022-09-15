@@ -141,8 +141,8 @@ class CompareResultComposite(CompareResultComponent):
         return "\n".join(string)
 
     def export(self, root_path, baseline, result_format, iso_path):
-        base_side_a = self.cmp_side_a
-        base_side_b = self.cmp_side_b
+        base_side_a = os.path.basename(iso_path[0]) if self.cmp_side_a.endswith('.src.rpm') else self.cmp_side_a
+        base_side_b = os.path.basename(iso_path[1]) if self.cmp_side_b.endswith('.src.rpm') else self.cmp_side_b
         osv_title = 'report-' + get_title(base_side_a) + '-' + get_title(base_side_b)
         export_floder = os.path.join(root_path, osv_title)
         if os.path.exists(export_floder):
@@ -187,7 +187,7 @@ class CompareResultComposite(CompareResultComponent):
         similarity = get_similarity(rows, base_side_a, base_side_b)
         # Write data to excel
         excel_file = DataExcelFile()
-        args = (similarity, base_side_a, base_side_b, root_path, osv_title, iso_path)
+        args = (similarity, base_side_a, base_side_b, root_path, osv_title, iso_path[1])
         excel_file.write_summary_file(*args)
         web_show_result = WebShowResult(excel_file.tools_result, excel_file.conclusion)
         web_show_result.write_json_result(*args)
@@ -288,7 +288,7 @@ def parse_result(result, base_side_a, base_side_b, rows, count_abi, parent_side_
                          result.cmp_type, result.detail)
     else:
         if result.cmp_type == CMP_TYPE_RPM_LEVEL:
-            assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b, result.cmp_side_a, result.cmp_side_b)
+            assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b)
         else:
             assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail)
 
@@ -424,7 +424,7 @@ def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, 
     rows[parent_side][result.cmp_type].append(row)
 
 
-def assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b):
+def assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b):
     category_level = result.detail['category']
     row = {
         base_side_a + " binary rpm package": result.cmp_side_a,

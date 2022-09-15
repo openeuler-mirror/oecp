@@ -75,7 +75,7 @@ class Factory(object):
                 file_path = local_path
 
             not path_is_remote(file_path) and logger.info(f"treat {file_path} as local rpm file")
-            repository = Repository(work_dir, verbose_path, category)
+            repository = Repository(work_dir, verbose_path, file_path, category)
             repository.upsert_a_rpm(file_path, verbose_path)
 
             return repository

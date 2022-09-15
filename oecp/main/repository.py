@@ -15,12 +15,14 @@
 # Description: repository
 # **********************************************************************************
 """
+import re
 from collections import UserDict
 import tempfile
 
 from oecp.utils.misc import path_is_remote, basename_of_path
 from oecp.proxy.requests_proxy import do_download
 from oecp.result.compare_result import *
+from oecp.utils.shell import shell_cmd
 
 logger = logging.getLogger("oecp")
 
@@ -30,7 +32,7 @@ class Repository(UserDict):
     多个rpm包组成一个repository
     """
 
-    def __init__(self, work_dir, name, category=None):
+    def __init__(self, work_dir, name, rpm_path, category=None):
         """
 
         :param work_dir: 工作目录
@@ -44,6 +46,7 @@ class Repository(UserDict):
 
         self._name = RPMProxy.rpm_name(name)
         self.verbose_path = name
+        self.src_package = self.acquire_source_package(rpm_path)
 
         self._category = category
         self._category_level = category.category_of_src_package(self._name)
@@ -137,7 +140,7 @@ class Repository(UserDict):
         :return:
         """
         result = CompareResultComposite(
-            CMP_TYPE_REPOSITORY, CMP_RESULT_TO_BE_DETERMINED, self.verbose_path, that.verbose_path)
+            CMP_TYPE_REPOSITORY, CMP_RESULT_TO_BE_DETERMINED, self.src_package, that.src_package)
 
         # 比较项存在依赖关系，将config、dumper、executor缓存下来传递，缓存通过比较项名称索引
         # {"plan_name": {"config": config, "dumper": {"this": this_dumper, "that": that_dumper}, "executor": executor}}
@@ -184,6 +187,19 @@ class Repository(UserDict):
         result.set_cmp_result()
 
         return result
+
+    def acquire_source_package(self, rpm_path):
+        cmd = ['rpm', '-qpi', '--nosignature', rpm_path]
+        code, out, err = shell_cmd(cmd)
+        if err:
+            logger.warning(err)
+        if out:
+            r_matchs = re.finditer("Source RPM\\s+:\\s+(.*)\\n", out)
+            for src_pkg in r_matchs:
+                if src_pkg:
+                    return src_pkg.group(1)
+            logger.warning(f"Not found {rpm_path} source package.")
+        return os.path.basename(rpm_path)
 
     def find_sensitive_str(self, plan):
         """

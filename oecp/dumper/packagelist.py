@@ -14,8 +14,6 @@
 """
 
 import logging
-import re
-from oecp.utils.shell import shell_cmd
 
 logger = logging.getLogger('oecp')
 
@@ -31,26 +29,10 @@ class PackageListDumper:
         item = {}
         for repo, repo_item in self.directory.items():
             for rpm_name in repo_item:
-                rpm = repo_item[rpm_name]['verbose_path']
                 category = repo_item[rpm_name]['category'].value
-                source_package = repo_item.verbose_path
-                if not source_package.endswith('.src.rpm'):
-                    fp = repo_item[rpm_name]['path']
-                    cmd = ['rpm', '-qpi', '--nosignature', fp]
-                    code, out, err = shell_cmd(cmd)
-                    if err:
-                        logger.warning(err)
-                    if out:
-                        for line in out.split("\n"):
-                            if not line:
-                                continue
-                            r = re.match("Source RPM\\s+:\\s+(.*)", line)
-                            if r:
-                                source_package = r.group(1)
-                                break
-
+                source_package = repo_item.src_package
                 attr = {'category': category, 'source_package': source_package}
-                item.setdefault(rpm, attr)
+                item.setdefault(rpm_name, attr)
         result = {'path': self.directory.verbose_path, self.data: item}
         return result
 
