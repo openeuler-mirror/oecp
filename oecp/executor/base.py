@@ -95,6 +95,8 @@ class CompareExecutor(ABC):
                 less.append([va, '', CMP_RESULT_LESS])
             elif va == vb:
                 same.append([va, vb, CMP_RESULT_SAME])
+            elif va.split()[-1] in ('m', 'y') and vb.split()[-1] in ('m', 'y'):
+                same.append([va, vb, CMP_RESULT_SAME])
             else:
                 diff.append([va, vb, CMP_RESULT_DIFF])
 
