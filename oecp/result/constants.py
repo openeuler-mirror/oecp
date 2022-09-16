@@ -137,6 +137,7 @@ FILTER_PATTERN = {
     "build": "^/usr/lib/.build-id/.*",
     "ima": "^/etc/ima/.*"
 }
+NO_FILES = "(没有包含文件)"
 
 # The similarity item displayed in the JSON report
 TOOLS_RESULT_ITEMS = ['core_pkg', 'level2 pkg', 'kabi', 'level2 rpm abi', 'service detail',

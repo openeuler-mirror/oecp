@@ -59,6 +59,8 @@ class FileListDumper(AbstractDumper):
                         continue
                     elif "metadata_list-compact" in line:
                         continue
+                    elif NO_FILES in line:
+                        continue
                     elif ".so." in line and not line.endswith(".py"):
                         continue
                     if rpm_name in white_list['rpm_name_list']:
