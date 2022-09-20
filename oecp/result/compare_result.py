@@ -192,10 +192,7 @@ class CompareResultComposite(CompareResultComponent):
         web_show_result = WebShowResult(excel_file.tools_result, excel_file.conclusion)
         web_show_result.write_json_result(*args)
         rows["similarity"] = [similarity]
-        summary = assgin_summary_result(rows, base_side_a, base_side_b)
         differences = get_differences_info(rows)
-        if summary:
-            rows["result"] = summary
         if differences:
             rows[CMP_TYPE_DIFFERENCES] = differences
 
@@ -213,8 +210,8 @@ class CompareResultComposite(CompareResultComponent):
                 if node == CMP_TYPE_RPM:
                     # add explanation for rpm package name result
                     explan = "rpm package name explan:\n\
-                    1   -- same name + version + son-version + release num\n\
-                    1.1 -- same name + version + son-version\n\
+                    1   -- same name + version + release num + distributor\n\
+                    1.1 -- same name + version + release num\n\
                     2   -- same name + version\n\
                     3   -- same name\n\
                     4   -- less\n\
@@ -291,44 +288,6 @@ def parse_result(result, base_side_a, base_side_b, rows, count_abi, parent_side_
             assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b)
         else:
             assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail)
-
-
-def assgin_summary_result(rows, side_a, side_b):
-    summary = {}
-    pkg_name = {
-        '1': "same",
-        '1.1': "same",
-        '2': "same",
-        '3': "diff",
-        '4': "less",
-        '5': "more"
-    }
-    for rpm in rows.get(CMP_TYPE_RPM, {}):
-        level = str(rpm.get("category level")) if rpm.get("category level") else "6"
-        summary.setdefault(level, {})
-        rpm_name = rpm[side_a + " binary rpm package"] + rpm[side_b + " binary rpm package"]
-        cmp_result = rpm["compare result"]
-        if rpm["compare type"] == CMP_TYPE_RPM_LEVEL:
-            cmp_result = pkg_name.get(cmp_result)
-
-        summary.get(level).setdefault(rpm_name, "same")
-        if summary.get(level).get(rpm_name) == "same" and cmp_result:
-            summary[level][rpm_name] = cmp_result
-
-    summary_dict = {}
-    for k, rpms in summary.items():
-        summary_row = {
-            "category level": k,
-            "same": 0,
-            "diff": 0,
-            "less": 0,
-            "more": 0
-        }
-        for rpm_name, result in rpms.items():
-            summary_row[result] += 1
-        summary_dict[k] = summary_row
-
-    return sorted(summary_dict.values(), key=lambda i: i["category level"])
 
 
 def assgin_end_result(summary_dict):

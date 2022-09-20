@@ -62,28 +62,23 @@ class RPMProxy(object):
                 # 名称-版本号-发布号.发行商.体系.rpm
                 # eg: grpc-1.31.0-6.oe1.x86_64.rpm
                 name, version = cls.rpm_name_version(rpm)
-                m = re.match(r"-(.+)\.rpm", rpm.replace(name + '-' + version, "", 1))
-                r_d_a = m.group(1)
-                arch = r_d_a.split('.')[-1]
-                r_d = r_d_a.rstrip(arch).rstrip('.')
-                prase = False
-                release, dist = '', ''
+                m = re.match(r"-(.+)\.(.+)\.rpm", rpm.replace(name + '-' + version, "", 1))
+                r_d, arch = m.group(1), m.group(2)
                 for d_flag in DIST_FLAG:
                     if d_flag not in r_d:
                         continue
                     else:
-                        prase = True
-                        first_r = r_d.split(d_flag)[0]
-                        first_d = r_d.split(d_flag)[-1]
-                        release = re.sub(r'.module[_+]+', '', first_r).strip('.')
-                        dist = d_flag + first_d
-                if not prase:
-                    m = re.match(r"([\d._]+)\.(.+)", r_d)
-                    if m:
-                        return name, version, m.group(1), m.group(2), arch
-                    else:
-                        release = r_d
-                return name, version, release, dist, arch
+                        sp_release = r_d.split(d_flag)[0].rstrip('.')
+                        release = re.sub(r'.module[_+]+', '.module', sp_release)
+                        d = d_flag + r_d.split(d_flag)[1]
+                        return name, version, release, d, arch
+                m = re.match(r"([\d._]+)\.(.+)", r_d)
+                if m:
+                    return name, version, m.group(1), m.group(2), arch
+                else:
+                    # 名称-版本号-发布号.体系.rpm
+                    # eg: grpc-1.31.0-6.x86_64.rpm
+                    return name, version, r_d, '', arch
             elif dist == "category":
                 # 名称-版本号-发布号.发行商-类型
                 # eg: texlive-base-20180414-28.oe1.oecp
