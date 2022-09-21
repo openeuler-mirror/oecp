@@ -32,15 +32,8 @@ class HeaderCompareExecutor(CompareExecutor):
         super(HeaderCompareExecutor, self).__init__(dump_a, dump_b, config)
         self.dump_a = dump_a.run()
         self.dump_b = dump_b.run()
-        cache_require_key = 'extract'
-        self._work_dir = self.config.get(cache_require_key, {}).get('work_dir', DETAIL_PATH)
         self.data = 'data'
         self.lack_conf_flag = False
-
-    @staticmethod
-    def _save_diff_result(file_path, content):
-        with open(file_path, "w") as f:
-            f.write(content)
 
     @staticmethod
     def _get_file_encoding_format(file_path):
@@ -85,22 +78,16 @@ class HeaderCompareExecutor(CompareExecutor):
 
     def _compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
-        category = dump_a['category'] if dump_a['category'] == dump_b[
-            'category'] else CPM_CATEGORY_DIFF
-        kind = dump_a['kind']
+        category = dump_a['category'] if dump_a['category'] == dump_b['category'] else CPM_CATEGORY_DIFF
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
-        verbose_diff_path = f'{dump_a["rpm"]}__diff__{dump_b["rpm"]}'
         dump_a_files = dump_a[self.data]
         dump_b_files = dump_b[self.data]
         common_file_pairs, only_file_a, only_file_b = self.split_common_files(dump_a_files, dump_b_files)
-        base_dir = os.path.join(self._work_dir, kind, verbose_diff_path)
         for pair in common_file_pairs:
             self._exclude_comments(pair[0])
             self._exclude_comments(pair[1])
             cmd = "diff -uBHN {} {}".format(pair[0], pair[1])
             ret, out, err = shell_cmd(cmd.split())
-            base_a = os.path.basename(pair[0])
-            base_b = os.path.basename(pair[1])
             file_a_path = pair[0].split("__rpm__")[-1]
             file_b_path = pair[1].split("__rpm__")[-1]
             for compare_line in out.split('\n')[3:]:
@@ -115,13 +102,9 @@ class HeaderCompareExecutor(CompareExecutor):
                     # 替换diff中的文件名
                     out = re.sub("---\\s+\\S+\\s+", "--- {} ".format(pair[0]), out)
                     out = re.sub("\\+\\+\\+\\s+\\S+\\s+", "+++ {} ".format(pair[1]), out)
-                    if not os.path.exists(base_dir):
-                        os.makedirs(base_dir)
-                    file_path = os.path.join(base_dir, f'{base_a}__cmp__{base_b}.md')
-                    self._save_diff_result(file_path, out)
                     self.count_cmp_result(count_result, CMP_RESULT_DIFF)
                     data = CompareResultComponent(
-                        CMP_TYPE_RPM_HEADER, CMP_RESULT_DIFF, file_a_path, file_b_path, file_path)
+                        CMP_TYPE_RPM_HEADER, CMP_RESULT_DIFF, file_a_path, file_b_path, detail_file=out)
                     result.set_cmp_result(CMP_RESULT_DIFF)
                 except IOError:
                     logger.exception("save compare result exception")

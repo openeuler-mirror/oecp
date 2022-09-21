@@ -23,5 +23,9 @@
             "rpm cmd",
             "rpm service",
             "rpm lib"
+          ],
+    "details_analyse":
+          [
+            "service detail"
           ]
 }

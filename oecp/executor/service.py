@@ -29,8 +29,6 @@ class ServiceCompareExecutor(CompareExecutor):
         super(ServiceCompareExecutor, self).__init__(dump_a, dump_b, config)
         self.dump_a = dump_a.run()
         self.dump_b = dump_b.run()
-        cache_require_key = 'extract'
-        self._work_dir = self.config.get(cache_require_key, {}).get('work_dir', '/tmp/oecp')
         self.data = 'data'
         self.split_flag = '__rpm__'
 
@@ -72,7 +70,7 @@ class ServiceCompareExecutor(CompareExecutor):
                 if sub_component_result[-1] != CMP_RESULT_SAME and single_result == CMP_RESULT_SAME:
                     single_result = CMP_RESULT_DIFF
                     result.set_cmp_result(single_result)
-                result._detail = {"file_name": detail_filename}
+                result.detail = {"file_name": detail_filename}
                 result.add_component(data)
         return result
 
