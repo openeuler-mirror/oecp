@@ -15,6 +15,7 @@
 # Description: compare result
 # **********************************************************************************
 """
+import stat
 import sys
 import shutil
 import operator
@@ -260,8 +261,10 @@ def get_title(base_side):
 
 
 def save_detail_result(file_path, content):
-    with open(file_path, "w") as f:
-        f.write(content)
+    flags = os.O_RDWR | os.O_CREAT
+    modes = stat.S_IROTH | stat.S_IRWXU
+    with os.fdopen(os.open(file_path, flags, modes), 'w', encoding='utf-8') as fd:
+        fd.write(content)
 
 
 def export_single_report(node, single_result, root_path, osv_title):
