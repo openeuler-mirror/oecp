@@ -145,7 +145,7 @@ TOOLS_RESULT_ITEMS = ['core_pkg', 'level2 pkg', 'kabi', 'level2 rpm abi', 'servi
 PLATFORM_RESULT_ITEMS = ['rpm test', 'AT', 'performance', 'ciconfig']
 
 # DETAIL PATH
-DETAIL_PATH = '/tmp/details_analyse/'
+DETAIL_PATH = "details_analyse"
 
 # The Column names of the Details in the RPM REPORT
 ALL_DETAILS_NAME = ['effect drivers', 'details path']

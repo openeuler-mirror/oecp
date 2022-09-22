@@ -15,6 +15,7 @@
 # Description: compare result
 # **********************************************************************************
 """
+import stat
 import sys
 import shutil
 import operator
@@ -36,20 +37,21 @@ class CompareResultComponent(object):
     比较结果对象
     """
 
-    def __init__(self, cmp_type, cmp_result, cmp_side_a, cmp_side_b, detail=None):
+    def __init__(self, cmp_type, cmp_result, cmp_side_a, cmp_side_b, detail=None, detail_file=None):
         """
 
         :param cmp_type: 比较名称，eg：kernel abi，kernel config
         :param cmp_result: 比较结果
         :param cmp_side_a: 比较对象
         :param cmp_side_b: 比较对象
-        :param detail: 比较结果详细内容
+        :param detail: 比较结果详细内容路径
         """
         self.cmp_type = cmp_type
         self.cmp_result = cmp_result
         self.cmp_side_a = cmp_side_a
         self.cmp_side_b = cmp_side_b
         self.detail = detail
+        self.detail_file = detail_file
         self._binary_rpm_package = None
         self._source_package = None
         self._level = None
@@ -155,7 +157,8 @@ class CompareResultComposite(CompareResultComponent):
             "l1_packages_abi": [0, 0, 0],
             "l2_packages_abi": [0, 0, 0]
         }
-        parse_result(self, base_side_a, base_side_b, rows, count_abi)
+        all_report_path = os.path.join(root_path, osv_title)
+        parse_result(self, base_side_a, base_side_b, rows, count_abi, all_report_path)
         if result_format == 'json':
             result = json_result(rows, base_side_a, base_side_b)
             export.export_json(root_path, 'osv', osv_title, result)
@@ -257,6 +260,13 @@ def get_title(base_side):
     return '-'.join(title)
 
 
+def save_detail_result(file_path, content):
+    flags = os.O_RDWR | os.O_CREAT
+    modes = stat.S_IROTH | stat.S_IRWXU
+    with os.fdopen(os.open(file_path, flags, modes), 'w', encoding='utf-8') as fd:
+        fd.write(content)
+
+
 def export_single_report(node, single_result, root_path, osv_title):
     for cmp_type, results in single_result.items():
         # for single result export, we should skip base level compare. like:
@@ -270,24 +280,26 @@ def export_single_report(node, single_result, root_path, osv_title):
         if cmp_type == CMP_TYPE_DRIVE_KABI and "effect drivers" not in headers:
             headers.append("effect drivers")
         if "details path" not in headers:
-            headers.append("details path")
+            if cmp_type in [CMP_TYPE_SERVICE, CMP_TYPE_RPM_CONFIG, CMP_TYPE_RPM_ABI, CMP_TYPE_RPM_HEADER]:
+                headers.append("details path")
         export.create_csv_report(headers, results, report_path)
 
 
-def parse_result(result, base_side_a, base_side_b, rows, count_abi, parent_side_a=None, parent_side_b=None,
+def parse_result(result, base_side_a, base_side_b, rows, count_abi, report_path, parent_side_a=None, parent_side_b=None,
                  cmp_type=None, detail=None):
     if hasattr(result, 'diff_components') and result.diff_components:
         if result.cmp_type == CMP_TYPE_RPM:
             assgin_composite_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, count_abi)
 
         for son_result in result.diff_components:
-            parse_result(son_result, base_side_a, base_side_b, rows, count_abi, result.cmp_side_a, result.cmp_side_b,
-                         result.cmp_type, result.detail)
+            parse_result(son_result, base_side_a, base_side_b, rows, count_abi, report_path, result.cmp_side_a,
+                         result.cmp_side_b, result.cmp_type, result.detail)
     else:
         if result.cmp_type == CMP_TYPE_RPM_LEVEL:
             assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b)
         else:
-            assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail)
+            assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail,
+                                 report_path)
 
 
 def assgin_end_result(summary_dict):
@@ -347,7 +359,7 @@ def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_
                 count_abi["l2_packages_abi"][i] += count_results[type_abi]
 
 
-def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail):
+def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail, report_path):
     parent_side = parent_side_b if parent_side_b else parent_side_a
     if result.cmp_type == CMP_TYPE_RPM_REQUIRES:
         row = {
@@ -376,11 +388,23 @@ def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, 
         row["category level"] = detail
         if result.cmp_type == CMP_TYPE_DRIVE_KABI:
             row["effect drivers"] = result.detail
+        elif result.cmp_type == CMP_TYPE_SERVICE:
+            row["details path"] = result.detail
     # handle kabi result
 
     rows.setdefault(parent_side, {})
     rows[parent_side].setdefault(result.cmp_type, [])
     rows[parent_side][result.cmp_type].append(row)
+    if result.detail_file:
+        dir_path = os.path.join(report_path, DETAIL_PATH, result.cmp_type.split()[-1],
+                                f'{parent_side_a}__cmp__{parent_side_b}')
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+        file_a = os.path.basename(result.cmp_side_a)
+        file_b = os.path.basename(result.cmp_side_b)
+        file_path = os.path.join(dir_path, f'{file_a}__cmp__{file_b}.md')
+        row["details path"] = DETAIL_PATH + file_path.split(DETAIL_PATH)[-1]
+        save_detail_result(file_path, result.detail_file)
 
 
 def assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b):
@@ -416,7 +440,7 @@ def get_differences_info(rows):
                     continue
                 for single_result in results:
                     if single_result['compare result'] != CMP_RESULT_SAME:
-                        if cmp_type ==CMP_TYPE_RPM_REQUIRES:
+                        if cmp_type == CMP_TYPE_RPM_REQUIRES:
                             single_result = get_require_differencs_info(single_result)
                         differences_info.append(single_result)
     return differences_info

@@ -22,7 +22,6 @@ import json
 from pathlib import Path
 
 from oecp.proxy.rpm_proxy import RPMProxy
-from oecp.result.constants import DETAIL_PATH
 
 
 def create_csv_report(header, rows, report_path):
@@ -52,10 +51,7 @@ def create_directory(root_path, report_name, osv_title, cmp_type=None, uid='', f
             if not os.path.exists(first_path):
                 os.makedirs(first_path)
             second_path = get_second_path(cmp_type)
-            if cmp_type == 'service detail':
-                full_second_path = DETAIL_PATH + '/' + second_path
-            else:
-                full_second_path = first_path + '/' + second_path
+            full_second_path = first_path + '/' + second_path
             if not os.path.exists(full_second_path):
                 os.makedirs(full_second_path)
             if uid:
@@ -93,7 +89,7 @@ def export_json(root_path, report_name, osv_title, result):
     json_data = json.dumps(result, indent=4, separators=(",", ": "))
     f = open(json_report_path, 'w')
     f.write(json_data)
-    f.close
+    f.close()
 
 
 def export_sensitive_results(root_path, result):

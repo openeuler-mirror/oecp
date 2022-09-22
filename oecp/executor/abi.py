@@ -20,7 +20,7 @@ import re
 from oecp.utils.shell import shell_cmd
 from oecp.result.compare_result import CMP_RESULT_SAME, CompareResultComposite, CMP_TYPE_RPM, CMP_TYPE_RPM_ABI, \
     CompareResultComponent, CMP_RESULT_DIFF
-from oecp.result.constants import DETAIL_PATH, COUNT_ABI_DETAILS
+from oecp.result.constants import COUNT_ABI_DETAILS
 from oecp.executor.base import CompareExecutor
 
 logger = logging.getLogger('oecp')
@@ -32,10 +32,7 @@ class ABICompareExecutor(CompareExecutor):
         super(ABICompareExecutor, self).__init__(dump_a, dump_b, config)
         self.dump_a = dump_a.run()
         self.dump_b = dump_b.run()
-        cache_require_key = 'extract'
-        self._work_dir = self.config.get(cache_require_key, {}).get('work_dir', DETAIL_PATH)
         self.data = 'data'
-        self.split_flag = '__rpm__'
         self.link_file = 'link_file'
 
     @staticmethod
@@ -67,11 +64,6 @@ class ABICompareExecutor(CompareExecutor):
         return remove_abi, change_abi, add_abi
 
     @staticmethod
-    def _save_result(file_path, content):
-        with open(file_path, "w") as f:
-            f.write(content)
-
-    @staticmethod
     def _set_so_mapping(library_files):
         if not library_files:
             return {}
@@ -99,7 +91,6 @@ class ABICompareExecutor(CompareExecutor):
     def compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         count_result.update(COUNT_ABI_DETAILS)
-        kind = dump_a['kind']
         rpm_a, rpm_b = dump_a['rpm'], dump_b['rpm']
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, rpm_a, rpm_b, dump_a['category'])
         debuginfo_rpm_path_a, debuginfo_rpm_path_b = dump_a['debuginfo_extract_path'], dump_b['debuginfo_extract_path']
@@ -110,9 +101,6 @@ class ABICompareExecutor(CompareExecutor):
             return result
         debuginfo_rpm_path_a = os.path.join(debuginfo_rpm_path_a, 'usr/lib/debug') if debuginfo_rpm_path_a else ''
         debuginfo_rpm_path_b = os.path.join(debuginfo_rpm_path_b, 'usr/lib/debug') if debuginfo_rpm_path_b else ''
-
-        verbose_cmp_path = f'{rpm_a}__cmp__{rpm_b}'
-        base_dir = os.path.join(self._work_dir, kind, verbose_cmp_path)
         for pair in library_pairs:
             base_a = os.path.basename(pair[0])
             base_b = os.path.basename(pair[1])
@@ -130,10 +118,6 @@ class ABICompareExecutor(CompareExecutor):
                 self.count_cmp_result(count_result, CMP_RESULT_SAME)
                 data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_SAME, base_a, base_b)
             else:
-                if not os.path.exists(base_dir):
-                    os.makedirs(base_dir)
-                file_path = os.path.join(base_dir, f'{base_a}__cmp__{base_b}.md')
-                self._save_result(file_path, out)
                 logger.debug("check abi diff")
                 removed_abi, changed_abi, added_abi = self.extract_abi_change_detail(out)
                 count_result['remove_abi'] += removed_abi
@@ -141,12 +125,12 @@ class ABICompareExecutor(CompareExecutor):
                 count_result['add_abi'] += added_abi
                 if changed_abi or removed_abi:
                     self.count_cmp_result(count_result, CMP_RESULT_DIFF)
-                    data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_DIFF, base_a, base_b, file_path)
+                    data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_DIFF, base_a, base_b, detail_file=out)
                     result.set_cmp_result(CMP_RESULT_DIFF)
                 else:
                     logger.debug("check abi functions that are not deleted or changed.")
                     self.count_cmp_result(count_result, CMP_RESULT_SAME)
-                    data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_SAME, base_a, base_b)
+                    data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_SAME, base_a, base_b, detail_file=out)
             result.add_component(data)
         dump_a_linkfiles, dump_b_linkfiles = dump_a[self.link_file], dump_b[self.link_file]
         self.compare_link_files(dump_a_linkfiles, dump_b_linkfiles, rpm_a)
