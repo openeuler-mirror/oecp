@@ -96,10 +96,7 @@ def calculate_similarity(all_rpm_report):
                 same_molecule = tmp_list.count('same') - temp_simple_reslut[2][2] - temp_simple_reslut[2][3]
                 dimension_num = divisor - require_provide_num
                 if same_molecule != 0 and dimension_num != 0:
-                    temp_simple_reslut[2][1] += round(
-                        same_molecule
-                        / dimension_num, 2
-                    )
+                    temp_simple_reslut[2][1] += round(same_molecule / dimension_num, 2)
                 temp_simple_reslut[2][4] += 1 if has_require else 0
             elif '3' in tmp_list:
                 result_dict[package] = round(tmp_list.count('same') / divisor, 2)

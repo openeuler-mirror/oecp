@@ -218,9 +218,9 @@ def assgin_rpm_summay(rpm_test_details, side_a, side_b):
                     rpm_side_result[side] = "fail"
         for s, result in rpm_side_result.items():
             if result == "fail":
-                summary[level]["[fail] " + s] += 1
+                summary.get(level)["[fail] " + s] += 1
             else:
-                summary[level]["[success] " + s] += 1
+                summary.get(level)["[success] " + s] += 1
     return sorted(summary.values(), key=lambda i: i["category level"]) + fail_rows
 
 
@@ -267,7 +267,7 @@ def assain_rpm_test_result(side_a, side_b, dump_a, dump_b, category_map):
         rpm_pkg = key
         rpm_cmp_result = compare(va, vb)
         rpm_test_details.setdefault(rpm_pkg, {})
-        rpm_test_details[rpm_pkg][CMP_TYPE_RPMS_TEST] = assain_rpm_test_details(rpm_pkg, side_a, side_b, va, vb,
+        rpm_test_details.get(rpm_pkg)[CMP_TYPE_RPMS_TEST] = assain_rpm_test_details(rpm_pkg, side_a, side_b, va, vb,
                                                                                 category_level)
 
         row = {
