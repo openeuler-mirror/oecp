@@ -148,7 +148,7 @@ PLATFORM_RESULT_ITEMS = ['rpm test', 'AT', 'performance', 'ciconfig']
 DETAIL_PATH = "details_analyse"
 
 # The Column names of the Details in the RPM REPORT
-ALL_DETAILS_NAME = ['effect drivers', 'details path']
+ALL_DETAILS_NAME = ['effect drivers', 'details path', 'file_name']
 
 # The Character in File name have changed.
 OLD_CHAR = ('oe1',)
