@@ -49,7 +49,7 @@
 | cli.py      |                        |                         | 命令启动脚本                           |
 | requirement |                        |                         | 工具依赖清单                           |
 | README.md   |                        |                         | 用户指导手册                           |
-| test        |                        |                         | 测试脚本夹                             |
+| test        |                        |                         | 测试脚本文件夹                             |
 | doc         |                        |                         | 设计文档文件夹                         |
 |             | oecpimg                |                         | 存放文档图片                           |
 |             | oecp-dev-1.0.md        |                         | 设计文档                               |
