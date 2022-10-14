@@ -25,9 +25,9 @@ from oecp.excel.individual_statistics import IndividualStatistics
 from oecp.excel.osv_data_summary import DataExcelFile
 from oecp.result import export
 from oecp.result.export import get_second_path
+from oecp.result.similar_result_calculate import calculate_similarity
 from oecp.result.similarity import *
 from oecp.result.json_result import *
-from similar_result_calculate import calculate_similarity
 
 logger = logging.getLogger("oecp")
 
@@ -142,7 +142,8 @@ class CompareResultComposite(CompareResultComponent):
                  [str(component) for component in self.diff_components]
         return "\n".join(string)
 
-    def export(self, root_path, baseline, result_format, iso_path):
+    def export(self, *e_args):
+        root_path, baseline, result_format, iso_path, platform_path = e_args
         base_side_a = os.path.basename(iso_path[0]) if self.cmp_side_a.endswith('.src.rpm') else self.cmp_side_a
         base_side_b = os.path.basename(iso_path[1]) if self.cmp_side_b.endswith('.src.rpm') else self.cmp_side_b
         osv_title = 'report-' + get_title(base_side_a) + '-' + get_title(base_side_b)
@@ -166,10 +167,10 @@ class CompareResultComposite(CompareResultComponent):
                 f"all results have compare done, please check: {os.path.join(os.path.realpath(root_path), osv_title)}")
             return 0
 
-        performance_rows = performance_result_parser(base_side_a, base_side_b, root_path, baseline)
-        rpm_test_rows, rpm_test_details = test_result_parser(base_side_a, base_side_b, root_path)
-        ciconfig_rows, file_config_rows = ciconfig_result_parser(base_side_a, base_side_b, root_path)
-        at_rows = at_result_parser(base_side_b, root_path)
+        performance_rows = performance_result_parser(base_side_a, base_side_b, platform_path, baseline)
+        rpm_test_rows, rpm_test_details = test_result_parser(base_side_a, base_side_b, platform_path)
+        ciconfig_rows, file_config_rows = ciconfig_result_parser(base_side_a, base_side_b, platform_path)
+        at_rows = at_result_parser(base_side_b, platform_path)
         if ciconfig_rows:
             rows[CMP_TYPE_CI_CONFIG] = ciconfig_rows
         if file_config_rows:
@@ -436,8 +437,6 @@ def get_differences_info(rows):
     for key in rows.keys():
         if key.endswith('.rpm') and not key.endswith('.src.rpm'):
             for cmp_type, results in rows[key].items():
-                if cmp_type == CMP_TYPE_SERVICE_DETAIL:
-                    continue
                 for single_result in results:
                     if single_result['compare result'] != CMP_RESULT_SAME:
                         if cmp_type == CMP_TYPE_RPM_REQUIRES:

@@ -53,7 +53,8 @@ def init_args():
     parser.add_argument("-f", "--format", type=str, dest="output_format", default="csv", help="result export format")
     parser.add_argument("-o", "--output", type=str, dest="output_file", default=default_output_file,
                         help="result output path")
-
+    parser.add_argument("--platform", type=str, dest="platform_test", default=default_output_file,
+                        help="platform test json result path")
     parser.add_argument("compare_files", metavar="file", type=str, nargs='*', help="compare files")
     parser.add_argument("--submit", help="submit job to compass-ci", type=str, dest="submit", default='at')
     parser.set_defaults(func=do_compress)
@@ -101,5 +102,6 @@ if __name__ == "__main__":
         product_b = Factory.create(args.compare_files[1], args, "none")
 
     result = product_a.compare(product_b, plan)
-    osv_title = result.export(args.output_file, args.perf_baseline_file, args.output_format, args.compare_files)
+    e_args = (args.output_file, args.perf_baseline_file, args.output_format, args.compare_files, args.platform_test)
+    osv_title = result.export(*e_args)
     args.func(osv_title, args)

@@ -1,4 +1,20 @@
 # -*- encoding=utf-8 -*-
+"""
+# **********************************************************************************
+# Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
+# [oecp] is licensed under the Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#     http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
+# PURPOSE.
+# See the Mulan PSL v2 for more details.
+# Author:
+# Create: 2022-06-10
+# Description: compare result
+# **********************************************************************************
+"""
 import os.path
 import pandas as pd
 
@@ -80,10 +96,7 @@ def calculate_similarity(all_rpm_report):
                 same_molecule = tmp_list.count('same') - temp_simple_reslut[2][2] - temp_simple_reslut[2][3]
                 dimension_num = divisor - require_provide_num
                 if same_molecule != 0 and dimension_num != 0:
-                    temp_simple_reslut[2][1] += round(
-                        same_molecule
-                        / dimension_num, 2
-                    )
+                    temp_simple_reslut[2][1] += round(same_molecule / dimension_num, 2)
                 temp_simple_reslut[2][4] += 1 if has_require else 0
             elif '3' in tmp_list:
                 result_dict[package] = round(tmp_list.count('same') / divisor, 2)
