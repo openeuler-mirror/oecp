@@ -20,6 +20,8 @@ install abidiff (centos): ''' yum install -y epel-release yum install -y libabig
 
 install createrepo: ''' yum install -y createrepo '''
 
+install binutils: ''' yum install -y binutils '''
+
 注意：openeuler需要配置openEuler-20.03-SP2以上版本everything仓库
 install abidiff (openEulerr): ''' yum install -y libabigail '''
 

@@ -44,58 +44,70 @@
 
 ## 2. 软件目录结构
 
-| 主目录      | 二级目录               | 三级目录                | 描述                                   |
-| ----------- | ---------------------- | ----------------------- | -------------------------------------- |
-| cli.py      |                        |                         | 命令启动脚本                           |
-| requirement |                        |                         | 工具依赖清单                           |
-| README.md   |                        |                         | 用户指导手册                           |
-| test        |                        |                         | 测试脚本文件夹                             |
-| doc         |                        |                         | 设计文档文件夹                         |
-|             | oecpimg                |                         | 存放文档图片                           |
-|             | oecp-dev-1.0.md        |                         | 设计文档                               |
-|             | oecp-module-dev-1.0.md |                         | 模块设计文档                           |
-| oecp        |                        |                         |                                        |
-|             | main                   |                         | 主模块                                 |
-|             |                        | factory.py              | 工厂方法，生产ISO、REPO等比较对象      |
-|             |                        | directory.py            | 目录级别对象、ISO对象、REPO对象        |
-|             |                        | repository.py           | 仓库级别对象                           |
-|             |                        | mapping                 | 二进制包和源码包映射                   |
-|             |                        | category.py             | 软件包、二进制包等级                   |
-|             |                        | plan.py                 | 比较计划                               |
-|             | executor               |                         | 比较模块                               |
-|             |                        | base.py                 | 比较器基类                             |
-|             |                        | list.py                 | 比较文件列表、包列表                   |
+| 主目录      | 二级目录               | 三级目录                    | 描述              |
+| ----------- | ---------------------- |-------------------------|-----------------|
+| cli.py      |                        |                         | 命令启动脚本          |
+| requirement |                        |                         | 工具依赖清单          |
+| README.md   |                        |                         | 用户指导手册          |
+| test        |                        |                         | 测试脚本夹           |
+| doc         |                        |                         | 设计文档文件夹         |
+|             | oecpimg                |                         | 存放文档图片          |
+|             | oecp-dev-1.0.md        |                         | 设计文档            |
+|             | oecp-module-dev-1.0.md |                         | 模块设计文档          |
+| oecp        |                        |                         |                 |
+|             | main                   |                         | 主模块             |
+|             |                        | factory.py              | 工厂方法，生产ISO、REPO等比较对象 |
+|             |                        | directory.py            | 目录级别对象、ISO对象、REPO对象 |
+|             |                        | repository.py           | 仓库级别对象          |
+|             |                        | mapping                 | 二进制包和源码包映射      |
+|             |                        | category.py             | 软件包、二进制包等级      |
+|             |                        | plan.py                 | 比较计划            |
+|             | executor               |                         | 比较模块            |
+|             |                        | base.py                 | 比较器基类           |
+|             |                        | list.py                 | 比较文件列表、包列表      |
 |             |                        | null.py                 | 空比较，当比较计划项只需要dumper时使用 |
-|             |                        | nvs.py                  | 符号、版本、名称比较器                 |
-|             |                        | plain.py                | 文件比较                               |
-|             | dumper                 |                         | dumper模块                             |
-|             |                        | base.py                 | dumper基类                             |
-|             |                        | config.py               | rpm包的配置文件                        |
-|             |                        | extract.py              | 提取rpm包内容                          |
-|             |                        | filelist.py             | 文件列表                               |
-|             |                        | kconfig.py              | 内核配置                               |
-|             |                        | null.py                 | 当比较计划项只需要执行比较时使用       |
-|             |                        | packagelist.py          | ISO中包列表                            |
-|             |                        | provides.py             | rpm包提供的符号                        |
-|             |                        | requires.py             | rpm包依赖的符号                        |
-|             | result                 |                         | 结果模块                               |
-|             |                        | compare_result.py       | 保存结果对象                           |
-|             |                        | constants.py            | 比较类型、比较结果宏                   |
-|             |                        | export.py               | 导出比较结果到csv文件                  |
-|             |                        | test_result.py          | 导出compass-ci比较的结果               |
-|             | proxy                  |                         | 第三方代理模块                         |
-|             |                        | rpm_proxy.py            | rpm包常用方法                          |
-|             |                        | proxy/requests_proxy.py | requests功能封装下载功能               |
-|             | utils                  |                         | 工具模块                               |
-|             |                        | utils/logger.py         | 日志                                   |
-|             |                        | utils/misc.py           | 常用工具                               |
-|             |                        | utils/shell.py          | shell命令                              |
-|             |                        | utils/unit_convert.py   | 单位转换                               |
-|             | conf                   |                         | 配置模块                               |
-|             |                        | category                | 包等级配置                             |
-|             |                        | performance             | compass-ci性能测试                     |
-|             |                        | plan                    | 比较计划                               |
-|             |                        | logger.conf             | 日志配置                               |
+|             |                        | nvs.py                  | 符号、版本、名称比较器     |
+|             |                        | plain.py                | 配置文件比较          |
+|             |                        | abi.py                  | 比较abi           |
+|             |                        | cmd.py                  | 比较命令文件、库文件      |
+|             |                        | header.py               | 比较头文件           |
+|             |                        | service.py              | 比较服务文件          |
+|             | dumper                 |                         | dumper模块        |
+|             |                        | base.py                 | dumper基类        |
+|             |                        | config.py               | rpm包的配置文件       |
+|             |                        | extract.py              | 提取rpm包内容        |
+|             |                        | filelist.py             | 文件列表            |
+|             |                        | kconfig.py              | 内核配置            |
+|             |                        | kabi.py                 | 内核abi           |
+|             |                        | kconfig_drive.py        | 内核驱动配置          |
+|             |                        | null.py                 | 当比较计划项只需要执行比较时使用 |
+|             |                        | packagelist.py          | ISO中包列表         |
+|             |                        | provides.py             | rpm包提供的符号       |
+|             |                        | requires.py             | rpm包依赖的符号       |
+|             |                        | abi.py                  | rpm包的so库文件      |
+|             |                        | cmd.py                  | rpm包的命令文件       |
+|             |                        | header.py               | rpm包的头文件        |
+|             |                        | service.py              | rpm包的服务文件       |
+|             | result                 |                         | 结果模块            |
+|             |                        | compare_result.py       | 保存结果对象          |
+|             |                        | constants.py            | 比较类型、比较结果宏      |
+|             |                        | export.py               | 导出比较结果到csv文件    |
+|             |                        | test_result.py          | 导出compass-ci比较的结果 |
+|             |                        | json_result.py          | 输出json格式比较结果报告  |
+|             |                        | similarity.py           | osv测试关注比较项相似度   |
+|             | proxy                  |                         | 第三方代理模块         |
+|             |                        | rpm_proxy.py            | rpm包常用方法        |
+|             |                        | proxy/requests_proxy.py | requests功能封装下载功能 |
+|             | utils                  |                         | 工具模块            |
+|             |                        | utils/logger.py         | 日志              |
+|             |                        | utils/misc.py           | 常用工具            |
+|             |                        | utils/shell.py          | shell命令         |
+|             |                        | utils/unit_convert.py   | 单位转换            |
+|             | conf                   |                         | 配置模块            |
+|             |                        | category                | 包等级配置           |
+|             |                        | performance             | compass-ci性能测试  |
+|             |                        | plan                    | 比较计划            |
+|             |                        | logger.conf             | 日志配置            |
 
 ## 3. 主要功能介绍
 
@@ -129,7 +141,7 @@ oecp工具适用于比较两个ISO镜像之间的差别，具体比较项有：
 
 install oecp:
 '''
-git clone https://gitee.com/xielihao/oecp-lite.git
+git clone https://gitee.com/openeuler/oecp
 cd oecp
 pip3 install -r requirement
 '''
@@ -162,62 +174,95 @@ pip3 install -r requirement
 
   * **`-b, --baseline`**
     指定`基线文件`，默认为oecp/conf/performance/openEuler-20.03-LTS-aarch64-dvd.iso.performance.json
-
-
+  
   * **`-f, --format`**
     指定`输出格式`，默认为csv
 
   * **`-o, --output`**
     指定`输出结果路径`，默认为/tmp/oecp
+
+  * **`--platform`**
+    指定`平台验证报告路径`，默认为/tmp/oecp
     
-* **举例**
+  * **举例**
 
-  * **` python3 cli.py  /root/openEuler-20.03-LTS-aarch64-dvd.iso /root/openEuler-20.03-LTS-SP1-aarch64-dvd.iso`**
+    * **` python3 cli.py  /root/openEuler-20.03-LTS-aarch64-dvd.iso /root/openEuler-20.03-LTS-SP1-aarch64-dvd.iso`**
 
-* **比较计划说明**
-  * **`all.json`**
-    涵盖下面所有配置项的比较
-  * **`config_file.json`**
-    比较rpm包中配置文件内容的差异，需依赖RPMExtractDumper（提取解压rpm的dumper类）
-  * **`filelist.json`**
-    比较rpm包文件列表差异，可通过rpm -pql ${rpm_path}命令获取rpm文件列表
-  * **`kconfig.json`**
-    比较内核配置文件，需依赖RPMExtractDumper（提取解压rpm的dumper类）
-  * **`package_list.json`**
-    比较两个rpm集合包名称、版本、发行版本的差异
-  * **`provides_requires.json`**
-    比较rpm的provides和requires差异，可通过rpm -pq --provides/requires ${rpm_path}查询
+  * **比较计划说明**
+    * **`all.json`**
+      涵盖下面所有配置项的比较
+    * **`config_file.json`**
+      比较rpm包中配置文件内容的差异，需依赖RPMExtractDumper（提取解压rpm的dumper类）
+    * **`filelist.json`**
+      比较rpm包文件列表差异，可通过rpm -pql ${rpm_path}命令获取rpm文件列表
+    * **`kconfig.json`**
+      比较内核配置文件，需依赖RPMExtractDumper（提取解压rpm的dumper类）
+    * **`package_list.json`**
+      比较两个rpm集合包名称、版本、发行版本的差异
+    * **`provides_requires.json`**
+      比较rpm的provides和requires差异，可通过rpm -pq --provides/requires ${rpm_path}查询
 
 ## 6.  软件卸载与环境清理
 
-
-
 ## 7.  OECP报告说明
 
-##### 1.最终报告
+ 1）最终报告
 
-oecp工具会展示一份最终报告，用与展示最终的测试结果，测试结果参考osv测试标准
+oecp工具会展示一份最终报告，用于展示最终的测试结果，测试结果参考osv测试标准。
 
-##### 2.all-similarity-report
+ 2）报告目录结构
 
-该报告展示了osv测试数据的汇总，有些数据目前暂时不用于最终比较
+| 主目录               | 二级目录                      | 三级目录               | 文件内容描述           |
+|-------------------|-------------------------------|--------------------|------------------|
+| report-iso-a--iso-b |                               |                    | 最终报告目录名称         |
+|                   | kernel_analyse                |                    | 内核比较结果目录         |
+|                   |                               | drive-kabi         | 内核驱动abi比较结果目录    |
+|                   |                               | drive-kconfig      | 内核驱动配置比较结果目录     |
+|                   |                               | kabi               | 内核abi比较结果目录      |
+|                   |                               | kconfig            | 内核配置比较结果目录       |
+|                   | rpm_analyse                   |                    | rpm比较结果目录        |
+|                   |                               | rpm-provides       | rpm包提供符号比较结果目录   |
+|                   |                               | rpm-requires       | rpm包依赖符号比较结果目录   |
+|                   | rpmabi_analyse                |                    | rpm包abi比较结果目录    |
+|                   |                               | rpm-abi            | rpm abi比较结果目录    |
+|                   | rpmfile_analyse               |                    | rpm包文件比较结果目录     |
+|                   |                               | rpm-cmd            | rpm包命令文件比较结果目录   |
+|                   |                               | rpm-config         | rpm包配置文件比较结果目录   |
+|                   |                               | rpm-files          | rpm包其他类型文件比较结果目录 |
+|                   |                               | rpm-header         | rpm包头文件比较结果目录    |
+|                   |                               | rpm-lib            | rpm包so库文件比较结果目录  |
+|                   |                               | rpm-service        | rpm包服务文件比较结果目录   |
+|                   | rpm-test                      |                    | 测试repo中所有rpm安装结果目录 |
+|                   | details_analyse               |                    | rpm文件比较内容目录      |
+|                   |                               | abi                | so库文件接口变化详情      |
+|                   |                               | config             | 配置文件内容变化详情       |
+|                   |                               | header             | 头文件内容变化详情        |
+|                   |                               | service-detail     | 服务文件配置变化详情       |
+|                   | all-AT-report.csv             |                    | 社区AT用例运行测试结果     |
+|                   | all-ciconfig-report.csv       |                    | OSV版本运行时默认配置一致性结果 |
+|                   | all-ci-file-config-report.csv |                    | 运行时默认配置文件一致性结果   |
+|                   | all-differences-report.csv    |                    | 静态检测所有比较差异结果汇总展示 |
+|                   | all-performance-report.csv    |                    | 基础性能测试统计结果       |
+|                   | all-rpm-report.csv            |                    | 静态检测rpm包层面比较结果汇总 |
+|                   | all-result-report.csv         |                    | rpm包等级比较结果统计     |
+|                   | all-rpm-test-report.csv       |                    | rpm安装平台测试结果统计    |
+|                   | all-similarity-report.csv     |                    | osv测试关注比较项相似度统计  |
+|                   | osv_data_summary.xlsx         |                    | osv测评报告          |
+|                   | similar_calculate_result.csv  |                    | 软件包测试项结果统计       |
+|                   | similar_calculate_result.csv  |                    | 软件包测试项结果统计       |
+|                   | web_show_result.json          |                    | osv测评json报告      |
 
-##### 3.all-rpm-test-report
+  输出比较结果报告中内容可分为*静态检测报告*及*平台验证分析报告*，报告文件数量取决于比较内容，此目录展示所有比较报告完全生成场景。
 
-该报告用于展示测试repo安装的时候，rpm包安装的结果
+ 3）all-rpm-report报告结果参数解析
 
-##### 4.all-result-report
+  该报告用于暂时保存rpm对比的详细结果：
 
-该报告用于展示rpm包对比的汇总结果
+  compare type栏显示为比较规则，其中包名比较规则如下：
 
-##### 5.all-rpm-report
+  Explain for rpm package name compare result:
 
-该报告用于暂时rpm对比的详细结果：
-
-compare type栏显示为比较规则，其中包名比较规则如下：
-
-rpm package name explan:
-                    1   -- same name + version + release num + 包名后缀
+                    1   -- same name + version + release num + distributor
 
                     1.1 -- same name + version + release num
 
@@ -229,10 +274,18 @@ rpm package name explan:
 
                     5   -- more
 
-其中，1 ，1.1 ，2在最后计算的时候都会作为same比较
+    其中1 ，1.1 ，2在最后计算的时候都会作为same比较
 
-可以根据compare detail下的路径，去结果的各层文件夹中取找到详细的报告
+    此报告中单项比较结果可以根据compare detail下的路径，去查看该比较项对应各层文件夹中的详细报告
 
-##### 6.all-pergormance-report
+  Explain for rpm category level:
 
-性能数据统计
+                level 0   --  核心包等级
+
+                level 1   --  软件包及软件包 API、ABI 在某个 LTS 版本的生命周期保持不变，跨 LTS 版本不保证
+
+                level 2   --  软件包及软件包 API、ABI 在某个 SP 版本的生命周期保持不变，跨 SP 版本不保证
+
+                level 3   --  版本升级兼容性不做保证
+
+                level 4   --  未指定的软件包
