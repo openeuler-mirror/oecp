@@ -15,7 +15,7 @@
 	"mlx4_core",
 	"mlx5_core",
 	"mpt3sas",
-	"nouvea",
+	"nouveau",
 	"nvidia",
 	"nvme",
 	"qla2xxx",
