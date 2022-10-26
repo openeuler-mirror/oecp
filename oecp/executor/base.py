@@ -118,41 +118,20 @@ class CompareExecutor(ABC):
 
     @staticmethod
     def format_rmp_name(data_a, data_b):
-        same_pairs = []
-        same_in_a, same_in_b = [], []
-        all_data_a_rpm, all_data_b_rpm = {}, {}
-        for index_a, rpm_a in enumerate(data_a):
-            rpm_a_name = rpm_a.get('name')
-            rpm_a_package = rpm_a.get('packages')[0] if rpm_a.get('packages') else None
-            # 保存rpm名字，以及数据索引，符号优先，以便获取完整数据
-            all_data_a_rpm[rpm_a_name] = index_a
-
-            for index_b, rpm_b in enumerate(data_b):
-                all_data_b_rpm.clear()
-                rpm_b_name = rpm_b.get('name')
-                rpm_b_package = rpm_b.get('packages')[0] if rpm_b.get('packages') else None
-                # 保存rpm名字，以及数据索引，符号优先，以便获取完整数据
-                all_data_b_rpm[rpm_b_name] = index_b
-
-                if rpm_a_name and rpm_b_name and RPMProxy.rpm_name(rpm_a_name) == RPMProxy.rpm_name(rpm_b_name) and \
-                        rpm_a_name not in same_in_a:
-                    same_pairs.append([rpm_a, rpm_b, CMP_RESULT_SAME])
-                    same_in_a.append(rpm_a_name)
-                    same_in_b.append(rpm_b_name)
-                elif rpm_a_package and rpm_b_package and RPMProxy.rpm_name(rpm_a_package) == \
-                        RPMProxy.rpm_name(rpm_b_package) and rpm_a_package not in same_in_a:
-                    same_pairs.append([rpm_a, rpm_b, CMP_RESULT_SAME])
-                    same_in_a.append(rpm_a_package)
-                    same_in_b.append(rpm_b_package)
-
-        less_rpm = set(all_data_a_rpm.keys()) - set(same_in_a)
-        more_rpm = set(all_data_b_rpm.keys()) - set(same_in_b)
+        same_pairs, commons_a, commons_b = [], [], []
+        for require_details_a in data_a:
+            for require_details_b in data_b:
+                if require_details_a.get('name') == require_details_b.get('name'):
+                    same_pairs.append([require_details_a, require_details_b, CMP_RESULT_SAME])
+                    commons_a.append(require_details_a)
+                    commons_b.append(require_details_b)
+        require_less = [less_require for less_require in data_a if less_require not in commons_a]
+        require_more = [more_require for more_require in data_b if more_require not in commons_b]
         all_dump = [
             same_pairs,
-            [[data_a[all_data_a_rpm[rpm_name]], '', CMP_RESULT_LESS] for rpm_name in less_rpm],
-            [['', data_b[all_data_b_rpm[rpm_name]], CMP_RESULT_MORE] for rpm_name in more_rpm]
+            [[single_less, '', CMP_RESULT_LESS] for single_less in require_less],
+            [['', single_more, CMP_RESULT_MORE] for single_more in require_more]
         ]
-
         return all_dump
 
     @staticmethod

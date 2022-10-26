@@ -73,7 +73,7 @@ class NVSCompareExecutor(CompareExecutor):
         for component in dump[self._data]:
 
             # provides 和 requires 比较忽视release版本号，requires加上依赖类型（强依赖或弱依赖）
-            #if dump['kind'] in ('provides', 'requires'):
+            # if dump['kind'] in ('provides', 'requires'):
             if dump ['kind'] == 'provides':
                 new_component = ' '.join([component['name'], component['symbol'], component['version'].split('-')[0]])
             elif dump ['kind'] == 'requires':
@@ -91,7 +91,8 @@ class NVSCompareExecutor(CompareExecutor):
                 requires_name, symbol, version = component['name'].strip(), component['symbol'].strip(), component[
                     'version'].strip()
                 packages = mapping.get_provides_rpm(requires_name, symbol, version)
-                require_result = dict(name=requires_name, packages=packages if packages else None,
+                requires_info = ' '.join([component['name'], component['symbol'], component['version'].split('-')[0]])
+                require_result = dict(name=requires_info, packages=','.join(packages) if packages else None,
                                       dependence=component['dependence'])
                 all_requires_rpm.append(require_result)
 
