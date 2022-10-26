@@ -39,11 +39,6 @@ def calculate_similarity(all_rpm_report):
     common_rpm_list = df[
         (df['compare result'] == '1') | (df['compare result'] == '1.1') | (df['compare result'] == '2') | (
                 df['compare result'] == '3')]
-    # centos软件包数量(去除4选项，即前者有，后者无)
-    centos_rpm_list = df[
-        (df['compare result'] == '1') | (df['compare result'] == '1.1') | (df['compare result'] == '2') | (
-                df['compare result'] == '3')
-        | (df['compare result'] == '5')]
     # 软件包总数
     total_rmp_list = df[
         (df['compare result'] == '1') | (df['compare result'] == '1.1') | (df['compare result'] == '2') | (
@@ -67,7 +62,7 @@ def calculate_similarity(all_rpm_report):
         tmp_require = tmp_table[tmp_table["compare type"] == "rpm requires"]
         tmp_provide = tmp_table[tmp_table["compare type"] == "rpm provides"]
         has_require = True
-        if (len(list(tmp_require["compare type"])) == 0 and len(list(tmp_provide["compare type"])) == 0):
+        if tmp_require.empty and tmp_provide.empty:
             has_require = False
         tmp_list = list(tmp_table['compare result'])
         divisor = len(tmp_list) - 1
@@ -91,9 +86,9 @@ def calculate_similarity(all_rpm_report):
                 temp_simple_reslut[2][0] += 1
                 temp_simple_reslut[2][2] += list(tmp_require["compare result"]).count("same")
                 temp_simple_reslut[2][3] += list(tmp_provide["compare result"]).count("same")
-                require_provide_num = temp_simple_reslut[2][2] + list(tmp_require["compare result"]).count("diff") \
-                                      + temp_simple_reslut[2][3] + list(tmp_provide["compare result"]).count("diff")
-                same_molecule = tmp_list.count('same') - temp_simple_reslut[2][2] - temp_simple_reslut[2][3]
+                require_provide_num = len(tmp_require) + len(tmp_provide)
+                same_molecule = tmp_list.count('same') - list(tmp_require["compare result"]).count("same") - list(
+                    tmp_provide["compare result"]).count("same")
                 dimension_num = divisor - require_provide_num
                 if same_molecule != 0 and dimension_num != 0:
                     temp_simple_reslut[2][1] += round(same_molecule / dimension_num, 2)
@@ -121,15 +116,11 @@ def calculate_similarity(all_rpm_report):
     for tmp in temp_simple_reslut:
         if line <= 2:
             molecule_section3 += 2 * tmp[4]
-            denominator += tmp[4]
             line += 1
         elif 2 < line < 4:
             molecule_section3 += tmp[2] + tmp[3]
-            denominator += tmp[4]
             line += 1
-        else:
-            denominator += tmp[4]
-            line += 1
+        denominator += tmp[4]
 
     section1_result = round(len(common_rpm_list) / len(total_rmp_list) * 100, 2) if not total_rmp_list.empty else 0
     section2_result = round(molecule_section2 / len(common_rpm_list) * 100, 2) if not common_rpm_list.empty else 0
