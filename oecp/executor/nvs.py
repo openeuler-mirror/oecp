@@ -92,7 +92,7 @@ class NVSCompareExecutor(CompareExecutor):
                     'version'].strip()
                 packages = mapping.get_provides_rpm(requires_name, symbol, version)
                 requires_info = ' '.join([component['name'], component['symbol'], component['version'].split('-')[0]])
-                require_result = dict(name=requires_info, packages=','.join(packages) if packages else None,
+                require_result = dict(name=requires_info, packages=','.join(packages) if packages else '',
                                       dependence=component['dependence'])
                 all_requires_rpm.append(require_result)
 
