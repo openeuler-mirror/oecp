@@ -365,11 +365,11 @@ def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, 
     if result.cmp_type == CMP_TYPE_RPM_REQUIRES:
         row = {
             "binary rpm package": parent_side,
-            base_side_a + " symbol name": result.cmp_side_a.get('name', None) if result.cmp_side_a else None,
-            base_side_a + " package name": result.cmp_side_a.get('packages', None) if result.cmp_side_a else None,
+            base_side_a + " symbol name": result.cmp_side_a.get('name', '') if result.cmp_side_a else '',
+            base_side_a + " package name": result.cmp_side_a.get('packages', '') if result.cmp_side_a else '',
             base_side_a + " dependence type": result.cmp_side_a.get('dependence', None) if result.cmp_side_a else None,
-            base_side_b + " symbol name": result.cmp_side_b.get('name', None) if result.cmp_side_b else None,
-            base_side_b + " package name": result.cmp_side_b.get('packages', None) if result.cmp_side_b else None,
+            base_side_b + " symbol name": result.cmp_side_b.get('name', '') if result.cmp_side_b else '',
+            base_side_b + " package name": result.cmp_side_b.get('packages', '') if result.cmp_side_b else '',
             base_side_b + " dependence type": result.cmp_side_b.get('dependence', None) if result.cmp_side_b else None,
             "compare result": result.cmp_result,
             "compare type": result.cmp_type,
@@ -446,20 +446,19 @@ def get_differences_info(rows):
 
 
 def get_require_differencs_info(single_result):
-    require_differencs_info = {}
-    require_differencs_info['binary rpm package'] = single_result['binary rpm package']
-    require_differencs_info['compare result'] = single_result['compare result']
-    require_differencs_info['compare type'] = single_result['compare type']
-    require_differencs_info['category level'] = single_result['category level']
-    for requries_key in list(single_result.keys()):
-        single_key = requries_key.split(" ")[0]
-        requries_value = single_result.get(requries_key, None)
-        if "package name" in requries_key:
-            if requries_value or not require_differencs_info.get(single_key, None):
-                require_differencs_info[single_key] = requries_value
-        elif "symbol name" in requries_key and requries_value and not require_differencs_info.get(single_key, None):
-            require_differencs_info[single_key] = requries_value
-    return require_differencs_info
+    differencs_info = {}
+    differencs_info['binary rpm package'] = single_result['binary rpm package']
+    differencs_info['compare result'] = single_result['compare result']
+    differencs_info['compare type'] = single_result['compare type']
+    differencs_info['category level'] = single_result['category level']
+    result_keys = list(single_result.keys())
+    side_a = result_keys[1].split(" ")[0]
+    side_b = result_keys[4].split(" ")[0]
+    symbol_a, package_a = single_result.get(result_keys[1]), single_result.get(result_keys[2])
+    symbol_b, package_b = single_result.get(result_keys[4]), single_result.get(result_keys[5])
+    differencs_info[side_a] = None if not symbol_a and not package_a else symbol_a.strip() + "  [" + package_a + "]"
+    differencs_info[side_b] = None if not symbol_b and not package_b else symbol_b.strip() + "  [" + package_b + "]"
+    return differencs_info
 
 
 def compare_result_name_to_attr(name):

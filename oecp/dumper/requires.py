@@ -30,7 +30,8 @@ class RequiresDumper(ComponentsDumper):
         self._recommends_cmd = ['rpm', '-pq', '--recommends', '--nosignature']
         self._component_key = 'requires'
 
-    def get_rpm_requires(self, dependence_type,  cmd):
+    @staticmethod
+    def get_rpm_requires(dependence_type, cmd):
         requires = []
         added_requires = []
         code, out, err = shell_cmd(cmd)
@@ -41,7 +42,7 @@ class RequiresDumper(ComponentsDumper):
                 for line in out.split("\n"):
                     if not line:
                         continue
-                    r = re.match("(\S+)\s([><=]=?)\s(\S+)", line)
+                    r = re.match("(\\S+)\\s([><=]=?)\\s(\\S+)", line)
                     try:
                         if r:
                             name, symbol, version = r.groups()

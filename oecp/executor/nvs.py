@@ -73,7 +73,7 @@ class NVSCompareExecutor(CompareExecutor):
         for component in dump[self._data]:
 
             # provides 和 requires 比较忽视release版本号，requires加上依赖类型（强依赖或弱依赖）
-            #if dump['kind'] in ('provides', 'requires'):
+            # if dump['kind'] in ('provides', 'requires'):
             if dump ['kind'] == 'provides':
                 new_component = ' '.join([component['name'], component['symbol'], component['version'].split('-')[0]])
             elif dump ['kind'] == 'requires':
@@ -91,7 +91,8 @@ class NVSCompareExecutor(CompareExecutor):
                 requires_name, symbol, version = component['name'].strip(), component['symbol'].strip(), component[
                     'version'].strip()
                 packages = mapping.get_provides_rpm(requires_name, symbol, version)
-                require_result = dict(name=requires_name, packages=packages if packages else None,
+                requires_info = ' '.join([component['name'], component['symbol'], component['version'].split('-')[0]])
+                require_result = dict(name=requires_info, packages=','.join(packages) if packages else '',
                                       dependence=component['dependence'])
                 all_requires_rpm.append(require_result)
 
@@ -149,8 +150,8 @@ class NVSCompareExecutor(CompareExecutor):
                     rpm_v_a, pretty_dump_a = self.to_pretty_dump(dump_a)
                     rpm_v_b, pretty_dump_b = self.to_pretty_dump(dump_b)
                     if dump_a['kind'] == CMP_TYPE_REQUIRES:
-                        components_a = pretty_dump_a[rpm_v_a]
-                        components_b = pretty_dump_b[rpm_v_b]
+                        components_a = pretty_dump_a.get(rpm_v_a)
+                        components_b = pretty_dump_b.get(rpm_v_b)
                     else:
                         components_a, components_b = set(pretty_dump_a[rpm_v_a]), set(pretty_dump_b[rpm_v_b])
                 result = self.cmp_component_set(dump_a, dump_b, components_a, components_b)
