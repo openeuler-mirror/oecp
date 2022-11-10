@@ -21,49 +21,6 @@ from oecp.result.constants import CMP_TYPE_RPM_LEVEL, RESULT_DIFF, RESULT_LESS, 
     CMP_RESULT_MORE, CMP_RESULT_SAME, CMP_RESULT_DIFF, CMP_TYPE_RPM_REQUIRES, RESULT_SAME
 
 
-# -------------------------------------------------------------------------------
-# json result
-# {
-#   "old_path": xxxx,
-#   "new_path": xxxx,
-#   "compare_result": "not pass",
-#   "compare_details": {
-#       "more": {
-#           "more_num": 2,
-#           "more_details": ["1.rpm", "2.rpm"]
-#       }
-#       "diff": {
-#           "diff_num": 2,
-#           "diff_details": {
-#               "lib_stan": {
-#                   "name": {
-#                       "old": xxx,
-#                       "new": xxx
-#                    },
-#                   "rpm_abi":{
-#                       "diff":{
-#                           "old": ["a.so_1.0", "b.so_2.0"],
-#                           "new": ["a.so_1.1", "b.so_2.1"]
-#                       }
-#                       "less": [],
-#                       "more": []
-#                   }
-#                   "rpm_provides": {...}
-#                   ...
-#               }
-#           }
-#       },
-#       "less": {
-#           "less_num": 2,
-#           "less_details": ["3.rpm", "4.rpm"]
-#       }
-#       "same": {
-#           "old": []
-#           "new": []
-#       }
-#   }
-# }
-# -------------------------------------------------------------------------------
 def json_result(rows, base_side_a, base_side_b):
     side_a = get_binary_side(base_side_a)
     side_b = get_binary_side(base_side_b)
@@ -205,7 +162,7 @@ def get_unsame_total(compare_detail):
 
 
 def is_same(rpm_cmp_result):
-    for cmp_type, result in rpm_cmp_result.items():
+    for result in rpm_cmp_result.values():
         for row in result:
             if row.get("compare result") not in RESULT_SAME:
                 return False
