@@ -144,17 +144,28 @@ class CompareExecutor(ABC):
         for k, va in data_a.items():
             vb = data_b.get(k, None)
             if vb is None:
-                losted.append([' '.join([k, "=", va]), '', 'losted'])
+                losted.append([' '.join([k, "=", va]), '', CMP_RESULT_LESS])
             elif va == vb:
-                same.append([' '.join([k, "=", va]), ' '.join([k, "=", vb]), 'same'])
+                same.append([' '.join([k, "=", va]), ' '.join([k, "=", vb]), CMP_RESULT_SAME])
             else:
-                changed.append([' '.join([k, "=", va]), ' '.join([k, "=", vb]), 'changed'])
+                changed.append([' '.join([k, "=", va]), ' '.join([k, "=", vb]), CMP_RESULT_CHANGE])
         all_dump.append(same)
         all_dump.append(changed)
         all_dump.append(losted)
         if changed or losted:
             file_result = CMP_RESULT_DIFF
         return file_result, all_dump
+
+    @staticmethod
+    def count_cmp_result(count_result, cmp_result):
+        if cmp_result in CMP_SAME_RESULT:
+            count_result["same"] += 1
+        elif cmp_result == CMP_RESULT_LESS:
+            count_result["less"] += 1
+        elif cmp_result == CMP_RESULT_MORE:
+            count_result["more"] += 1
+        elif cmp_result == CMP_RESULT_DIFF:
+            count_result["diff"] += 1
 
     @staticmethod
     def get_equal_rate(dist_a, dist_b):
@@ -190,7 +201,7 @@ class CompareExecutor(ABC):
             dict_a[os.path.basename(side_a_file)] = side_a_file
         for side_b_file in list(only_dump_b):
             dict_b[os.path.basename(side_b_file)] = side_b_file
-        for single_key in dict_a.keys():
+        for single_key in dict_a:
             if dict_b.get(single_key):
                 side_a_file = dict_a.get(single_key)
                 side_b_file = dict_b.get(single_key)
@@ -203,7 +214,7 @@ class CompareExecutor(ABC):
                     common_dump_add.append([side_a_file, side_b_file])
                     only_dump_a.discard(side_a_file)
                     only_dump_b.discard(side_b_file)
-        return [only_dump_a, only_dump_b, change_dump, common_dump_add]
+        self.format_special_changed_files(only_dump_a, only_dump_b, change_dump, common_dump_add)
 
     def format_dump(self, data_a, data_b):
         dump_set_a, dump_set_b = set(data_a), set(data_b)
@@ -211,9 +222,19 @@ class CompareExecutor(ABC):
         only_dump_a = dump_set_a - dump_set_b
         only_dump_b = dump_set_b - dump_set_a
         change_dump, common_dump_add = [], []
-        only_dump_a, only_dump_b, change_dump, common_dump_add = self.find_dir_version_change_files(
-            only_dump_a, only_dump_b, change_dump, common_dump_add)
+        self.find_dir_version_change_files(only_dump_a, only_dump_b, change_dump, common_dump_add)
+        all_dump = [
+            [[x, x, CMP_RESULT_SAME] for x in common_dump],
+            [[x[0], x[1], CMP_RESULT_CHANGE] for x in change_dump],
+            [[x, '', CMP_RESULT_LESS] for x in only_dump_a],
+            [['', x, CMP_RESULT_MORE] for x in only_dump_b]
+        ]
+        if common_dump_add:
+            for common_cmp_pair in common_dump_add:
+                all_dump[0].append([common_cmp_pair[0], common_cmp_pair[1], CMP_RESULT_SAME])
+        return all_dump
 
+    def format_special_changed_files(self, only_dump_a, only_dump_b, change_dump, common_dump_add):
         for side_a_file in list(only_dump_a):
             for side_b_file in list(only_dump_b):
                 get_result = ''
@@ -245,16 +266,6 @@ class CompareExecutor(ABC):
                     only_dump_a.discard(side_a_file)
                     only_dump_b.discard(side_b_file)
                     break
-        all_dump = [
-            [[x, x, CMP_RESULT_SAME] for x in common_dump],
-            [[x[0], x[1], CMP_RESULT_CHANGE] for x in change_dump],
-            [[x, '', CMP_RESULT_LESS] for x in only_dump_a],
-            [['', x, CMP_RESULT_MORE] for x in only_dump_b]
-        ]
-        if common_dump_add:
-            for common_cmp_pair in common_dump_add:
-                all_dump[0].append([common_cmp_pair[0], common_cmp_pair[1], CMP_RESULT_SAME])
-        return all_dump
 
     def split_common_files(self, files_a, files_b):
         common_file_pairs, common_file_a, common_file_b = [], [], []
@@ -354,16 +365,6 @@ class CompareExecutor(ABC):
             cmp_results.append(single_result)
 
         return cmp_results
-
-    def count_cmp_result(self, count_result, cmp_result):
-        if cmp_result in CMP_SAME_RESULT:
-            count_result["same"] += 1
-        elif cmp_result == CMP_RESULT_LESS:
-            count_result["less"] += 1
-        elif cmp_result == CMP_RESULT_MORE:
-            count_result["more"] += 1
-        elif cmp_result == CMP_RESULT_DIFF:
-            count_result["diff"] += 1
 
     @abstractmethod
     def run(self):

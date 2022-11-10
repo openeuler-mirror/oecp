@@ -16,8 +16,9 @@
 # **********************************************************************************
 """
 
-from oecp.result.constants import *
 from oecp.proxy.rpm_proxy import RPMProxy
+from oecp.result.constants import CMP_TYPE_RPM_LEVEL, RESULT_DIFF, RESULT_LESS, CMP_RESULT_LESS, RESULT_MORE, \
+    CMP_RESULT_MORE, CMP_RESULT_SAME, CMP_RESULT_DIFF, CMP_TYPE_RPM_REQUIRES, RESULT_SAME
 
 
 # -------------------------------------------------------------------------------
@@ -73,7 +74,8 @@ def json_result(rows, base_side_a, base_side_b):
 
     for single_result in rpm_rows:
         if single_result["compare type"] == CMP_TYPE_RPM_LEVEL:
-            group_rpm_name_result(pkg_compare_detail, single_result, side_a, side_b, rows, base_side_a, base_side_b)
+            args = (pkg_compare_detail, single_result, side_a, side_b, rows, base_side_a, base_side_b)
+            group_rpm_name_result(*args)
 
     unsame_total = get_unsame_total(pkg_compare_detail)
     compare_result = "not pass" if unsame_total > 0 else "pass"
@@ -87,11 +89,14 @@ def json_result(rows, base_side_a, base_side_b):
 
 
 # group by cmp_result
-def group_rpm_name_result(detail, single_result, side_a, side_b, rows, base_side_a, base_side_b):
+def group_rpm_name_result(*args):
+    detail, single_result, side_a, side_b, rows, base_side_a, base_side_b = args
     result = single_result["compare result"]
-    rpm_name = single_result.get(side_a) if single_result.get(side_a) else single_result.get(side_b)
+    rpm_name = single_result.get(side_b) if single_result.get(side_b) else single_result.get(side_a)
     pkg_name = RPMProxy.rpm_name(rpm_name)
-    detail_setdefault(detail, single_result, side_a, side_b, rows, pkg_name)
+    if rows.get(pkg_name):
+        detail_args = (detail, single_result, side_a, side_b, rows, pkg_name)
+        detail_setdefault(*detail_args)
     if result in RESULT_DIFF:
         assign_diff_details(detail, pkg_name, base_side_a, base_side_b, rows.get(pkg_name))
     elif result in RESULT_LESS:
@@ -110,7 +115,8 @@ def group_rpm_name_result(detail, single_result, side_a, side_b, rows, base_side
             assign_diff_details(detail, pkg_name, base_side_a, base_side_b, rpm_result)
 
 
-def detail_setdefault(detail, single_result, side_a, side_b, rows, pkg_name):
+def detail_setdefault(*detail_args):
+    detail, single_result, side_a, side_b, rows, pkg_name = detail_args
     detail.setdefault(CMP_RESULT_SAME, {
         "same_details": {
             "old": [],
@@ -125,7 +131,7 @@ def detail_setdefault(detail, single_result, side_a, side_b, rows, pkg_name):
             "new": single_result.get(side_b)
         }
     })
-    for cmp_type, results in rows.get(pkg_name).items():
+    for cmp_type in rows.get(pkg_name):
         detail[CMP_RESULT_DIFF]["diff_details"][pkg_name].setdefault(cmp_type, {})
     detail.setdefault(CMP_RESULT_LESS, {"less_details": [], "less_num": 0})
     detail.setdefault(CMP_RESULT_MORE, {"more_details": [], "more_num": 0})
@@ -143,30 +149,26 @@ def assign_details(rpm_result, base_side_a, base_side_b):
         return None
     diff_detail = {}
     for cmp_type, results in rpm_result.items():
-        if cmp_type == CMP_TYPE_RPM_FILES:
-            diff_detail.setdefault(cmp_type, {})
-            for single_result in results:
-                result = single_result["compare result"]
-                if result == "same":
-                    continue
-                obj = single_result.get(base_side_a) if single_result.get(base_side_a) else single_result.get(
-                    base_side_b)
+        diff_detail.setdefault(cmp_type, {})
+        for single_result in results:
+            result = single_result["compare result"]
+            if result == "same":
+                continue
+
+            if cmp_type == CMP_TYPE_RPM_REQUIRES:
+                side_a = base_side_a + " symbol name"
+                side_b = base_side_b + " symbol name"
+                obj = single_result.get(side_a) if single_result.get(side_a) else single_result.get(side_b)
                 diff_detail[cmp_type].setdefault(result, [])
                 diff_detail[cmp_type][result].append(obj)
-        elif cmp_type != CMP_TYPE_RPM:
-            diff_detail.setdefault(cmp_type, {})
-            for single_result in results:
-                result = single_result["compare result"]
-                if result == "same":
-                    continue
-
+            else:
                 if result in RESULT_DIFF:
-                    diff_detail[cmp_type].setdefault(result, {
+                    diff_detail.get(cmp_type).setdefault(result, {
                         "old": [],
                         "new": []
                     })
-                    diff_detail[cmp_type][result]["old"].append(single_result.get(base_side_a))
-                    diff_detail[cmp_type][result]["new"].append(single_result.get(base_side_b))
+                    diff_detail.get(cmp_type).get(result)["old"].append(single_result.get(base_side_a))
+                    diff_detail.get(cmp_type).get(result)["new"].append(single_result.get(base_side_b))
                 else:
                     obj = single_result.get(base_side_a) if single_result.get(base_side_a) else single_result.get(
                         base_side_b)
@@ -186,7 +188,7 @@ def simplify_key(rows):
 
     new_rows = {}
     for k, v in rows.items():
-        if isinstance(v, dict):
+        if not k.endswith(".src.rpm"):
             new_rows[RPMProxy.rpm_name(k)] = v
     return new_rows
 
@@ -203,11 +205,8 @@ def get_unsame_total(compare_detail):
 
 
 def is_same(rpm_cmp_result):
-    try:
-        for cmp_type, result in rpm_cmp_result.items():
-            for row in result:
-                if row.get("compare result") not in RESULT_SAME:
-                    return False
-    except:
-        return False
+    for cmp_type, result in rpm_cmp_result.items():
+        for row in result:
+            if row.get("compare result") not in RESULT_SAME:
+                return False
     return True

@@ -163,9 +163,12 @@ class CompareResultComposite(CompareResultComponent):
         if result_format == 'json':
             result = json_result(rows, base_side_a, base_side_b)
             export.export_json(root_path, 'osv', osv_title, result)
+            details_path = os.path.join(root_path, osv_title, DETAIL_PATH)
+            if os.path.exists(details_path):
+                shutil.rmtree(details_path)
             logger.info(
                 f"all results have compare done, please check: {os.path.join(os.path.realpath(root_path), osv_title)}")
-            return 0
+            return osv_title
 
         performance_rows = performance_result_parser(base_side_a, base_side_b, platform_path, baseline)
         rpm_test_rows, rpm_test_details = test_result_parser(base_side_a, base_side_b, platform_path)
@@ -188,7 +191,7 @@ class CompareResultComposite(CompareResultComponent):
         if at_rows:
             rows[CMP_TYPE_AT] = at_rows
 
-        similarity = get_similarity(rows, base_side_a, base_side_b)
+        similarity = get_similarity(rows, base_side_b)
         # Write data to excel
         excel_file = DataExcelFile()
         args = (similarity, base_side_a, base_side_b, root_path, osv_title, iso_path[1])
@@ -448,9 +451,6 @@ def get_differences_info(rows):
 def get_require_differencs_info(single_result):
     differencs_info = {}
     differencs_info['binary rpm package'] = single_result['binary rpm package']
-    differencs_info['compare result'] = single_result['compare result']
-    differencs_info['compare type'] = single_result['compare type']
-    differencs_info['category level'] = single_result['category level']
     result_keys = list(single_result.keys())
     side_a = result_keys[1].split(" ")[0]
     side_b = result_keys[4].split(" ")[0]
@@ -458,6 +458,10 @@ def get_require_differencs_info(single_result):
     symbol_b, package_b = single_result.get(result_keys[4]), single_result.get(result_keys[5])
     differencs_info[side_a] = None if not symbol_a and not package_a else symbol_a.strip() + "  [" + package_a + "]"
     differencs_info[side_b] = None if not symbol_b and not package_b else symbol_b.strip() + "  [" + package_b + "]"
+    differencs_info['compare result'] = single_result['compare result']
+    differencs_info['compare type'] = single_result['compare type']
+    differencs_info['category level'] = single_result['category level']
+
     return differencs_info
 
 
