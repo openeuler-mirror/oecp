@@ -191,7 +191,7 @@ class CompareResultComposite(CompareResultComponent):
         if at_rows:
             rows[CMP_TYPE_AT] = at_rows
 
-        similarity = get_similarity(rows, base_side_b)
+        similarity = get_similarity(rows, base_side_a, base_side_b)
         # Write data to excel
         excel_file = DataExcelFile()
         args = (similarity, base_side_a, base_side_b, root_path, osv_title, iso_path[1])
