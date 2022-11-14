@@ -68,10 +68,17 @@ class RPMProxy(object):
                     if d_flag not in r_d:
                         continue
                     else:
-                        sp_release = r_d.split(d_flag)[0].rstrip('.')
-                        release = re.sub(r'.module[_+]+', '.module', sp_release)
-                        d = d_flag + r_d.split(d_flag)[1]
-                        return name, version, release, d, arch
+                        m_dist = re.search(d_flag + r"\d+", r_d)
+                        if m_dist:
+                            sp_release = r_d.split(m_dist.group())[0].rstrip('.')
+                            release = re.sub(r'.module[_+]+', '.module', sp_release)
+                            d = m_dist.group() + r_d.split(m_dist.group())[1]
+                            # eg: caja-core-extensions-1.22.0-1.ky3.kb58.x86_64.rpm
+                            kb_num = re.search(r"kb\d+", d)
+                            if kb_num:
+                                release = release + '.' + kb_num.group()
+                                d = d.split(kb_num.group())[0].rstrip('.')
+                            return name, version, release, d, arch
                 m = re.match(r"([\d._]+)\.(.+)", r_d)
                 if m:
                     return name, version, m.group(1), m.group(2), arch

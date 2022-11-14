@@ -88,9 +88,8 @@ class WebShowResult:
         if not floder_path:
             os.makedirs(floder_path)
         file_path = os.path.join(floder_path, 'web_show_result.json').replace("\\", '/')
-        json_result = json.dumps(self.web_show_result)
         with open(file_path, 'w') as rf:
-            rf.write(json_result)
+            json.dump(self.web_show_result, rf, indent=4)
 
     def write_json_result(self, *args):
         try:
@@ -98,7 +97,7 @@ class WebShowResult:
             self.web_show_result.setdefault('osv_name', side_b.split('-')[0])
             conclusion = 'PASS' if self.conclusion == '通过' else 'NO PASS'
             self.web_show_result.setdefault('total_result', conclusion)
-            arch = "aarch64" if "aarch64" in side_b else "X86"
+            arch = "aarch64" if "aarch64" in side_b or "arm64" in side_b else "X86"
             self.web_show_result.setdefault('arch', arch)
             self.web_show_result.setdefault('os_download_link', '')
             checksum = gen_hash_key(iso_path)

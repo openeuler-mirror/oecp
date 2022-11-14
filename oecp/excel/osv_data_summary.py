@@ -209,7 +209,7 @@ class DataExcelFile:
         self.sheet.cell(row=FIFTEEN_ROW, column=FOUR_COLUMN).value = FIFTEEN_TITLE[0] + os_name + FIFTEEN_TITLE[1]
         self.sheet.cell(row=SIX_ROW, column=SIX_COLUMN).value = self.obtain_base_os(side_a)
         self.sheet.cell(row=TWO_ROW, column=SIX_COLUMN).value = edition
-        version = "aarch64" if "aarch64" in edition else "X86"
+        version = "aarch64" if "aarch64" in edition or 'arm64' in edition else "X86"
         self.sheet.cell(row=THREE_ROW, column=SIX_COLUMN).value = version
         self.sheet.cell(row=FIVE_ROW, column=SIX_COLUMN).value = gen_hash_key(iso_path)
         font_color = self.green_font if self.conclusion == "通过" else self.red_font

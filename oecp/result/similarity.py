@@ -37,7 +37,7 @@ def get_similarity(rows, side_a, side_b):
     count_rpm_level, _ = rpm_count(rows, side_a, side_b)
     count_rpm_test = rpm_test_count(rows.get(CMP_TYPE_RPM))
 
-    for node, results in rows.items():
+    for results in rows.values():
         if not isinstance(results, list):
             for rpm_type, rpm_results in results.items():
                 if rpm_type in SIMILARITY_TYPES:
@@ -147,9 +147,10 @@ def rpm_count(rows, side_a, side_b):
         if not result["compare type"] == CMP_TYPE_RPM_LEVEL:
             continue
 
-        pkg = result[side_a + " binary rpm package"]
+        pkg_a = result[side_a + " binary rpm package"]
+        pkg_b = result[side_b + " binary rpm package"]
         if float(result["compare result"]) == 4:
-            if pkg.split(',')[0].endswith('.i686.rpm'):
+            if pkg_a.split(',')[0].endswith('.i686.rpm'):
                 continue
         elif float(result["compare result"]) > 4:
             continue
@@ -157,16 +158,16 @@ def rpm_count(rows, side_a, side_b):
         if result["category level"] == 0:
             if float(result["compare result"]) > 2:
                 b = result.get(side_b + " binary rpm package")
-                mark_pkg = b if b else pkg
+                mark_pkg = b if b else pkg_b
                 mark_pkgs.append(mark_pkg)
                 count["core_pkg"]["diff"] += 1
             else:
-                if is_same_rpm(rows.get(pkg)):
+                if is_same_rpm(rows.get(pkg_b)):
                     count["core_pkg"]["same"] += 1
                 else:
                     count["core_pkg"]["diff"] += 1
         else:
-            if (result["compare result"] in RESULT_SAME) and is_same_rpm(rows.get(pkg)):
+            if (result["compare result"] in RESULT_SAME) and is_same_rpm(rows.get(pkg_b)):
                 count.get(result.get("category level"))["same"] += 1
             else:
                 count.get(result.get("category level"))["diff"] += 1
