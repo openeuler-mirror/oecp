@@ -1,0 +1,155 @@
+#!/bin/bash
+current_folder=$(pwd)
+install_folder=
+
+
+function get_config() {
+  cat /etc/oecpreport/conf.ini | grep -E ^$1 | sed 's/[[:space:]]//g' | awk 'BEGIN{FS="="}{print $2}'
+}
+
+
+function get_oecp_app(){
+    _cli=$(get_config "cli")
+    oecp_app=$(echo $_cli | sed 's/\/cli.py//')
+    
+    if [ ! -d $oecp_app ] ; then
+        mkdir -p $oecp_app
+        echo "Start clone oecp tools"
+        git clone https://gitee.com/openeuler/oecp.git $oecp_app
+        echo "Finish clone oecp tools"
+    fi
+    echo "Update or install oecp requirement"
+    yum install -y createrepo libabigail binutils epel-release 
+    pip3 install -i https://pypi.douban.com/simple/ -r $oecp_app/requirement
+}
+
+
+function create_uwsgi_conf(){
+install_folder=$(get_config "chdir")
+pid=$(get_config "pidfile")
+log=$(get_config "daemonize")
+echo "[uwsgi]
+http=:5000
+module=manage:app
+chdir =$install_folder
+callable=app
+buffer-size=65535
+pidfile=$install_folder/$pid
+http-timeout=300
+enable-threads=true
+touch-logreopen=$install_folder/.touch_for_logrotate
+daemonize=$log" >$install_folder/oecpreport.ini
+
+}
+
+
+function start_service(){
+    create_uwsgi_conf
+    uwsgi -d --ini $install_folder/oecpreport.ini
+    nohup celery --workdir $install_folder -A application.core.task.tasks:celery worker &
+}
+
+
+function stop_service(){
+    install_folder=$(get_config "chdir")
+    pid=$(get_config "pidfile")
+    if [ ! -f $install_folder/$pid ]; then
+        echo "Stop service failed,$install_folder/$pid does not exists"
+        exit 1
+    fi
+    ps auxww | grep 'oecpreport.ini' | grep -v grep | awk '{print $2}' | xargs kill -9
+    rm -rf $install_folder/$pid
+    rm -rf $install_folder/oecpreport.ini
+    echo "Stop oecpreport service: $install_folder/oecpreport.ini"
+    ps auxww | grep 'celery' | grep -v grep | awk '{print $2}' | xargs kill -9
+}
+
+function cp_app_to_workfloder(){
+    
+    cp -r oecpreport/application $install_folder
+    cp -r oecpreport/libs $install_folder
+    cp oecpreport/manage.py $install_folder
+    cp oecpreport.service /lib/systemd/system
+    chmod 640 /lib/systemd/system/oecpreport.service
+    echo "Finish copy app flles"
+}
+
+function clean(){
+    echo "Clean work env"
+    rm -rf $install_folder/*
+    rm -rf /usr/bin/oecp-report
+    rm -rf /etc/oecpreport/conf.ini
+    rm -rf /lib/systemd/system/oecpreport.service
+    echo "Work area cleared"
+}
+
+function install_api_service(){
+    install_folder=$1
+    if [ "$install_folder" = "" ]; then
+        echo 'failed: Please enter the location where the application is installed.'
+        exit 1
+    fi
+
+    if [ "${install_folder: -1}" = "/" ] ;then
+        install_folder=$(echo ${install_folder%?})
+    fi 
+    
+    clean
+    yum install gcc python3-devel -y
+    cp oecp-report /usr/bin
+    chmod +x oecp-report
+    if [ ! -d "/etc/oecpreport" ] ; then
+        mkdir -p /etc/oecpreport
+    fi
+
+    if [ ! -d "/var/log/oecp" ] ; then
+        mkdir -p /var/log/oecp
+    fi
+    cp conf.ini /etc/oecpreport
+    sed -i "/^chdir=*/cchdir=$install_folder" /etc/oecpreport/conf.ini
+    sed -i "/^cli=*/ccli=$install_folder/oecp/cli.py" /etc/oecpreport/conf.ini
+    sed -i "/^workspace=*/cworkspace=$install_folder/workspace" /etc/oecpreport/conf.ini
+
+    if [ ! -d $install_folder ] ; then
+        mkdir -p $install_folder
+    fi
+    cp_app_to_workfloder
+    get_oecp_app
+
+    echo "Start install or update oecp report requirement"
+    pip3 install -i https://pypi.douban.com/simple/ -r requirements.txt
+    systemctl daemon-reload
+
+}
+
+
+function container_run(){
+    echo "Start run container"
+    install_folder=/app
+    create_uwsgi_conf
+    uwsgi -d --ini $install_folder/oecpreport.ini
+    celery --workdir $install_folder -A application.core.task.tasks:celery worker
+}
+
+
+case $1 in
+start)
+    start_service
+    ;;
+stop)
+    stop_service
+    ;;
+restart)
+    stop_service
+    start_service 
+    ;;
+install)
+    install_api_service $2
+    ;;
+run)
+    container_run
+    ;;
+*)  
+    echo 'unknown comand,try again stop or start'
+    ;;
+esac
