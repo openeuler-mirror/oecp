@@ -144,8 +144,7 @@ class CompareResultComposite(CompareResultComponent):
 
     def export(self, *e_args):
         root_path, baseline, result_format, iso_path, platform_path = e_args
-        base_side_a = os.path.basename(iso_path[0]) if self.cmp_side_a.endswith('.src.rpm') else self.cmp_side_a
-        base_side_b = os.path.basename(iso_path[1]) if self.cmp_side_b.endswith('.src.rpm') else self.cmp_side_b
+        base_side_a, base_side_b = format_base_side(self.cmp_side_a, self.cmp_side_b, iso_path)
         osv_title = 'report-' + get_title(base_side_a) + '-' + get_title(base_side_b)
         export_floder = os.path.join(root_path, osv_title)
         if os.path.exists(export_floder):
@@ -252,6 +251,20 @@ class CompareResultComposite(CompareResultComponent):
         logger.info(f"all similatity are: {similarity}")
 
         return osv_title
+
+
+def format_base_side(cmp_side_a, cmp_side_b, iso_path):
+    # rpm单包比较结果
+    if cmp_side_a.endswith('.src.rpm') and cmp_side_b.endswith('.src.rpm'):
+        return os.path.basename(iso_path[0]), os.path.basename(iso_path[1])
+    # 远端repo比较结果
+    elif 'repodata' in cmp_side_a and 'repodata' in cmp_side_b:
+        side_a = cmp_side_a.split(',')[0]
+        side_b = cmp_side_b.split(',')[0]
+        return side_a.split('://')[-1], side_b.split('://')[-1]
+    # iso比较结果
+    else:
+        return cmp_side_a, cmp_side_b
 
 
 def get_title(base_side):

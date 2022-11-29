@@ -26,7 +26,7 @@ from oecp.result.compare_result import *
 from oecp.proxy.rpm_proxy import RPMProxy
 from oecp.proxy.requests_proxy import do_download
 from oecp.utils.shell import shell_cmd
-from oecp.main.mapping import SQLiteMapping, RepositoryPackageMapping
+from oecp.main.mapping import SQLiteMapping
 from oecp.main.repository import Repository
 
 logger = logging.getLogger("oecp")
@@ -421,7 +421,7 @@ class DistISO(Directory):
 
 class OEDistRepo(Directory):
     def __init__(self, paths, work_dir, category):
-        super(OEDistRepo, self).__init__('', work_dir, category)
+        super(OEDistRepo, self).__init__(paths, work_dir, category)
 
         self._work_dir = work_dir
         self._cmp_type = CMP_TYPE_DIST_REPOSITORY
@@ -432,13 +432,10 @@ class OEDistRepo(Directory):
         # https://repo.openeuler.org/openEuler-20.03-LTS-SP1/debuginfo/aarch64/repodata"
         # - "https://repo.openeuler.org/openEuler-20.03-LTS-SP1/everything/aarch64/repodata,
         # https://repo.openeuler.org/openEuler-20.03-LTS-SP1/debuginfo/aarch64/repodata"
-        self._format_paths(paths)
-
-        for _path in paths:
-            _rpm_path, _debuginfo_path = _path.split(',')
-            self._set_primary_sqlite_path(_rpm_path)
-            self._set_primary_sqlite_path(_debuginfo_path)
-            self.upsert_a_group(_rpm_path, _debuginfo_path, self._get_primary_sqlite_path(_rpm_path))
+        _rpm_path, _debuginfo_path = self._format_paths(paths)
+        self._set_primary_sqlite_path(_rpm_path)
+        self._set_primary_sqlite_path(_debuginfo_path)
+        self.upsert_a_group(_rpm_path, _debuginfo_path, self._get_primary_sqlite_path(_rpm_path))
 
     @staticmethod
     def _format_paths(paths):
@@ -453,15 +450,23 @@ class OEDistRepo(Directory):
         #    https://repo.openeuler.org/openEuler-20.03-LTS-SP1/debuginfo/aarch64/repodata,
         #    https://repo.openeuler.org/openEuler-20.03-LTS-SP1/everything/aarch64/repodata"
         """
-        for i, _path in enumerate(paths):
-            if ',' not in _path:
-                _path = _path + ','
-            _path = _path.replace('/,', ',')
+        if isinstance(paths, str):
+            _path = paths.split(',')
+            if len(_path) == 2 and 'debuginfo' in _path[1]:
+                return _path[0].rstrip('/'), _path[1].rstrip('/')
+            elif not 'debuginfo' in paths:
+                return paths.rstrip('/'), None
+            else:
+                logger.error('Please checke the input path.')
+        else:
+            logger.error("please input repo path as a string.")
 
-            if _path.endswith('/'):
-                _path = _path[:-1]
-
-            paths[i] = _path.replace(' ', '')
+    @staticmethod
+    def set_iso_sqlite(plan, side, sqlite_path):
+        config = plan.config_of(CMP_TYPE_REQUIRES)
+        if config:
+            config.setdefault('sqlite_path', {})
+            config['sqlite_path'].setdefault(side, []).append(sqlite_path)
 
     def upsert_a_group(self, path, debuginfo_path=None, sqlite_path=None):
         """
@@ -473,19 +478,23 @@ class OEDistRepo(Directory):
         """
         logger.info(f"upsert a group, path: {path}, debuginfo: {debuginfo_path}, sqlite: {sqlite_path}")
 
-        mapping = SQLiteMapping(sqlite_path) if sqlite_path else RepositoryPackageMapping()
         focus_on_rpm = self._all_focus_on_rpm(path)
         debuginfo_rpm = self.all_debuginfo_rpm(debuginfo_path)
         logger.info(f"{len(focus_on_rpm)} rpm packages, {len(debuginfo_rpm)} debuginfo packages")
         for rpm, rpm_path in focus_on_rpm.items():
-            repository_full_name = mapping.repository_of_package(rpm)
-            repository_name = RPMProxy.rpm_name(repository_full_name)
+            repository_name = self.acquire_repository_package(rpm)
             correspond_debuginfo_rpm = RPMProxy.correspond_debuginfo_name(rpm)
             if repository_name in self:
                 self[repository_name].upsert_a_rpm(rpm_path, rpm, debuginfo_rpm.get(correspond_debuginfo_rpm))
             else:
-                self[repository_name] = Repository(self._work_dir, repository_full_name, rpm_path, self._category)
+                self[repository_name] = Repository(self._work_dir, rpm, rpm_path, self._category)
                 self[repository_name].upsert_a_rpm(rpm_path, rpm, debuginfo_rpm.get(correspond_debuginfo_rpm))
+
+    def compare(self, that, plan):
+        self.set_iso_sqlite(plan, 'side_a', self._sqlite_paths)
+        that.set_iso_sqlite(plan, 'side_b', that._sqlite_paths)
+
+        return super(OEDistRepo, self).compare(that, plan)
 
     def parse_repomd_xml(self, repomd_xml_url):
         if not repomd_xml_url:
@@ -600,6 +609,7 @@ class OEDistRepo(Directory):
 
         package_full_path = package_path
         _sqlite_path = self._sqlite_paths.get(package_path, None)
+
         logger.debug(f"package_path={package_path},package_full_path={package_full_path},sqlite_path={_sqlite_path},"
                      f"sqlite_paths={self._sqlite_paths}")
         if not _sqlite_path:
@@ -616,7 +626,8 @@ class OEDistRepo(Directory):
                 if RPMProxy.is_debuginfo_rpm(package_name):
                     rs[package_name] = os.path.join('/'.join(package_path.split('/')[:-1]), location_href)
             else:
-                if RPMProxy.is_rpm_file(package_name) and not RPMProxy.is_debuginfo_rpm(package_name):
+                if RPMProxy.is_rpm_file(package_name) and not RPMProxy.is_debuginfo_rpm(
+                        package_name) and RPMProxy.is_rpm_focus_on(package_name):
                     rs[package_name] = os.path.join('/'.join(package_path.split('/')[:-1]), location_href)
 
         return rs

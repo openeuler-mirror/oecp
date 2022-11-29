@@ -84,7 +84,7 @@ class Factory(object):
 
             # dist repo
             logger.info(f"treat {file_path} as openEuler dist repository")
-            return OEDistRepo([file_path], work_dir, category)
+            return OEDistRepo(file_path, work_dir, category)
         else:
             # directory
             logger.info(f"treat {file_path} as local directory")
