@@ -16,19 +16,19 @@
 ## 2. oecp下载安装与部署
 
 
-install abidiff (centos): ''' yum install -y epel-release yum install -y libabigail '''
+install abidiff (centos): ''' yum install -y epel-release; yum install -y libabigail '''
 
 install createrepo: ''' yum install -y createrepo '''
 
 install binutils: ''' yum install -y binutils '''
 
 注意：openeuler需要配置openEuler-20.03-SP2以上版本everything仓库
-install abidiff (openEulerr): ''' yum install -y libabigail '''
+install abidiff (openEuler): ''' yum install -y libabigail '''
 
 install oecp:
 '''
-git clone https://gitee.com/openeuler/oecp.git
-cd oecp
+git clone https://gitee.com/openeuler/oecp.git;
+cd oecp;
 pip3 install -r requirement
 '''
 
@@ -75,12 +75,12 @@ pip3 install -r requirement
     涵盖下面所有配置项的比较
   * **`config_file.json`**
     比较rpm包中配置文件内容的差异，需依赖RPMExtractDumper（提取解压rpm的dumper类）
-  * **`filelist.json`**
+  * **`file_list.json`**
     比较rpm包文件列表差异，可通过rpm -pql ${rpm_path}命令获取rpm文件列表
   * **`kconfig.json`**
     比较内核配置文件，需依赖RPMExtractDumper（提取解压rpm的dumper类）
   * **`package_list.json`**
-    比较两个rpm集合包名称、版本、发行版本的差异
+    比较两个rpm包名称、版本、发行版本的差异
   * **`provides_requires.json`**
     比较rpm的provides和requires差异，可通过rpm -pq --provides/requires ${rpm_path}查询
 
