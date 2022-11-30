@@ -1,0 +1,15 @@
+[Unit]
+Description=oecp report service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/oecp-report start
+ExecStop=/usr/bin/oecp-report stop
+Restart=always
+RestartSec=1
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
