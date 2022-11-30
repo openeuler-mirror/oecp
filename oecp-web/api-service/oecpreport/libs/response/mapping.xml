@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<codewrap type="science and engineering">
+<code label="SUCCESS">
+    <status_code>200</status_code>
+    <message_zh>操作成功</message_zh>
+</code>
+<code label="OK">
+    <status_code>200</status_code>
+    <message_zh>操作成功</message_zh>
+</code>
+<code label="FAIL">
+    <status_code>400</status_code>
+    <message_zh>操作失败</message_zh>
+</code>
+<code label="APPID_MCHID_NOT_MATCH">
+    <status_code>400</status_code>
+    <message_zh>商户号与appid不匹配</message_zh>
+</code>
+<code label="BANK_ERROR">
+    <status_code>500</status_code>
+    <message_zh>银行系统异常</message_zh>
+</code>
+<code label="OUT_TRADE_NO_USED">
+    <status_code>403</status_code>
+    <message_zh>商户订单号重复</message_zh>
+</code>
+<code label="REQUEST_BLOCKED">
+    <status_code>403</status_code>
+    <message_zh>请求受阻</message_zh>
+</code>
+<code label="BIZ_ERR_NEED_RETRY">
+    <status_code>500</status_code>
+    <message_zh>退款业务流程错误</message_zh>
+</code>
+<code label="USERPAYING">
+    <status_code>202</status_code>
+    <message_zh>用户支付中，需要输入密码</message_zh>
+</code>
+<code label="PARAM_ERROR">
+    <status_code>400</status_code>
+    <message_zh>参数错误</message_zh>
+</code>
+<code label="ORDER_NOT_EXIST">
+    <status_code>404</status_code>
+    <message_zh>请求的资源不存在</message_zh>
+</code>
+<code label="CONTRACT_NOT_EXIST">
+    <status_code>403</status_code>
+    <message_zh>签约协议不存在</message_zh>
+</code>
+<code label="PHONE_NOT_EXIST">
+    <status_code>400</status_code>
+    <message_zh>手机号不存在</message_zh>
+</code>
+<code label="SIGN_ERROR">
+    <status_code>401</status_code>
+    <message_zh>签名验证失败</message_zh>
+</code>
+<code label="ACCOUNT_ERROR">
+    <status_code>403</status_code>
+    <message_zh>账号异常</message_zh>
+</code>
+<code label="SYSTEM_ERROR">
+    <status_code>500</status_code>
+    <message_zh>系统错误</message_zh>
+</code>
+<code label="AUTH_CODE_INVALID">
+    <status_code>400</status_code>
+    <message_zh>收银员扫描的不是微信支付的条码</message_zh>
+</code>
+<code label="FREQUENCY_LIMITED">
+    <status_code>429</status_code>
+    <message_zh>频率超限</message_zh>
+</code>
+<code label="RATELIMIT_EXCEEDED">
+    <status_code>429</status_code>
+    <message_zh>频率限制</message_zh>
+</code>
+<code label="NO_AUTH">
+    <status_code>403</status_code>
+    <message_zh>商户暂无权限使用此功能</message_zh>
+</code>
+<code label="RULE_LIMIT">
+    <status_code>403</status_code>
+    <message_zh>业务规则限制</message_zh>
+</code>
+<code label="AUTH_CODE_EXPIRE">
+    <status_code>403</status_code>
+    <message_zh>用户的条码已经过期</message_zh>
+</code>
+<code label="TRADE_ERROR">
+    <status_code>403</status_code>
+    <message_zh>交易错误</message_zh>
+</code>
+<code label="NOT_ENOUGH">
+    <status_code>403</status_code>
+    <message_zh>余额不足</message_zh>
+</code>
+<code label="USER_NOT_EXIST">
+    <status_code>404</status_code>
+    <message_zh>用户账户注销</message_zh>
+</code>
+<code label="ERROR">
+    <status_code>500</status_code>
+    <message_zh>业务错误</message_zh>
+</code>
+<code label="FREQUENCY_LIMIT_EXCEED">
+    <status_code>429</status_code>
+    <message_zh>接口限频</message_zh>
+</code>
+<code label="CONTRACT_EXISTED">
+    <status_code>403</status_code>
+    <message_zh>协议已存在</message_zh>
+</code>
+<code label="USER_ACCOUNT_ABNORMAL">
+    <status_code>403</status_code>
+    <message_zh>用户账户异常</message_zh>
+</code>
+<code label="CONTRACT_ERROR">
+    <status_code>403</status_code>
+    <message_zh>当前用户签约状态失效</message_zh>
+</code>
+<code label="REFUND_NOT_EXISTS">
+    <status_code>404</status_code>
+    <message_zh>订单号错误或订单状态不正确</message_zh>
+</code>
+<code label="CONTRACT_NOT_CONFIRMED">
+    <status_code>403</status_code>
+    <message_zh>二级商户未开启手动提现权限</message_zh>
+</code>
+<code label="NO_STATEMENT_EXIST">
+    <status_code>400</status_code>
+    <message_zh>账单文件不存在</message_zh>
+</code>
+<code label="STATEMENT_CREATING">
+    <status_code>400</status_code>
+    <message_zh>账单生成中</message_zh>
+</code>
+<code label="MCH_NOT_EXISTS">
+    <status_code>404</status_code>
+    <message_zh>商户号不存在</message_zh>
+</code>
+<code label="INVALID_REQUEST">
+    <status_code>400</status_code>
+    <message_zh>请求参数符合参数格式，但不符合业务规则</message_zh>
+</code>
+<code label="RESOURCE_NOT_EXISTS">
+    <status_code>404</status_code>
+    <message_zh>查询的资源不存在</message_zh>
+</code>
+<code label="RESOURCE_ALREADY_EXISTS">
+    <status_code>400</status_code>
+    <message_zh>用户已签约该商户，不可重复签约</message_zh>
+</code>
+<code label="ALREADY_EXISTS">
+    <status_code>400</status_code>
+    <message_zh>资源已存在</message_zh>
+</code>
+<code label="USER_NOT_REGISTERED">
+    <status_code>400</status_code>
+    <message_zh>服务未开通或账号未注册</message_zh>
+</code>
+<code label="USER_NOT_EXISTS">
+    <status_code>404</status_code>
+    <message_zh>openid不正确</message_zh>
+</code>
+<code label="ORDER_CLOSED">
+    <status_code>400</status_code>
+    <message_zh>订单已关闭</message_zh>
+</code>
+<code label="ORDER_PAID">
+    <status_code>400</status_code>
+    <message_zh>订单已支付</message_zh>
+</code>
+<code label="ORDER_REVERSED">
+    <status_code>400</status_code>
+    <message_zh>订单已撤销</message_zh>
+</code>
+<code label="ORDERCLOSED">
+    <status_code>400</status_code>
+    <message_zh>订单已关闭</message_zh>
+</code>
+<code label="ORDERPAID">
+    <status_code>400</status_code>
+    <message_zh>订单已支付</message_zh>
+</code>
+<code label="ORDERREVERSED">
+    <status_code>400</status_code>
+    <message_zh>订单已撤销</message_zh>
+</code>
+<code label="ACCOUNT_NOT_VERIFIED">
+    <status_code>403</status_code>
+    <message_zh>二级商户下行打款未成功</message_zh>
+</code>
+<code label="NOT_FOUND">
+    <status_code>404</status_code>
+    <message_zh>请求的资源不存在</message_zh>
+</code>
+
+
+<code label="isv.SMS_SIGNATURE_SCENE_ILLEGAL">
+    <status_code>400</status_code>
+    <message_zh>短信所使用签名场景非法</message_zh>
+</code>
+<code label="isv.EXTEND_CODE_ERROR">
+    <status_code>400</status_code>
+    <message_zh>扩展码使用错误，相同的扩展码不可用于多个签名</message_zh>
+</code>
+<code label="isv.DOMESTIC_NUMBER_NOT_SUPPORTED">
+    <status_code>400</status_code>
+    <message_zh>国际/港澳台消息模板不支持发送境内号码</message_zh>
+</code>
+<code label="isv.DENY_IP_RANGE">
+    <status_code>400</status_code>
+    <message_zh>源IP地址所在的地区被禁用</message_zh>
+</code>
+<code label="isv.DAY_LIMIT_CONTROL">
+    <status_code>400</status_code>
+    <message_zh>触发日发送限额</message_zh>
+</code>
+<code label="isv.SMS_CONTENT_ILLEGAL">
+    <status_code>400</status_code>
+    <message_zh>短信内容包含禁止发送内容</message_zh>
+</code>
+<code label="isv.SMS_SIGN_ILLEGAL">
+    <status_code>400</status_code>
+    <message_zh>签名禁止使用</message_zh>
+</code>
+<code label="isp.RAM_PERMISSION_DENY">
+    <status_code>400</status_code>
+    <message_zh>RAM权限不足</message_zh>
+</code>
+<code label="isv.OUT_OF_SERVICE">
+    <status_code>400</status_code>
+    <message_zh>业务停机</message_zh>
+</code>
+<code label="isv.PRODUCT_UN_SUBSCRIPT">
+    <status_code>400</status_code>
+    <message_zh>未开通云通信产品的阿里云客户</message_zh>
+</code>
+<code label="isv.PRODUCT_UNSUBSCRIBE">
+    <status_code>400</status_code>
+    <message_zh>产品未开通</message_zh>
+</code>
+<code label="isv.ACCOUNT_NOT_EXISTS">
+    <status_code>400</status_code>
+    <message_zh>账户不存在</message_zh>
+</code>
+<code label="isv.ACCOUNT_ABNORMAL">
+    <status_code>400</status_code>
+    <message_zh>账户异常</message_zh>
+</code>
+<code label="isv.SMS_TEMPLATE_ILLEGAL">
+    <status_code>400</status_code>
+    <message_zh>短信模版不合法</message_zh>
+</code>
+<code label="isv.SMS_SIGNATURE_ILLEGAL">
+    <status_code>400</status_code>
+    <message_zh>短信签名不合法</message_zh>
+</code>
+<code label="isv.INVALID_PARAMETERS">
+    <status_code>400</status_code>
+    <message_zh>参数异常</message_zh>
+</code>
+<code label="isp.SYSTEM_ERROR">
+    <status_code>500</status_code>
+    <message_zh>系统错误</message_zh>
+</code>
+<code label="isv.MOBILE_NUMBER_ILLEGAL">
+    <status_code>400</status_code>
+    <message_zh>非法手机号</message_zh>
+</code>
+<code label="isv.MOBILE_COUNT_OVER_LIMIT">
+    <status_code>400</status_code>
+    <message_zh>手机号码数量超过限制</message_zh>
+</code>
+<code label="isv.TEMPLATE_MISSING_PARAMETERS">
+    <status_code>400</status_code>
+    <message_zh>模版缺少变量</message_zh>
+</code>
+<code label="isv.BUSINESS_LIMIT_CONTROL">
+    <status_code>400</status_code>
+    <message_zh>业务限流</message_zh>
+</code>
+<code label="isv.INVALID_JSON_PARAM">
+    <status_code>400</status_code>
+    <message_zh>JSON参数不合法，只接受字符串值</message_zh>
+</code>
+<code label="isv.BLACK_KEY_CONTROL_LIMIT">
+    <status_code>400</status_code>
+    <message_zh>黑名单管控</message_zh>
+</code>
+<code label="isv.PARAM_LENGTH_LIMIT">
+    <status_code>400</status_code>
+    <message_zh>参数超出长度限制</message_zh>
+</code>
+<code label="isv.PARAM_NOT_SUPPORT_URL">
+    <status_code>400</status_code>
+    <message_zh>不支持URL</message_zh>
+</code>
+<code label="isv.AMOUNT_NOT_ENOUGH">
+    <status_code>400</status_code>
+    <message_zh>账户余额不足</message_zh>
+</code>
+<code label="isv.TEMPLATE_PARAMS_ILLEGAL">
+    <status_code>400</status_code>
+    <message_zh>模版变量里包含非法关键字</message_zh>
+</code>
+<code label="SignatureDoesNotMatch">
+    <status_code>400</status_code>
+    <message_zh>指定的签名与我们的计算机不匹配</message_zh>
+</code>
+<code label="InvalidTimeStamp.Expired">
+    <status_code>400</status_code>
+    <message_zh>时间戳或日期已过期</message_zh>
+</code>
+<code label="SignatureNonceUsed">
+    <status_code>400</status_code>
+    <message_zh>签名随机数已被使用</message_zh>
+</code>
+<code label="InvalidVersion">
+    <status_code>400</status_code>
+    <message_zh>版本无效</message_zh>
+</code>
+<code label="InvalidAction.NotFound">
+    <status_code>400</status_code>
+    <message_zh>未找到指定的API，请检查您的URL和方法</message_zh>
+</code>
+<code label="isv.SIGN_COUNT_OVER_LIMIT">
+    <status_code>400</status_code>
+    <message_zh>一个自然日中申请签名数量超过限制</message_zh>
+</code>
+<code label="isv.TEMPLATE_COUNT_OVER_LIMIT">
+    <status_code>400</status_code>
+    <message_zh>一个自然日中申请模板数量超过限制</message_zh>
+</code>
+<code label="isv.SIGN_NAME_ILLEGAL">
+    <status_code>400</status_code>
+    <message_zh>签名名称不符合规范</message_zh>
+</code>
+<code label="isv.SIGN_FILE_LIMIT">
+    <status_code>400</status_code>
+    <message_zh>签名认证材料附件大小超过限制</message_zh>
+</code>
+<code label="isv.SIGN_OVER_LIMIT">
+    <status_code>400</status_code>
+    <message_zh>签名字符数量超过限制</message_zh>
+</code>
+<code label="isv.TEMPLATE_OVER_LIMIT">
+    <status_code>400</status_code>
+    <message_zh>模板字符数量超过限制</message_zh>
+</code>
+<code label="SIGNATURE_BLACKLIST">
+    <status_code>400</status_code>
+    <message_zh>签名黑名单</message_zh>
+</code>
+<code label="isv.SHORTURL_OVER_LIMIT">
+    <status_code>400</status_code>
+    <message_zh>一天创建短链数量超过限制</message_zh>
+</code>
+<code label="isv.NO_AVAILABLE_SHORT_URL">
+    <status_code>400</status_code>
+    <message_zh>无有效短链</message_zh>
+</code>
+<code label="isv.SHORTURL_NAME_ILLEGAL">
+    <status_code>400</status_code>
+    <message_zh>短链名称非法</message_zh>
+</code>
+<code label="isv.SOURCEURL_OVER_LIMIT">
+    <status_code>400</status_code>
+    <message_zh>原始链接字符数量超过限制</message_zh>
+</code>
+<code label="isv.SHORTURL_TIME_ILLEGAL">
+    <status_code>400</status_code>
+    <message_zh>短链有效期期限超过限制</message_zh>
+</code>
+<code label="isv.PHONENUMBERS_OVER_LIMIT">
+    <status_code>400</status_code>
+    <message_zh>上传手机号个数超过上限</message_zh>
+</code>
+<code label="isv.SHORTURL_STILL_AVAILABLE">
+    <status_code>400</status_code>
+    <message_zh>原始链接生成的短链仍在有效期内</message_zh>
+</code>
+<code label="isv.SHORTURL_NOT_FOUND">
+    <status_code>400</status_code>
+    <message_zh>没有可删除的短链</message_zh>
+</code>
+<code label="isv.ERROR_SIGN_NOT_MODIFY">
+    <status_code>400</status_code>
+    <message_zh>签名不支持修改</message_zh>
+</code>
+
+</codewrap>
