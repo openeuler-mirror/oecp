@@ -54,13 +54,16 @@ class NVSCompareExecutor(CompareExecutor):
     def instantiation_mapping(self):
         for side in self.config.get('sqlite_path', {}).keys():
             for sqlite_a in self.config['sqlite_path'].get(side, []):
-                if not isinstance(sqlite_a, str):
+                self.mapping.setdefault(side, [])
+                if isinstance(sqlite_a, dict):
+                    for sqlite in sqlite_a.values():
+                        self.mapping[side].append(SQLiteMapping(sqlite))
+                elif not isinstance(sqlite_a, str):
                     repo_path = os.path.join(sqlite_a.name, 'repodata')
                     for file in os.listdir(repo_path):
                         if '-primary.sqlite.' in file:
-                            sqlite_a = os.path.join(repo_path, file)
-                self.mapping.setdefault(side, [])
-                self.mapping[side].append(SQLiteMapping(sqlite_a))
+                            sqlite = os.path.join(repo_path, file)
+                            self.mapping[side].append(SQLiteMapping(sqlite))
 
     def to_pretty_dump(self, dump):
         """
@@ -74,9 +77,9 @@ class NVSCompareExecutor(CompareExecutor):
 
             # provides 和 requires 比较忽视release版本号，requires加上依赖类型（强依赖或弱依赖）
             # if dump['kind'] in ('provides', 'requires'):
-            if dump ['kind'] == 'provides':
+            if dump['kind'] == 'provides':
                 new_component = ' '.join([component['name'], component['symbol'], component['version'].split('-')[0]])
-            elif dump ['kind'] == 'requires':
+            elif dump['kind'] == 'requires':
                 requires_name = ' '.join([component['name'], component['symbol'], component['version'].split('-')[0]])
                 new_component = dict(name=requires_name, dependence=component['dependence'])
             else:
