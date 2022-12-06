@@ -19,7 +19,8 @@ function get_oecp_app(){
         echo "Finish clone oecp tools"
     fi
     echo "Update or install oecp requirement"
-    yum install -y createrepo libabigail binutils epel-release 
+    yum install -y createrepo libabigail binutils
+    yum install -y epel-release 
     pip3 install -i https://pypi.douban.com/simple/ -r $oecp_app/requirement
 }
 
