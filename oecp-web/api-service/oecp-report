@@ -77,6 +77,7 @@ function cp_app_to_workfloder(){
 function clean(){
     echo "Clean work env"
     rm -rf $install_folder/*
+    chmod -R 755 /usr
     rm -rf /usr/bin/oecp-report
     rm -rf /etc/oecpreport/conf.ini
     rm -rf /lib/systemd/system/oecpreport.service
@@ -96,8 +97,10 @@ function install_api_service(){
     
     clean
     yum install gcc python3-devel -y
+    # chmod -R 755 /usr
     cp oecp-report /usr/bin
-    chmod +x oecp-report
+    # chmod +x oecp-report
+    chmod +x /usr/bin/oecp-report
     if [ ! -d "/etc/oecpreport" ] ; then
         mkdir -p /etc/oecpreport
     fi
