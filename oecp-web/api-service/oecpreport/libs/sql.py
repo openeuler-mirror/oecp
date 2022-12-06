@@ -77,6 +77,8 @@ class Mysql:
             encoding="utf-8",
             convert_unicode=True,
             echo=True,
+            pool_size=25,
+            pool_recycle=600
         )
         return engine
 
