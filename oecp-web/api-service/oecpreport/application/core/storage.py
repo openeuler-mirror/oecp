@@ -286,14 +286,21 @@ class AnalysisReport:
         source_version, target_version = self.rpm_report_header
         source_version = source_version.split()[0]
         target_version = target_version.split()[0]
-        report_base = ReportBase(
-            title=source_version + "VS" + target_version,
-            source_version=source_version,
-            target_version=target_version,
-            state="importing",
-            create_time=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())),
-        )
         with DataBase() as db:
+            title = target_version.split('-')[0]
+            if title:
+                count = db.session.query(ReportBase).filter(ReportBase.title == title).count()
+                if count > 0:
+                    title += count
+            else:
+                title = target_version
+            report_base = ReportBase(
+                title=title,
+                source_version=source_version,
+                target_version=target_version,
+                state="importing",
+                create_time=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())),
+            )
             base_report = (
                 db.session.query(ReportBase)
                 .filter(
