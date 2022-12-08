@@ -291,7 +291,7 @@ class AnalysisReport:
             if title:
                 count = db.session.query(ReportBase).filter(ReportBase.title == title).count()
                 if count > 0:
-                    title += count
+                    title += "_" + str(count)
             else:
                 title = target_version
             report_base = ReportBase(
