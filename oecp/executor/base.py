@@ -23,7 +23,7 @@ from oecp.result.compare_result import CMP_RESULT_MORE, CMP_RESULT_LESS, CMP_RES
     CMP_RESULT_CHANGE
 
 # 两者category指定的级别不同或者未指定
-from oecp.result.constants import OLD_CHAR, NEW_CHAR, CMP_SAME_RESULT, CMP_TYPE_KCONFIG
+from oecp.result.constants import STAND_DISTS, OSV_DISTS, CMP_SAME_RESULT, CMP_TYPE_KCONFIG
 
 CPM_CATEGORY_DIFF = 4
 
@@ -36,39 +36,18 @@ class CompareExecutor(ABC):
         self.config = config
 
     @staticmethod
-    def get_version_change_files(side_a_file, side_b_file, o_char=None, n_char=None):
-        side_a_floders = side_a_file.split('/')
-        side_b_floders = side_b_file.split('/')
-        compare_result = CMP_RESULT_SAME
-        if len(side_a_floders) == len(side_b_floders):
-            for index in range(1, len(side_a_floders) - 1):
-                floder_a = side_a_floders[index]
-                floder_b = side_b_floders[index]
-                if floder_a == floder_b:
-                    continue
-                elif floder_a.split(o_char) == floder_b.split(n_char):
-                    continue
-                elif re.search('\\d+\\.\\d+', side_a_floders[index]) and re.search('\\d+\\.\\d+',
-                                                                                   side_b_floders[index]):
-                    compare_result = CMP_RESULT_CHANGE
-                    continue
-                else:
-                    compare_result = CMP_RESULT_DIFF
-                    break
-            return compare_result
-
-    @staticmethod
-    def format_dump_file(data_a, data_b):
-        dump_set_a, dump_set_b = set(data_a), set(data_b)
-        common_dump = dump_set_a & dump_set_b
-        only_dump_a = dump_set_a - dump_set_b
-        only_dump_b = dump_set_b - dump_set_a
-        all_dump = [
-            [[x, x, CMP_RESULT_SAME] for x in common_dump],
-            [[x, '', CMP_RESULT_LESS] for x in only_dump_a],
-            [['', x, CMP_RESULT_MORE] for x in only_dump_b]
-        ]
-        return all_dump
+    def identify_dist_difference(side_a, side_b):
+        """
+        识别发行商dist修改的标识符
+        @param side_a: 基准标识符
+        @param side_b: osv标识符
+        @return:
+        """
+        for standard_dist in STAND_DISTS:
+            for osv_dist in OSV_DISTS.get(standard_dist):
+                if side_a.split(standard_dist) == side_b.split(osv_dist):
+                    return True
+        return False
 
     @staticmethod
     def format_dump_kv(data_a, data_b, kind):
@@ -195,26 +174,26 @@ class CompareExecutor(ABC):
             return True
         return False
 
-    def find_dir_version_change_files(self, only_dump_a, only_dump_b, change_dump, common_dump_add):
-        dict_a, dict_b = {}, {}
-        for side_a_file in list(only_dump_a):
-            dict_a[os.path.basename(side_a_file)] = side_a_file
-        for side_b_file in list(only_dump_b):
-            dict_b[os.path.basename(side_b_file)] = side_b_file
-        for single_key in dict_a:
-            if dict_b.get(single_key):
-                side_a_file = dict_a.get(single_key)
-                side_b_file = dict_b.get(single_key)
-                get_result = self.get_version_change_files(side_a_file, side_b_file)
-                if get_result == CMP_RESULT_CHANGE:
-                    change_dump.append([side_a_file, side_b_file])
-                    only_dump_a.discard(side_a_file)
-                    only_dump_b.discard(side_b_file)
-                elif get_result == CMP_RESULT_SAME:
-                    common_dump_add.append([side_a_file, side_b_file])
-                    only_dump_a.discard(side_a_file)
-                    only_dump_b.discard(side_b_file)
-        self.format_special_changed_files(only_dump_a, only_dump_b, change_dump, common_dump_add)
+    def get_version_change_files(self, side_a_file, side_b_file):
+        side_a_floders = side_a_file.split('/')
+        side_b_floders = side_b_file.split('/')
+        compare_result = CMP_RESULT_SAME
+        if len(side_a_floders) == len(side_b_floders):
+            for index in range(1, len(side_a_floders) - 1):
+                floder_a = side_a_floders[index]
+                floder_b = side_b_floders[index]
+                if floder_a == floder_b:
+                    continue
+                elif self.identify_dist_difference(floder_a, floder_b):
+                    continue
+                elif re.search('\\d+\\.\\d+', side_a_floders[index]) and re.search('\\d+\\.\\d+',
+                                                                                   side_b_floders[index]):
+                    compare_result = CMP_RESULT_CHANGE
+                    continue
+                else:
+                    compare_result = CMP_RESULT_DIFF
+                    break
+            return compare_result
 
     def format_dump(self, data_a, data_b):
         dump_set_a, dump_set_b = set(data_a), set(data_b)
@@ -222,7 +201,7 @@ class CompareExecutor(ABC):
         only_dump_a = dump_set_a - dump_set_b
         only_dump_b = dump_set_b - dump_set_a
         change_dump, common_dump_add = [], []
-        self.find_dir_version_change_files(only_dump_a, only_dump_b, change_dump, common_dump_add)
+        self.format_changed_files(only_dump_a, only_dump_b, change_dump, common_dump_add)
         all_dump = [
             [[x, x, CMP_RESULT_SAME] for x in common_dump],
             [[x[0], x[1], CMP_RESULT_CHANGE] for x in change_dump],
@@ -234,13 +213,14 @@ class CompareExecutor(ABC):
                 all_dump[0].append([common_cmp_pair[0], common_cmp_pair[1], CMP_RESULT_SAME])
         return all_dump
 
-    def format_special_changed_files(self, only_dump_a, only_dump_b, change_dump, common_dump_add):
+    def format_changed_files(self, only_dump_a, only_dump_b, change_dump, common_dump_add):
         for side_a_file in list(only_dump_a):
             for side_b_file in list(only_dump_b):
                 get_result = ''
                 file_a, file_b = os.path.basename(side_a_file), os.path.basename(side_b_file)
-                # 识别so库文件两种版本变化形式
-                if file_a.endswith('.so') and file_b.endswith('.so'):
+                if file_a == file_b or self.identify_dist_difference(file_a, file_b):
+                    get_result = self.get_version_change_files(side_a_file, side_b_file)
+                elif file_a.endswith('.so') and file_b.endswith('.so'):
                     file_a_version_1 = re.search('\\d+\\.\\d+', file_a.split('-')[-1])
                     file_b_version_1 = re.search('\\d+\\.\\d+', file_a.split('-')[-1])
                     if file_a_version_1 and file_b_version_1 and file_a.split('-')[0] == file_b.split('-')[0]:
@@ -250,11 +230,6 @@ class CompareExecutor(ABC):
                     file_b_version_2 = re.search('\\d+\\.\\d+\\.\\d+', file_a.split('.so.')[-1])
                     if file_a_version_2 and file_b_version_2:
                         get_result = self.get_version_change_files(side_a_file, side_b_file)
-                # 识别rpm文件、文件夹名称中发行商字样变更
-                for o_char in OLD_CHAR:
-                    for n_char in NEW_CHAR[o_char]:
-                        if file_a.split(o_char) == file_b.split(n_char):
-                            get_result = self.get_version_change_files(side_a_file, side_b_file, o_char, n_char)
 
                 if get_result == CMP_RESULT_CHANGE:
                     change_dump.append([side_a_file, side_b_file])
@@ -266,6 +241,30 @@ class CompareExecutor(ABC):
                     only_dump_a.discard(side_a_file)
                     only_dump_b.discard(side_b_file)
                     break
+
+    def format_dump_file(self, data_a, data_b):
+        dump_set_a, dump_set_b = set(data_a), set(data_b)
+        common_dump = dump_set_a & dump_set_b
+        only_dump_a = dump_set_a - dump_set_b
+        only_dump_b = dump_set_b - dump_set_a
+        common_dump_result = [[x, x, CMP_RESULT_SAME] for x in common_dump]
+        common_dump_a, common_dump_b = [], []
+        for side_a in only_dump_a:
+            for side_b in only_dump_b:
+                if self.identify_dist_difference(side_a, side_b):
+                    common_dump_result.append([side_a, side_b, CMP_RESULT_SAME])
+                    common_dump_a.append(side_a)
+                    common_dump_b.append(side_b)
+                    break
+        only_dump_a = only_dump_a - set(common_dump_a)
+        only_dump_b = only_dump_b - set(common_dump_b)
+        all_dump = [
+            common_dump_result,
+            [[x, '', CMP_RESULT_LESS] for x in only_dump_a],
+            [['', x, CMP_RESULT_MORE] for x in only_dump_b]
+        ]
+
+        return all_dump
 
     def split_common_files(self, files_a, files_b):
         common_file_pairs, common_file_a, common_file_b = [], [], []
@@ -278,7 +277,7 @@ class CompareExecutor(ABC):
                     common_file_b.append(file_b)
                 elif os.path.basename(path_a) == os.path.basename(path_b):
                     cmp_result = self.get_version_change_files(path_a, path_b)
-                    if cmp_result == CMP_RESULT_CHANGE:
+                    if cmp_result in CMP_SAME_RESULT:
                         common_file_pairs.append([file_a, file_b])
                         common_file_a.append(file_a)
                         common_file_b.append(file_b)

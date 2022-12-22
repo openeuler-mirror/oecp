@@ -62,15 +62,16 @@ CMP_TYPE_REPOSITORY_RPMS = "iso rpm"
 CMP_TYPE_RPMS_TEST = "rpm test"
 CMP_TYPE_PERFORMANCE = "performance"
 CMP_TYPE_SERVICE = "rpm service"
-CMP_TYPE_SERVICE_DETAIL = 'service detail'
-CMP_TYPE_CI_CONFIG = 'ciconfig'
-CMP_TYPE_CI_FILE_CONFIG = 'ci file config'
-CMP_TYPE_AT = 'AT'
-CMP_TYPE_CMD = 'rpm cmd'
-CMP_TYPE_RPM_HEADER = 'rpm header'
-CMP_TYPE_RPM_LIB = 'rpm lib'
-CMP_TYPE_DIFFERENCES = 'differences'
+CMP_TYPE_SERVICE_DETAIL = "service detail"
+CMP_TYPE_CI_CONFIG = "ciconfig"
+CMP_TYPE_CI_FILE_CONFIG = "ci file config"
+CMP_TYPE_AT = "AT"
+CMP_TYPE_CMD = "rpm cmd"
+CMP_TYPE_RPM_HEADER = "rpm header"
+CMP_TYPE_RPM_LIB = "rpm lib"
+CMP_TYPE_DIFFERENCES = "differences"
 CMP_TYPE_REQUIRES = "requires"
+CMP_TYPE_PROVIDES = "provides"
 
 # COMPOSITE_CMPS which without detail report
 COMPOSITE_CMPS = {CMP_TYPE_RPM, CMP_TYPE_REPOSITORY}
@@ -151,8 +152,8 @@ DETAIL_PATH = "details_analyse"
 ALL_DETAILS_NAME = ['effect drivers', 'details path', 'file_name']
 
 # The Character in File name have changed.
-OLD_CHAR = ('oe1',)
-NEW_CHAR = {'oe1': ['ky10']}
+STAND_DISTS = ('oe1',)
+OSV_DISTS = {'oe1': ['ky10']}
 
 # All Kernel Binary Package Name
 KERNEL = 'kernel'

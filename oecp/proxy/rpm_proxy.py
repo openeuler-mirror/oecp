@@ -63,6 +63,10 @@ class RPMProxy(object):
                 # eg: grpc-1.31.0-6.oe1.x86_64.rpm
                 name, version = cls.rpm_name_version(rpm)
                 m = re.match(r"-(.+)\.(.+)\.rpm", rpm.replace(name + '-' + version, "", 1))
+                if not m:
+                    # eg: RAID-3858_3758-EulerOS2.10-hiraid-1.0.0.18-aarch64.rpm
+                    m = re.match(r"-(.+)\.rpm", rpm.replace(name + '-' + version, "", 1))
+                    return name, version, '', '', m.group(1)
                 r_d, arch = m.group(1), m.group(2)
                 for d_flag in DIST_FLAG:
                     if d_flag not in r_d:
