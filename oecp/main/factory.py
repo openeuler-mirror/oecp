@@ -22,6 +22,8 @@ import logging
 from oecp.main.repository import Repository
 from oecp.main.directory import Directory, DistISO, OEDistRepo
 from oecp.main.category import Category
+from oecp.proxy.rpm_proxy import RPMProxy
+from oecp.result.constants import STAND_DISTS
 
 from oecp.utils.misc import path_is_remote
 from oecp.proxy.requests_proxy import do_download_tqdm
@@ -32,20 +34,20 @@ logger = logging.getLogger("oecp")
 
 class Factory(object):
     @staticmethod
-    def create(file_paths, args, file_type):
+    def create(file_paths, args, file_type, side):
 
         work_dir = args.work_dir
         category = Category(args.category_path)
         if file_type == 'repo':
             logger.info(f"treat {file_paths} as openEuler dist repository")
-            return OEDistRepo(file_paths, work_dir, category)
+            return OEDistRepo(file_paths, work_dir, category, side)
         elif file_type == 'iso':
             logger.info(f"treat {file_paths} as iso")
-            return DistISO(file_paths, work_dir, category, True)
+            return DistISO(file_paths, work_dir, category, side, True)
         elif file_type == 'dir':
             # directory
             logger.info(f"treat {file_paths} as local directory")
-            return Directory(file_paths[0], work_dir, category, False)
+            return Directory(file_paths[0], work_dir, category, side, False)
         elif file_type != "none":
             raise RuntimeError(f"compare type {file_type} is illegal")
 
@@ -62,10 +64,15 @@ class Factory(object):
 
             not path_is_remote(file_path) and logger.info(f"treat {file_path} as local iso")
 
-            return DistISO(file_path, work_dir, category)
+            return DistISO(file_path, work_dir, category, side)
         elif file_path.endswith("rpm"):
             # rpm type
             verbose_path = os.path.basename(file_path)
+            dist = RPMProxy.rpm_standard_dist(verbose_path)
+            if dist:
+                STAND_DISTS[side] = dist
+            else:
+                logger.warning(f"{verbose_path} is not a standard rpm name,It doesn't resolve to dist.")
             if path_is_remote(file_path):
                 logger.info(f"treat {file_path} as remote rpm file")
 
@@ -75,6 +82,7 @@ class Factory(object):
                 file_path = local_path
 
             not path_is_remote(file_path) and logger.info(f"treat {file_path} as local rpm file")
+
             repository = Repository(work_dir, verbose_path, file_path, category)
             repository.upsert_a_rpm(file_path, verbose_path)
 
@@ -84,12 +92,12 @@ class Factory(object):
 
             # dist repo
             logger.info(f"treat {file_path} as openEuler dist repository")
-            return OEDistRepo(file_path, work_dir, category)
+            return OEDistRepo(file_path, work_dir, category, side)
         else:
             # directory
             logger.info(f"treat {file_path} as local directory")
 
-            return Directory(file_path, work_dir, category, False)
+            return Directory(file_path, work_dir, category, side, False)
 
     @staticmethod
     def guess_obs_repo(remote_path):

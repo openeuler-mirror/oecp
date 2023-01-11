@@ -23,7 +23,7 @@ from oecp.result.compare_result import CMP_RESULT_MORE, CMP_RESULT_LESS, CMP_RES
     CMP_RESULT_CHANGE
 
 # 两者category指定的级别不同或者未指定
-from oecp.result.constants import STAND_DISTS, OSV_DISTS, CMP_SAME_RESULT, CMP_TYPE_KCONFIG
+from oecp.result.constants import STAND_DISTS, CMP_SAME_RESULT, CMP_TYPE_KCONFIG, BASE_SIDE, OSV_SIDE
 
 CPM_CATEGORY_DIFF = 4
 
@@ -34,20 +34,6 @@ class CompareExecutor(ABC):
         self.dump_a = dump_a
         self.dump_b = dump_b
         self.config = config
-
-    @staticmethod
-    def identify_dist_difference(side_a, side_b):
-        """
-        识别发行商dist修改的标识符
-        @param side_a: 基准标识符
-        @param side_b: osv标识符
-        @return:
-        """
-        for standard_dist in STAND_DISTS:
-            for osv_dist in OSV_DISTS.get(standard_dist):
-                if side_a.split(standard_dist) == side_b.split(osv_dist):
-                    return True
-        return False
 
     @staticmethod
     def format_dump_kv(data_a, data_b, kind):
@@ -184,7 +170,7 @@ class CompareExecutor(ABC):
                 floder_b = side_b_floders[index]
                 if floder_a == floder_b:
                     continue
-                elif self.identify_dist_difference(floder_a, floder_b):
+                elif floder_a.split(STAND_DISTS[BASE_SIDE]) == floder_b.split(STAND_DISTS[OSV_SIDE]):
                     continue
                 elif re.search('\\d+\\.\\d+', side_a_floders[index]) and re.search('\\d+\\.\\d+',
                                                                                    side_b_floders[index]):
@@ -218,7 +204,7 @@ class CompareExecutor(ABC):
             for side_b_file in list(only_dump_b):
                 get_result = ''
                 file_a, file_b = os.path.basename(side_a_file), os.path.basename(side_b_file)
-                if file_a == file_b or self.identify_dist_difference(file_a, file_b):
+                if file_a == file_b or file_a.split(STAND_DISTS[BASE_SIDE]) == file_b.split(STAND_DISTS[OSV_SIDE]):
                     get_result = self.get_version_change_files(side_a_file, side_b_file)
                 elif file_a.endswith('.so') and file_b.endswith('.so'):
                     file_a_version_1 = re.search('\\d+\\.\\d+', file_a.split('-')[-1])
@@ -251,7 +237,7 @@ class CompareExecutor(ABC):
         common_dump_a, common_dump_b = [], []
         for side_a in only_dump_a:
             for side_b in only_dump_b:
-                if self.identify_dist_difference(side_a, side_b):
+                if side_a.split(STAND_DISTS[BASE_SIDE]) == side_b.split(STAND_DISTS[OSV_SIDE]):
                     common_dump_result.append([side_a, side_b, CMP_RESULT_SAME])
                     common_dump_a.append(side_a)
                     common_dump_b.append(side_b)

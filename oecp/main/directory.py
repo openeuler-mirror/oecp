@@ -33,7 +33,7 @@ logger = logging.getLogger("oecp")
 
 
 class Directory(UserDict):
-    def __init__(self, path, work_dir, category, lazy=True):
+    def __init__(self, path, work_dir, category, side, lazy=True):
         """
 
         :param path: 目录路径
@@ -52,6 +52,7 @@ class Directory(UserDict):
         self._category = category
 
         self._lazy = lazy
+        self.side = side
 
         # 加载当前目录，rpm和debuginfo包都在当前目录
         if not self._lazy:
@@ -123,6 +124,7 @@ class Directory(UserDict):
         logger.info(
             f"{self.verbose_path} upsert a group, path: {path}, debuginfo: {debuginfo_path}")
         focus_on_rpm = self._all_focus_on_rpm(path)
+        self.get_target_dist(focus_on_rpm, self.side)
         debuginfo_rpm = self.all_debuginfo_rpm(debuginfo_path)
         logger.info(
             f"{self.verbose_path} total {len(focus_on_rpm)} rpm packages, {len(debuginfo_rpm)} debuginfo packages")
@@ -184,6 +186,15 @@ class Directory(UserDict):
         finally:
             side_a.clean()
             side_b.clean()
+
+    @staticmethod
+    def get_target_dist(focus_on_rpm, tar):
+        if not STAND_DISTS.get(tar):
+            for rpm in focus_on_rpm.keys():
+                d = RPMProxy.rpm_standard_dist(rpm)
+                if d:
+                    STAND_DISTS[tar] = d
+                    break
 
     @staticmethod
     def acquire_repository_package(rpm):
@@ -249,9 +260,10 @@ class DistISO(Directory):
 
     # path = "/a.iso,/a-debug.iso" with_debug=True
     # path = "/a.iso"
-    def __init__(self, path, work_dir, category, with_debug=False):
+    def __init__(self, path, work_dir, category, side, with_debug=False):
         self.debuginfo_iso = ''
         self.rpm_iso = ''
+        self.side = side
 
         if with_debug:
             path = self._format_path(path)
@@ -259,7 +271,7 @@ class DistISO(Directory):
             self.debuginfo_iso = path.split(',')[1]
         else:
             self.rpm_iso = path
-        super(DistISO, self).__init__(self.rpm_iso, work_dir, category)
+        super(DistISO, self).__init__(self.rpm_iso, work_dir, category, side)
 
         self._cmp_type = CMP_TYPE_ISO
         self.verbose_path = os.path.basename(self.rpm_iso)
@@ -331,7 +343,12 @@ class DistISO(Directory):
             self_all_debuginfo_rpm = self.all_debuginfo_rpm(self.debuginfo_iso)
             _packages_sqlite = self.iso_packages_sqlite.get(self.rpm_iso)
             for dir_package in _packages_sqlite:
-                self.upsert_a_group(dir_package, self_all_debuginfo_rpm)
+                self_focus_on_rpm = self._all_focus_on_rpm(dir_package)
+                logger.info(
+                    f"{self.verbose_path} total {len(self_focus_on_rpm)} rpm packages, {len(self_all_debuginfo_rpm)} debuginfo packages")
+                self.get_target_dist(self_focus_on_rpm, self.side)
+
+                self.upsert_a_group(self_focus_on_rpm, self_all_debuginfo_rpm)
 
             that.mount_iso(that.rpm_iso)
             that.mount_iso(that.debuginfo_iso)
@@ -341,7 +358,12 @@ class DistISO(Directory):
             that_all_debuginfo_rpm = that.all_debuginfo_rpm(that.debuginfo_iso)
             _packages_sqlite = that.iso_packages_sqlite.get(that.rpm_iso)
             for dir_package in _packages_sqlite:
-                that.upsert_a_group(dir_package, that_all_debuginfo_rpm)
+                that_focus_on_rpm = self._all_focus_on_rpm(dir_package)
+                logger.info(
+                    f"{that.verbose_path} total {len(that_focus_on_rpm)} rpm packages, {len(that_all_debuginfo_rpm)} debuginfo packages")
+                self.get_target_dist(that_focus_on_rpm, that.side)
+
+                that.upsert_a_group(that_focus_on_rpm, that_all_debuginfo_rpm)
 
             return super(DistISO, self).compare(that, plan)
         finally:
@@ -390,10 +412,7 @@ class DistISO(Directory):
                 config['sqlite_path'].setdefault(side, []).append(tem_dir_obj)
         self.iso_packages_sqlite[iso] = packages
 
-    def upsert_a_group(self, packages_path, debuginfo_rpm=None):
-        focus_on_rpm = self._all_focus_on_rpm(packages_path)
-        logger.info(
-            f"{self.verbose_path} total {len(focus_on_rpm)} rpm packages, {len(debuginfo_rpm)} debuginfo packages")
+    def upsert_a_group(self, focus_on_rpm, debuginfo_rpm=None):
         for rpm, rpm_path in focus_on_rpm.items():
             repository_name = self.acquire_repository_package(rpm)
             correspond_debuginfo_rpm = RPMProxy.correspond_debuginfo_name(rpm)
@@ -420,12 +439,13 @@ class DistISO(Directory):
 
 
 class OEDistRepo(Directory):
-    def __init__(self, paths, work_dir, category):
-        super(OEDistRepo, self).__init__(paths, work_dir, category)
+    def __init__(self, paths, work_dir, category, side):
+        super(OEDistRepo, self).__init__(paths, work_dir, category, side)
 
         self._work_dir = work_dir
         self._cmp_type = CMP_TYPE_DIST_REPOSITORY
         self._sqlite_paths = {}
+        self._side = side
 
         # paths
         # - "https://repo.openeuler.org/openEuler-20.03-LTS-SP1/EPOL/aarch64/repodata,
@@ -479,6 +499,7 @@ class OEDistRepo(Directory):
         logger.info(f"upsert a group, path: {path}, debuginfo: {debuginfo_path}, sqlite: {sqlite_path}")
 
         focus_on_rpm = self._all_focus_on_rpm(path)
+        self.get_target_dist(focus_on_rpm, self._side)
         debuginfo_rpm = self.all_debuginfo_rpm(debuginfo_path)
         logger.info(f"{len(focus_on_rpm)} rpm packages, {len(debuginfo_rpm)} debuginfo packages")
         for rpm, rpm_path in focus_on_rpm.items():
@@ -650,8 +671,8 @@ class OBSRepo(OEDistRepo):
     OBS 发布repo
     """
 
-    def __init__(self, path, work_dir, category, arch=None):
-        super(OEDistRepo, self).__init__(path, work_dir, category)
+    def __init__(self, path, work_dir, category, side, arch=None):
+        super(OEDistRepo, self).__init__(path, work_dir, category, side)
 
         self._raw_path = path
         self.verbose_path = os.path.basename(path)
