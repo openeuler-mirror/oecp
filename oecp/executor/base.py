@@ -160,7 +160,8 @@ class CompareExecutor(ABC):
             return True
         return False
 
-    def get_version_change_files(self, side_a_file, side_b_file):
+    @staticmethod
+    def get_version_change_files(side_a_file, side_b_file):
         side_a_floders = side_a_file.split('/')
         side_b_floders = side_b_file.split('/')
         compare_result = CMP_RESULT_SAME
@@ -170,7 +171,7 @@ class CompareExecutor(ABC):
                 floder_b = side_b_floders[index]
                 if floder_a == floder_b:
                     continue
-                elif floder_a.split(STAND_DISTS[BASE_SIDE]) == floder_b.split(STAND_DISTS[OSV_SIDE]):
+                elif floder_a.split(STAND_DISTS.get(BASE_SIDE)) == floder_b.split(STAND_DISTS.get(OSV_SIDE)):
                     continue
                 elif re.search('\\d+\\.\\d+', side_a_floders[index]) and re.search('\\d+\\.\\d+',
                                                                                    side_b_floders[index]):
@@ -180,6 +181,33 @@ class CompareExecutor(ABC):
                     compare_result = CMP_RESULT_DIFF
                     break
             return compare_result
+        else:
+            return CMP_RESULT_DIFF
+
+    @staticmethod
+    def format_dump_file(data_a, data_b):
+        dump_set_a, dump_set_b = set(data_a), set(data_b)
+        common_dump = dump_set_a & dump_set_b
+        only_dump_a = dump_set_a - dump_set_b
+        only_dump_b = dump_set_b - dump_set_a
+        common_dump_result = [[x, x, CMP_RESULT_SAME] for x in common_dump]
+        common_dump_a, common_dump_b = [], []
+        for side_a in only_dump_a:
+            for side_b in only_dump_b:
+                if side_a.split(STAND_DISTS.get(BASE_SIDE)) == side_b.split(STAND_DISTS.get(OSV_SIDE)):
+                    common_dump_result.append([side_a, side_b, CMP_RESULT_SAME])
+                    common_dump_a.append(side_a)
+                    common_dump_b.append(side_b)
+                    break
+        only_dump_a = only_dump_a - set(common_dump_a)
+        only_dump_b = only_dump_b - set(common_dump_b)
+        all_dump = [
+            common_dump_result,
+            [[x, '', CMP_RESULT_LESS] for x in only_dump_a],
+            [['', x, CMP_RESULT_MORE] for x in only_dump_b]
+        ]
+
+        return all_dump
 
     def format_dump(self, data_a, data_b):
         dump_set_a, dump_set_b = set(data_a), set(data_b)
@@ -204,7 +232,8 @@ class CompareExecutor(ABC):
             for side_b_file in list(only_dump_b):
                 get_result = ''
                 file_a, file_b = os.path.basename(side_a_file), os.path.basename(side_b_file)
-                if file_a == file_b or file_a.split(STAND_DISTS[BASE_SIDE]) == file_b.split(STAND_DISTS[OSV_SIDE]):
+                if file_a == file_b or file_a.split(STAND_DISTS.get(BASE_SIDE)) == file_b.split(
+                        STAND_DISTS.get(OSV_SIDE)):
                     get_result = self.get_version_change_files(side_a_file, side_b_file)
                 elif file_a.endswith('.so') and file_b.endswith('.so'):
                     file_a_version_1 = re.search('\\d+\\.\\d+', file_a.split('-')[-1])
@@ -227,30 +256,6 @@ class CompareExecutor(ABC):
                     only_dump_a.discard(side_a_file)
                     only_dump_b.discard(side_b_file)
                     break
-
-    def format_dump_file(self, data_a, data_b):
-        dump_set_a, dump_set_b = set(data_a), set(data_b)
-        common_dump = dump_set_a & dump_set_b
-        only_dump_a = dump_set_a - dump_set_b
-        only_dump_b = dump_set_b - dump_set_a
-        common_dump_result = [[x, x, CMP_RESULT_SAME] for x in common_dump]
-        common_dump_a, common_dump_b = [], []
-        for side_a in only_dump_a:
-            for side_b in only_dump_b:
-                if side_a.split(STAND_DISTS[BASE_SIDE]) == side_b.split(STAND_DISTS[OSV_SIDE]):
-                    common_dump_result.append([side_a, side_b, CMP_RESULT_SAME])
-                    common_dump_a.append(side_a)
-                    common_dump_b.append(side_b)
-                    break
-        only_dump_a = only_dump_a - set(common_dump_a)
-        only_dump_b = only_dump_b - set(common_dump_b)
-        all_dump = [
-            common_dump_result,
-            [[x, '', CMP_RESULT_LESS] for x in only_dump_a],
-            [['', x, CMP_RESULT_MORE] for x in only_dump_b]
-        ]
-
-        return all_dump
 
     def split_common_files(self, files_a, files_b):
         common_file_pairs, common_file_a, common_file_b = [], [], []

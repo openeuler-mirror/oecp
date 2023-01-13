@@ -344,8 +344,8 @@ class DistISO(Directory):
             _packages_sqlite = self.iso_packages_sqlite.get(self.rpm_iso)
             for dir_package in _packages_sqlite:
                 self_focus_on_rpm = self._all_focus_on_rpm(dir_package)
-                logger.info(
-                    f"{self.verbose_path} total {len(self_focus_on_rpm)} rpm packages, {len(self_all_debuginfo_rpm)} debuginfo packages")
+                logger.info(f"{self.verbose_path} total {len(self_focus_on_rpm)} rpm packages, "
+                            f"{len(self_all_debuginfo_rpm)} debuginfo packages")
                 self.get_target_dist(self_focus_on_rpm, self.side)
 
                 self.upsert_a_group(self_focus_on_rpm, self_all_debuginfo_rpm)
@@ -359,8 +359,8 @@ class DistISO(Directory):
             _packages_sqlite = that.iso_packages_sqlite.get(that.rpm_iso)
             for dir_package in _packages_sqlite:
                 that_focus_on_rpm = self._all_focus_on_rpm(dir_package)
-                logger.info(
-                    f"{that.verbose_path} total {len(that_focus_on_rpm)} rpm packages, {len(that_all_debuginfo_rpm)} debuginfo packages")
+                logger.info(f"{that.verbose_path} total {len(that_focus_on_rpm)} rpm packages, "
+                            f"{len(that_all_debuginfo_rpm)} debuginfo packages")
                 self.get_target_dist(that_focus_on_rpm, that.side)
 
                 that.upsert_a_group(that_focus_on_rpm, that_all_debuginfo_rpm)
