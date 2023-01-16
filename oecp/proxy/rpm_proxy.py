@@ -19,7 +19,7 @@ import re
 import subprocess
 import logging
 
-from oecp.result.constants import DIST_FLAG
+from oecp.result.constants import STAND_DISTS
 
 logger = logging.getLogger('oecp')
 
@@ -50,6 +50,20 @@ class RPMProxy(object):
         return name, m.group(1)
 
     @classmethod
+    def rpm_standard_dist(cls, rpm):
+        """
+        返回rpm包dist标识
+        :param rpm: 寻找标准包名解析, eg: "gcc-10.3.1-17.oe2203.aarch64.rpm"
+        :return: distribution 标识
+        """
+        m = re.match(r"^.+-.+-(.+)", rpm)
+
+        if m:
+            d = re.match(r"\d+\.(\w+)\.\w+\.rpm", m.group(1))
+            return d.group(1) if d else ''
+        return ''
+
+    @classmethod
     def rpm_n_v_r_d_a(cls, rpm, dist="openEuler"):
         """
         解析rpm包的名称、版本号、发布号、发行商、体系
@@ -68,21 +82,19 @@ class RPMProxy(object):
                     m = re.match(r"-(.+)\.rpm", rpm.replace(name + '-' + version, "", 1))
                     return name, version, '', '', m.group(1)
                 r_d, arch = m.group(1), m.group(2)
-                for d_flag in DIST_FLAG:
-                    if d_flag not in r_d:
+                for d_flag in STAND_DISTS.values():
+                    if not d_flag or d_flag not in r_d:
                         continue
                     else:
-                        m_dist = re.search(d_flag + r"\d+", r_d)
-                        if m_dist:
-                            sp_release = r_d.split(m_dist.group())[0].rstrip('.')
-                            release = re.sub(r'.module[_+]+', '.module', sp_release)
-                            d = m_dist.group() + r_d.split(m_dist.group())[1]
-                            # eg: caja-core-extensions-1.22.0-1.ky3.kb58.x86_64.rpm
-                            kb_num = re.search(r"kb\d+", d)
-                            if kb_num:
-                                release = release + '.' + kb_num.group()
-                                d = d.split(kb_num.group())[0].rstrip('.')
-                            return name, version, release, d, arch
+                        sp_release = r_d.split(d_flag)[0].rstrip('.')
+                        release = re.sub(r'.module[_+]+', '.module', sp_release)
+                        d = d_flag + r_d.split(d_flag)[1]
+                        # eg: caja-core-extensions-1.22.0-1.ky3.kb58.x86_64.rpm
+                        kb_num = re.search(r"kb\d+", d)
+                        if kb_num:
+                            release = release + '.' + kb_num.group()
+                            d = d.split(kb_num.group())[0].rstrip('.')
+                        return name, version, release, d, arch
                 m = re.match(r"([\d._]+)\.(.+)", r_d)
                 if m:
                     return name, version, m.group(1), m.group(2), arch

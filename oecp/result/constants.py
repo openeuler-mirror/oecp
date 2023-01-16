@@ -151,9 +151,14 @@ DETAIL_PATH = "details_analyse"
 # The Column names of the Details in the RPM REPORT
 ALL_DETAILS_NAME = ['effect drivers', 'details path', 'file_name']
 
-# The Character in File name have changed.
-STAND_DISTS = ('oe1',)
-OSV_DISTS = {'oe1': ['ky10']}
+# Get base and osv distribution.
+BASE_SIDE = 'base'
+OSV_SIDE = 'osv'
+
+STAND_DISTS = {
+    BASE_SIDE: None,
+    OSV_SIDE: None
+}
 
 # All Kernel Binary Package Name
 KERNEL = 'kernel'
@@ -165,8 +170,6 @@ COUNT_ABI_DETAILS = {
     'change_abi': 0,
     'add_abi': 0
 }
-# Dist name
-DIST_FLAG = ['el', 'oe', 'an', 'ky', 'ctl', 'eulerosv', 'tles']
 
 RPMFILE_CMP_TYPES = [CMP_TYPE_SERVICE, CMP_TYPE_RPM_CONFIG, CMP_TYPE_RPM_HEADER, CMP_TYPE_RPM_FILES,
                      CMP_TYPE_RPM_LIB, CMP_TYPE_CMD]

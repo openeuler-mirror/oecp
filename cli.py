@@ -21,6 +21,7 @@ import logging
 import argparse
 
 from oecp.result.compress import compress_report
+from oecp.result.constants import BASE_SIDE, OSV_SIDE
 from oecp.utils.logger import init_logger
 from oecp.main.plan import Plan
 
@@ -86,11 +87,10 @@ if __name__ == "__main__":
     _ = not os.path.exists(args.output_file) and os.mkdir(args.output_file)
 
     from oecp.main.factory import Factory
-
     if args.debuginfo:
         logger.info(f"start compare {plan.get_base()} with {plan.get_other()}")
-        product_a = Factory.create(plan.get_base(), args, plan.get_type())
-        product_b = Factory.create(plan.get_other(), args, plan.get_type())
+        product_a = Factory.create(plan.get_base(), args, plan.get_type(), BASE_SIDE)
+        product_b = Factory.create(plan.get_other(), args, plan.get_type(), OSV_SIDE)
     else:
         cmp_files_num = len(args.compare_files)
         if cmp_files_num != 2:
@@ -98,8 +98,8 @@ if __name__ == "__main__":
             logger.error(f"The number of input compare files is {cmp_files_num}, but need 2")
             sys.exit(1)
         logger.info(f"start compare {args.compare_files[0]} with {args.compare_files[1]}")
-        product_a = Factory.create(args.compare_files[0], args, "none")
-        product_b = Factory.create(args.compare_files[1], args, "none")
+        product_a = Factory.create(args.compare_files[0], args, "none", BASE_SIDE)
+        product_b = Factory.create(args.compare_files[1], args, "none", OSV_SIDE)
 
     result = product_a.compare(product_b, plan)
     e_args = (args.output_file, args.perf_baseline_file, args.output_format, args.compare_files, args.platform_test)
