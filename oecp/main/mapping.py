@@ -223,4 +223,4 @@ class SQLiteMapping(RepositoryPackageMapping):
                 else:
                     package_name.append(rpm_record[0].split('/')[-1])
 
-        return package_name
+        return package_name[:3]

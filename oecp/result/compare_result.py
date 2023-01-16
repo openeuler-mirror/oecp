@@ -143,7 +143,7 @@ class CompareResultComposite(CompareResultComponent):
         return "\n".join(string)
 
     def export(self, *e_args):
-        root_path, baseline, result_format, iso_path, platform_path = e_args
+        root_path, result_format, iso_path, platform_path = e_args
         base_side_a, base_side_b = format_base_side(self.cmp_side_a, self.cmp_side_b, iso_path)
         osv_title = 'report-' + get_title(base_side_a) + '-' + get_title(base_side_b)
         export_floder = os.path.join(root_path, osv_title)
@@ -169,7 +169,7 @@ class CompareResultComposite(CompareResultComponent):
                 f"all results have compare done, please check: {os.path.join(os.path.realpath(root_path), osv_title)}")
             return osv_title
 
-        performance_rows = performance_result_parser(base_side_a, base_side_b, platform_path, baseline)
+        performance_rows = performance_result_parser(base_side_a, base_side_b, platform_path)
         rpm_test_rows, rpm_test_details = test_result_parser(base_side_a, base_side_b, platform_path)
         ciconfig_rows, file_config_rows = ciconfig_result_parser(base_side_a, base_side_b, platform_path)
         at_rows = at_result_parser(base_side_b, platform_path)

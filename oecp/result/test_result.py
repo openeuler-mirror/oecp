@@ -38,18 +38,24 @@ logger = logging.getLogger("oecp")
 #       eg: EulixOS-Server-1.0-aarch64.iso.at.json
 # ------------------------------------------------------------------------------------
 
-def performance_result_parser(side_a, side_b, root_path, baseline):
+def performance_result_parser(side_a, side_b, root_path):
     perf_result = []
     side_a_result = get_performacnce_result(side_a, root_path)
     side_b_result = get_performacnce_result(side_b, root_path)
-    base_line_result = load_json_result(baseline)
     small_better_reg = get_perf_reg()['small_better']
 
-    if not (base_line_result and side_b_result and side_a_result):
-        return perf_result
+    if not side_a_result:
+        if not side_b_result:
+            logger.warning("not exists baseline performance json file.")
+            return perf_result
+        elif side_b_result:
+            base_path = os.path.realpath(os.path.dirname(os.path.dirname(__file__)))
+            base_performance = os.path.join(base_path, "conf/performance/baseline-openEuler-20.03-LTS-SP1-everything"
+                                                       "-aarch64-dvd.iso.performance.json")
+            side_a_result = load_json_result(base_performance)
 
-    for metric, value in base_line_result.items():
-        avg_b = side_b_result.get(metric)['average']
+    for metric, value in side_a_result.items():
+        avg_b = side_b_result.get(metric, {}).get('average')
         if small_better(metric, small_better_reg):
             baseline_avg = value['average'] + (value['average'] * 0.05)
             if avg_b:
