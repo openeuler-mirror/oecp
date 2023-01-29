@@ -34,13 +34,13 @@ pip3 install -r requirement
 
 ## 3. oecp使用
 
-`python3 cli.py [-n PARALLEL] [-w WORK_DIR] [-p PLAN_PATH]
+`python3 cli.py [-h] [-n PARALLEL] [-w WORK_DIR] [-p PLAN_PATH]
                 [-c CATEGORY_PATH] [--platform PLATFORM_TEST_PATH]
-                [-f OUTPUT_FORMAT] [-o OUTPUT_FILE]
+                [-f OUTPUT_FORMAT] [-o OUTPUT_FILE] [-d DEBUGINFO]
                 file1 file2`
 * **位置参数(必选)**
   * **`file`**
-    指定两个比较的iso文件，注意以file1作为基准
+    指定两个比较的iso文件/存放rpm包的目录（directory）/rpm包，注意以file1作为基准
 
 * **可选参数**
 
@@ -55,7 +55,10 @@ pip3 install -r requirement
 
   * **`-c, --category`**
     指定`包级别信息`，默认为oecp/conf/category/category.json
-
+	
+  * **`-d, --debuginfo`**
+    指定`debuginfo iso/rpm路径`
+	
   * **`-f, --format`**
     指定`输出格式`，默认为csv
 
