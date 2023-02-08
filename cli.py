@@ -36,8 +36,6 @@ def init_args():
     default_conf_path = os.path.join(os.path.dirname(__file__), "oecp/conf")
     default_plan_path = os.path.join(default_conf_path, "plan/all.json")
     default_category_path = os.path.join(default_conf_path, "category/category.json")
-    default_perf_baseline_file = os.path.join(
-        default_conf_path, "performance/baseline-openEuler-20.03-LTS-SP1-everything-aarch64-dvd.iso.performance.json")
     default_work_dir = "/tmp/oecp"
     default_output_file = "/tmp/oecp/"
 
@@ -48,9 +46,6 @@ def init_args():
     parser.add_argument("-p", "--plan", type=str, dest="plan_path", default=default_plan_path, help="compare plan path")
     parser.add_argument("-c", "--category", type=str, dest="category_path", default=default_category_path,
                         help="package category path")
-    parser.add_argument("-b", "--baseline", type=str, dest="perf_baseline_file", default=default_perf_baseline_file,
-                        help="baseline performance result")
-
     parser.add_argument("-f", "--format", type=str, dest="output_format", default="csv", help="result export format")
     parser.add_argument("-o", "--output", type=str, dest="output_file", default=default_output_file,
                         help="result output path")
@@ -73,7 +68,7 @@ if __name__ == "__main__":
     args = init_args()
     logger.info(f"--plan: {args.plan_path}")
     logger.info(f"--category: {args.category_path}")
-    logger.info(f"--baseline: {args.perf_baseline_file}")
+    logger.info(f"--platform: {args.platform_test}")
     logger.info(f"--work_dir: {args.work_dir}")
     logger.info(f"--format: {args.output_format}")
     logger.info(f"--output: {args.output_file}")
@@ -102,6 +97,6 @@ if __name__ == "__main__":
         product_b = Factory.create(args.compare_files[1], args, "none", OSV_SIDE)
 
     result = product_a.compare(product_b, plan)
-    e_args = (args.output_file, args.perf_baseline_file, args.output_format, args.compare_files, args.platform_test)
+    e_args = (args.output_file, args.output_format, args.compare_files, args.platform_test)
     osv_title = result.export(*e_args)
     args.func(osv_title, args)

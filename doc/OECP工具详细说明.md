@@ -151,12 +151,12 @@ pip3 install -r requirement
 pip3 install -r requirement
 
 `python3 cli.py [-h] [-n PARALLEL] [-w WORK_DIR] [-p PLAN_PATH]
-                [-c CATEGORY_PATH] [-b PERF_BASELINE_FILE] [-a {x86_64,aarch64}]
-                [-f OUTPUT_FORMAT] [-o OUTPUT_FILE]
+                [-c CATEGORY_PATH] [--platform PLATFORM_TEST_PATH]
+                [-f OUTPUT_FORMAT] [-o OUTPUT_FILE] [-d DEBUGINFO]
                 file1 file2`
 * **位置参数(必选)**
   * **`file`**
-    指定两个比较的iso文件
+    指定两个比较的iso文件/存放rpm包的目录（directory）/rpm包，以file1作为基准
 
 * **可选参数**
 
@@ -171,18 +171,18 @@ pip3 install -r requirement
 
   * **`-c, --category`**
     指定`包级别信息`，默认为oecp/conf/category/category.json
-
-  * **`-b, --baseline`**
-    指定`基线文件`，默认为oecp/conf/performance/openEuler-20.03-LTS-aarch64-dvd.iso.performance.json
   
   * **`-f, --format`**
     指定`输出格式`，默认为csv
 
   * **`-o, --output`**
     指定`输出结果路径`，默认为/tmp/oecp
+  
+  * **`-d, --debuginfo`**
+    指定`debuginfo iso/rpm路径`
 
   * **`--platform`**
-    指定`平台验证报告路径`，默认为/tmp/oecp
+    指定`进行平台验证有关json报告地址`，默认为/tmp/oecp；性能测试默认基线文件为oecp/conf/performance/openEuler-20.03-LTS-aarch64-dvd.iso.performance.json
     
   * **举例**
 

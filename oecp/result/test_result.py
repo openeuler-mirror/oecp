@@ -38,30 +38,24 @@ logger = logging.getLogger("oecp")
 #       eg: EulixOS-Server-1.0-aarch64.iso.at.json
 # ------------------------------------------------------------------------------------
 
-def performance_result_parser(side_a, side_b, root_path, baseline):
+def performance_result_parser(side_a, side_b, root_path):
     perf_result = []
     side_a_result = get_performacnce_result(side_a, root_path)
     side_b_result = get_performacnce_result(side_b, root_path)
-    base_line_result = load_json_result(baseline)
-    small_better_reg = get_perf_reg()['small_better']
 
-    if not (base_line_result and side_b_result and side_a_result):
-        return perf_result
+    if not side_a_result:
+        if not side_b_result:
+            logger.warning("not exists baseline performance json file.")
+            return perf_result
+        elif side_b_result:
+            base_path = os.path.realpath(os.path.dirname(os.path.dirname(__file__)))
+            base_performance = os.path.join(base_path, "conf/performance/baseline-openEuler-20.03-LTS-SP1-everything"
+                                                       "-aarch64-dvd.iso.performance.json")
+            side_a_result = load_json_result(base_performance)
 
-    for metric, value in base_line_result.items():
-        avg_b = side_b_result.get(metric)['average']
-        if small_better(metric, small_better_reg):
-            baseline_avg = value['average'] + (value['average'] * 0.05)
-            if avg_b:
-                cmp_result = 'pass' if avg_b - baseline_avg < 0 else 'fail'
-            else:
-                cmp_result = ''
-        else:
-            baseline_avg = value['average'] - (value['average'] * 0.05)
-            if avg_b:
-                cmp_result = 'fail' if avg_b - baseline_avg < 0 else 'pass'
-            else:
-                cmp_result = ''
+    for metric, value in side_a_result.items():
+        avg_b = side_b_result.get(metric, {}).get('average')
+        baseline_avg, cmp_result = cmp_performance_metric(metric, value, avg_b)
         row = {
             "metric": metric,
             side_a: side_a_result[metric]['average'] if side_a_result.get(metric) else '',
@@ -72,6 +66,31 @@ def performance_result_parser(side_a, side_b, root_path, baseline):
         perf_result.append(row)
 
     return perf_result
+
+
+def cmp_performance_metric(metric, value, avg_b):
+    """
+    lmbench性能测试指标项结果与基线平均值比较计算
+    @param metric: 测试指标项
+    @param value: 基线文件性能测试指标项均值
+    @param avg_b: osv性能测试指标项均值
+    @return: baseline_avg（区分延迟指标测试项与其它指标项），cmp_result（比较结果）
+    """
+    small_better_reg = get_perf_reg()['small_better']
+    if small_better(metric, small_better_reg):
+        baseline_avg = value['average'] + (value['average'] * 0.05)
+        if avg_b:
+            cmp_result = 'pass' if avg_b - baseline_avg < 0 else 'fail'
+        else:
+            cmp_result = ''
+    else:
+        baseline_avg = value['average'] - (value['average'] * 0.05)
+        if avg_b:
+            cmp_result = 'fail' if avg_b - baseline_avg < 0 else 'pass'
+        else:
+            cmp_result = ''
+
+    return baseline_avg, cmp_result
 
 
 def get_performacnce_result(side, root_path):
@@ -268,7 +287,7 @@ def assain_rpm_test_result(side_a, side_b, dump_a, dump_b, category_map):
         rpm_cmp_result = compare(va, vb)
         rpm_test_details.setdefault(rpm_pkg, {})
         rpm_test_details.get(rpm_pkg)[CMP_TYPE_RPMS_TEST] = assain_rpm_test_details(rpm_pkg, side_a, side_b, va, vb,
-                                                                                category_level)
+                                                                                    category_level)
 
         row = {
             side_a + " binary rpm package": rpm_side_a,
