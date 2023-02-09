@@ -37,12 +37,14 @@ def get_similarity(rows, side_a, side_b):
     count_rpm_level, _ = rpm_count(rows, side_a, side_b)
     count_rpm_test = rpm_test_count(rows.get(CMP_TYPE_RPM))
 
-    for results in rows.values():
+    for keys, results in rows.items():
         if not isinstance(results, list):
             for rpm_type, rpm_results in results.items():
                 if rpm_type in SIMILARITY_TYPES:
                     for result in rpm_results:
                         count_single_result(count, result, rpm_type)
+                elif rpm_type in KERNEL_TYPES:
+                    count_kernel_result(count, rpm_results, rpm_type, keys)
 
     level1_name_rate = count_rate(count_rpm_level.get(1).get("same"),
                                   count_rpm_level.get(1).get("same") + count_rpm_level.get(1).get("diff"))
@@ -83,6 +85,16 @@ def get_similarity(rows, side_a, side_b):
             similarity["level0 " + count_type] = l0_rate
             similarity["level1 " + count_type] = l1_rate
             similarity["level2 " + count_type] = l2_rate
+        elif count_type in KERNEL_TYPES:
+            rate = 0
+            for single_kernel in count.get(count_type).values():
+                single_rate = count_rate(single_kernel.get('same'),
+                                         single_kernel.get('same') + single_kernel.get('diff'))
+                rate = single_rate if single_rate > rate else rate
+            if rate:
+                similarity[count_type] = rate
+                continue
+
         rate = count_rate(count.get(count_type).get("all").get("same"),
                           count.get(count_type).get("all").get("same") + count.get(count_type).get("all").get("diff"))
         similarity[count_type] = rate
@@ -119,6 +131,21 @@ def count_single_result(count, result, cmp_type):
         count[cmp_type]['all']['same'] += 1
     else:
         count[cmp_type]['all']['diff'] += 1
+
+
+def count_kernel_result(count, rpm_results, cmp_type, rpm):
+    count.setdefault(cmp_type, {})
+    rpm_name, version = RPMProxy.rpm_name_version(rpm)
+    rpm_n_v = rpm_name + version
+    count.get(cmp_type).setdefault(rpm_n_v, {
+        "same": 0,
+        "diff": 0
+    })
+    for result in rpm_results:
+        if result["compare result"] in RESULT_SAME:
+            count.get(cmp_type).get(rpm_n_v)["same"] += 1
+        else:
+            count.get(cmp_type).get(rpm_n_v)["diff"] += 1
 
 
 def rpm_count(rows, side_a, side_b):

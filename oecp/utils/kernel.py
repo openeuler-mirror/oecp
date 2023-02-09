@@ -20,8 +20,9 @@ from oecp.proxy.rpm_proxy import RPMProxy
 
 
 def get_file_by_pattern(pattern, cache_dumper, kernel):
-    kernel_name = RPMProxy.rpm_name(kernel)
-    extract_path = cache_dumper.get_package_extract_path(kernel_name)
+    kernel_name, version = RPMProxy.rpm_name_version(kernel)
+    kernel_name_version = kernel_name + version
+    extract_path = cache_dumper.get_package_extract_path(kernel_name_version)
     if not extract_path:
         return ''
     for root, dirs, files in os.walk(extract_path):

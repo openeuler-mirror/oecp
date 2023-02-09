@@ -147,9 +147,11 @@ class RPMExtractDumper(AbstractDumper):
     def get_cmd_files(self, extract_dir_name):
         return self._cmd_files[extract_dir_name]
 
-    def get_package_extract_path(self, package_name):
+    def get_package_extract_path(self, kernel_name_version):
         for k, v in self._extract_info.items():
-            if RPMProxy.rpm_name(k) != package_name:
+            name, version = RPMProxy.rpm_name_version(k)
+            rpm_name_version = name + version
+            if rpm_name_version != kernel_name_version:
                 continue
             else:
                 extract_path = str(v.name)
