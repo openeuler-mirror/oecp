@@ -25,7 +25,7 @@ def get_file_by_pattern(pattern, cache_dumper, kernel):
     extract_path = cache_dumper.get_package_extract_path(kernel_name_version)
     if not extract_path:
         return ''
-    for root, dirs, files in os.walk(extract_path):
+    for root, _, files in os.walk(extract_path):
         for item in files:
             if re.match(pattern, item):
                 file_path = os.path.join(root, item)
