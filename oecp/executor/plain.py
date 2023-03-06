@@ -38,9 +38,13 @@ class PlainCompareExecutor(CompareExecutor):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         category = dump_a['category'] if dump_a['category'] == dump_b['category'] else CPM_CATEGORY_DIFF
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
-        dump_a_files = dump_a[self.data]
-        dump_b_files = dump_b[self.data]
-        common_file_pairs, only_file_a, only_file_b = self.split_common_files(dump_a_files, dump_b_files)
+        dump_a_files = self.split_files_mapping(dump_a[self.data])
+        dump_b_files = self.split_files_mapping(dump_b[self.data])
+        flag_v_r_d = self.extract_version_flag(dump_a['rpm'], dump_b['rpm'])
+        common_file_pairs, only_file_a, only_file_b = self.format_fullpath_files(dump_a_files, dump_b_files, flag_v_r_d)
+        if not common_file_pairs and not only_file_a and not only_file_b:
+            logger.debug(f"No config package found, ignored with {dump_b['rpm']} and {dump_b['rpm']}")
+            return result
         for pair in common_file_pairs:
             cmd = "diff -uN {} {}".format(pair[0], pair[1])
             ret, out, err = shell_cmd(cmd.split())
@@ -69,16 +73,15 @@ class PlainCompareExecutor(CompareExecutor):
                 self.count_cmp_result(count_result, CMP_RESULT_SAME)
                 data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_SAME, base_a, base_b)
             result.add_component(data)
-        if only_file_a:
-            for file_a in only_file_a:
-                self.count_cmp_result(count_result, CMP_RESULT_LESS)
-                data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_LESS, os.path.basename(file_a), '')
-                result.add_component(data)
-        if only_file_b:
-            for file_b in only_file_b:
-                self.count_cmp_result(count_result, CMP_RESULT_MORE)
-                data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_MORE, '', os.path.basename(file_b))
-                result.add_component(data)
+
+        for file_a in only_file_a:
+            self.count_cmp_result(count_result, CMP_RESULT_LESS)
+            data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_LESS, os.path.basename(file_a), '')
+            result.add_component(data)
+        for file_b in only_file_b:
+            self.count_cmp_result(count_result, CMP_RESULT_MORE)
+            data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_MORE, '', os.path.basename(file_b))
+            result.add_component(data)
         result.add_count_info(count_result)
 
         return result

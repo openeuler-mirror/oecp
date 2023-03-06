@@ -88,13 +88,12 @@ class RPMProxy(object):
                     else:
                         sp_release = r_d.split(d_flag)[0].rstrip('.')
                         release = re.sub(r'.module[_+]+', '.module', sp_release)
-                        d = d_flag + r_d.split(d_flag)[1]
+                        initial_d = r_d.split(sp_release)[-1].strip('.')
                         # eg: caja-core-extensions-1.22.0-1.ky3.kb58.x86_64.rpm
-                        kb_num = re.search(r"kb\d+", d)
+                        kb_num = re.search(r"kb\d+", initial_d)
                         if kb_num:
                             release = release + '.' + kb_num.group()
-                            d = d.split(kb_num.group())[0].rstrip('.')
-                        return name, version, release, d, arch
+                        return name, version, release, d_flag, arch
                 m = re.match(r"([\d._]+)\.(.+)", r_d)
                 if m:
                     return name, version, m.group(1), m.group(2), arch
@@ -117,6 +116,13 @@ class RPMProxy(object):
     @classmethod
     def is_rpm_file(cls, rpm):
         return rpm.endswith(".rpm")
+
+    @classmethod
+    def filter_specific_rpm(cls, rpm):
+        specific_rpm = ['kernel-source']
+        rpm_name = cls.rpm_name(rpm)
+
+        return rpm_name in specific_rpm
 
     @classmethod
     def is_rpm_focus_on(cls, rpm):

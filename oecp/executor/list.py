@@ -55,7 +55,8 @@ class ListCompareExecutor(CompareExecutor):
         category = dump_a['category'] if dump_a['category'] == dump_b[
             'category'] else CPM_CATEGORY_DIFF
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
-        component_results = self.format_dump(dump_a[self.data], dump_b[self.data])
+        flag_v_r_d = self.extract_version_flag(dump_a['rpm'], dump_b['rpm'])
+        component_results = self.format_dump(dump_a[self.data], dump_b[self.data], flag_v_r_d)
         for component_result in component_results:
             for sub_component_result in component_result:
                 self.count_cmp_result(count_result, sub_component_result[-1])
@@ -112,7 +113,10 @@ class ListCompareExecutor(CompareExecutor):
                         rpm_a, rpm_b = rpm_pair[0], rpm_pair[1]
                         rpm_a_n, rpm_a_v, rpm_a_r, rpm_a_d, _ = RPMProxy.rpm_n_v_r_d_a(rpm_a)
                         rpm_b_n, rpm_b_v, rpm_b_r, rpm_b_d, _ = RPMProxy.rpm_n_v_r_d_a(rpm_b)
-                        if rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r == rpm_b_r and rpm_a_d != rpm_b_d:
+                        # eg: custom_build_tool-1.0-17.oe1.oe1.aarch64.rpm
+                        if rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r == rpm_b_r and rpm_a_d == rpm_b_d:
+                            row = [rpm_a, rpm_b, CMP_LEVEL_SAME]
+                        elif rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r == rpm_b_r and rpm_a_d != rpm_b_d:
                             row = [rpm_a, rpm_b, CMP_LEVEL_NEARLY_SAME]
                         elif rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r != rpm_b_r:
                             row = [rpm_a, rpm_b, CMP_LEVEL_BIG_VERSION_SAME]

@@ -29,26 +29,19 @@ class CmdCompareExecutor(CompareExecutor):
         self.dump_a = dump_a.run()
         self.dump_b = dump_b.run()
         self.data = 'data'
-        self.split_flag = '__rpm__'
-
-    def _split_files(self, cmd_file):
-        split_file = []
-        if cmd_file:
-            for file in cmd_file:
-                split_file.append(file.split(self.split_flag)[-1])
-        return split_file
 
     def _compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         category = dump_a['category']
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
-        file_a = self._split_files(dump_a[self.data])
-        file_b = self._split_files(dump_b[self.data])
-        if not file_a and not file_b:
+        cmd_a_file = dump_a[self.data]
+        cmd_b_file = dump_b[self.data]
+        flag_v_r_d = self.extract_version_flag(dump_a['rpm'], dump_b['rpm'])
+        if not cmd_a_file and not cmd_b_file:
             logger.debug(
                 f"No {self.config.get('compare_type')} package found, ignored with {dump_a['rpm']} and {dump_b['rpm']}")
             return result
-        component_results = self.format_dump(file_a, file_b)
+        component_results = self.format_dump(cmd_a_file, cmd_b_file, flag_v_r_d)
         for component_result in component_results:
             for sub_component_result in component_result:
                 self.count_cmp_result(count_result, sub_component_result[-1])

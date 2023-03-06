@@ -30,7 +30,6 @@ class ServiceCompareExecutor(CompareExecutor):
         self.dump_a = dump_a.run()
         self.dump_b = dump_b.run()
         self.data = 'data'
-        self.split_flag = '__rpm__'
 
     @staticmethod
     def _load_details(file_path):
@@ -74,32 +73,21 @@ class ServiceCompareExecutor(CompareExecutor):
                 result.add_component(data)
         return result
 
-    def intercept_file_name(self, file, pattern="full"):
-        common_path_flag = '/usr/lib/systemd/system/'
-        full_path = file.split(self.split_flag)[-1]
-        if pattern == 'half':
-            half_path = full_path.split(common_path_flag)[-1]
-            if '/' in half_path:
-                half_path = '/' + half_path
-            return half_path
-        return full_path
-
     def _compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         category = dump_a['category']
+        flag_v_r_d = self.extract_version_flag(dump_a['rpm'], dump_b['rpm'])
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
-        dump_a_files = dump_a[self.data]
-        dump_b_files = dump_b[self.data]
-        common_file_pairs, only_file_a, only_file_b = self.split_common_files(dump_a_files, dump_b_files)
-        if not common_file_pairs:
+        dump_a_files = self.split_files_mapping(dump_a[self.data])
+        dump_b_files = self.split_files_mapping(dump_b[self.data])
+        common_file_pairs, only_file_a, only_file_b = self.format_fullpath_files(dump_a_files, dump_b_files, flag_v_r_d)
+        if not common_file_pairs and not only_file_a and not only_file_b:
             logger.debug(f"No service package found, ignored with {dump_b['rpm']} and {dump_b['rpm']}")
             return result
         details_path = os.path.join(DETAIL_PATH, 'service-detail', dump_b['rpm']) + '.csv'
         for pair in common_file_pairs:
-            detail_filename = self.intercept_file_name(pair[0])
-            # 不显示/usr/lib/systemd/system/路径
-            base_a = self.intercept_file_name(pair[0], 'full')
-            base_b = self.intercept_file_name(pair[1], 'full')
+            base_a = pair[0].split(self.split_flag)[-1]
+            base_b = pair[1].split(self.split_flag)[-1]
             details_a = self._load_details(pair[0])
             details_b = self._load_details(pair[1])
             file_result, component_results = self.format_service_detail(details_a, details_b)
@@ -111,21 +99,21 @@ class ServiceCompareExecutor(CompareExecutor):
                 self.count_cmp_result(count_result, file_result)
                 data = CompareResultComponent(CMP_TYPE_SERVICE, file_result, base_a, base_b)
             result.add_component(data)
-            result_detail = self._detail_set(dump_a, dump_b, component_results, detail_filename)
+            result_detail = self._detail_set(dump_a, dump_b, component_results, base_a)
             result.add_component(result_detail)
-        if only_file_a:
-            for file_a in only_file_a:
-                self.count_cmp_result(count_result, CMP_RESULT_LESS)
-                side_a = self.intercept_file_name(file_a, 'full')
-                data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_LESS, side_a, '')
-                result.add_component(data)
-        if only_file_b:
-            for file_b in only_file_b:
-                self.count_cmp_result(count_result, CMP_RESULT_MORE)
-                side_b = self.intercept_file_name(file_b, 'full')
-                data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_MORE, '', side_b)
-                result.add_component(data)
+
+        for file_a in only_file_a:
+            self.count_cmp_result(count_result, CMP_RESULT_LESS)
+            data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_LESS, file_a, '')
+            result.add_component(data)
+
+        for file_b in only_file_b:
+            self.count_cmp_result(count_result, CMP_RESULT_MORE)
+            data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_MORE, '', file_b)
+            result.add_component(data)
+
         result.add_count_info(count_result)
+
         return result
 
     def compare(self):

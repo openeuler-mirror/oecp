@@ -80,16 +80,20 @@ class HeaderCompareExecutor(CompareExecutor):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         category = dump_a['category'] if dump_a['category'] == dump_b['category'] else CPM_CATEGORY_DIFF
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
-        dump_a_files = dump_a[self.data]
-        dump_b_files = dump_b[self.data]
-        common_file_pairs, only_file_a, only_file_b = self.split_common_files(dump_a_files, dump_b_files)
+        map_files_a = self.split_files_mapping(dump_a[self.data])
+        map_files_b = self.split_files_mapping(dump_b[self.data])
+        flag_v_r_d = self.extract_version_flag(dump_a['rpm'], dump_b['rpm'])
+        common_file_pairs, only_file_a, only_file_b = self.format_fullpath_files(map_files_a, map_files_b, flag_v_r_d)
+        if not common_file_pairs and not only_file_a and not only_file_b:
+            logger.debug(f"No header package found, ignored with {dump_b['rpm']} and {dump_b['rpm']}")
+            return result
         for pair in common_file_pairs:
             self._exclude_comments(pair[0])
             self._exclude_comments(pair[1])
             cmd = "diff -uBHN {} {}".format(pair[0], pair[1])
             ret, out, err = shell_cmd(cmd.split())
-            file_a_path = pair[0].split("__rpm__")[-1]
-            file_b_path = pair[1].split("__rpm__")[-1]
+            file_a_path = pair[0].split(self.split_flag)[-1]
+            file_b_path = pair[1].split(self.split_flag)[-1]
             for compare_line in out.split('\n')[3:]:
                 if compare_line:
                     lack_conf = re.match('-', compare_line)
@@ -114,16 +118,14 @@ class HeaderCompareExecutor(CompareExecutor):
                 self.count_cmp_result(count_result, CMP_RESULT_SAME)
                 data = CompareResultComponent(CMP_TYPE_RPM_HEADER, CMP_RESULT_SAME, file_a_path, file_b_path)
             result.add_component(data)
-        if only_file_a:
-            for file_a in only_file_a:
-                self.count_cmp_result(count_result, CMP_RESULT_LESS)
-                data = CompareResultComponent(CMP_TYPE_RPM_HEADER, CMP_RESULT_LESS, file_a.split("__rpm__")[-1], '')
-                result.add_component(data)
-        if only_file_b:
-            for file_b in only_file_b:
-                self.count_cmp_result(count_result, CMP_RESULT_MORE)
-                data = CompareResultComponent(CMP_TYPE_RPM_HEADER, CMP_RESULT_MORE, '', file_b.split("__rpm__")[-1])
-                result.add_component(data)
+        for file_a in only_file_a:
+            self.count_cmp_result(count_result, CMP_RESULT_LESS)
+            data = CompareResultComponent(CMP_TYPE_RPM_HEADER, CMP_RESULT_LESS, file_a, '')
+            result.add_component(data)
+        for file_b in only_file_b:
+            self.count_cmp_result(count_result, CMP_RESULT_MORE)
+            data = CompareResultComponent(CMP_TYPE_RPM_HEADER, CMP_RESULT_MORE, '', file_b)
+            result.add_component(data)
         result.add_count_info(count_result)
 
         return result
