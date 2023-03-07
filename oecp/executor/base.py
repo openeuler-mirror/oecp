@@ -269,7 +269,7 @@ class CompareExecutor(ABC):
     def mapping_files(files, flag):
         map_result = {}
         for file in files:
-            pat_other = re.compile(r"(\d+\.\d+\.\d+)|(\d+\.\d+)|(v\d{8}-\d{4})")
+            pat_other = re.compile(r"(\d+\.\d+\.\d+)|(\d+\.\d+)|(v\d{8}-\d{4})|(-[a-z0-9]{32})")
             simple_file = file.replace(flag, '')
             remove_version_file = re.sub(pat_other, '', simple_file)
             map_result.setdefault(remove_version_file, file)

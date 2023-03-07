@@ -76,11 +76,11 @@ class PlainCompareExecutor(CompareExecutor):
 
         for file_a in only_file_a:
             self.count_cmp_result(count_result, CMP_RESULT_LESS)
-            data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_LESS, os.path.basename(file_a), '')
+            data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_LESS, file_a, '')
             result.add_component(data)
         for file_b in only_file_b:
             self.count_cmp_result(count_result, CMP_RESULT_MORE)
-            data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_MORE, '', os.path.basename(file_b))
+            data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_MORE, '', file_b)
             result.add_component(data)
         result.add_count_info(count_result)
 
