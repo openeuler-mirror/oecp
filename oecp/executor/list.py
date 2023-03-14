@@ -50,7 +50,7 @@ class ListCompareExecutor(CompareExecutor):
             one2more.setdefault(rpm_n_a, []).append(rpm_a)
         return one2more
 
-    def _strict_compare(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
+    def _strict_compare(self, dump_a, dump_b, single_result):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         category = dump_a['category'] if dump_a['category'] == dump_b[
             'category'] else CPM_CATEGORY_DIFF
@@ -72,7 +72,7 @@ class ListCompareExecutor(CompareExecutor):
 
         return result
 
-    def _directory_compare(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
+    def _directory_compare(self, dump_a, dump_b, single_result):
         result = CompareResultComposite(CMP_TYPE_DIRECTORY, single_result, self.dump_a['path'], self.dump_b['path'])
         rpm_set_a, rpm_set_b = set(list(dump_a.keys())), set(list(dump_b.keys()))
         # rpm 完全相同集合
@@ -140,13 +140,13 @@ class ListCompareExecutor(CompareExecutor):
             for single_pair in similar_dumpers:
                 if single_pair:
                     # dump_a: single_pair[0], dump_b: single_pair[1]
-                    result = self._strict_compare(single_pair[0], single_pair[1])
+                    result = self._strict_compare(single_pair[0], single_pair[1], CMP_RESULT_SAME)
                     compare_list.append(result)
             return compare_list
         if self.config.get('only_directory', False):
             dump_a = self.dump_a[self.data]
             dump_b = self.dump_b[self.data]
-            return self._directory_compare(dump_a, dump_b)
+            return self._directory_compare(dump_a, dump_b, CMP_RESULT_SAME)
 
     def run(self):
         result = self.compare()
