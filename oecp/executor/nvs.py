@@ -60,9 +60,9 @@ class NVSCompareExecutor(CompareExecutor):
                         self.mapping[side].append(SQLiteMapping(sqlite))
                 elif not isinstance(sqlite_a, str):
                     repo_path = os.path.join(sqlite_a.name, 'repodata')
-                    for file in os.listdir(repo_path):
-                        if '-primary.sqlite.' in file:
-                            sqlite = os.path.join(repo_path, file)
+                    for f_repo in os.listdir(repo_path):
+                        if '-primary.sqlite.' in f_repo:
+                            sqlite = os.path.join(repo_path, f_repo)
                             self.mapping[side].append(SQLiteMapping(sqlite))
 
     def to_pretty_dump(self, dump):
@@ -77,10 +77,11 @@ class NVSCompareExecutor(CompareExecutor):
             # requires 比较忽视release版本号，加上依赖类型（强依赖或弱依赖）
             if dump['kind'] == 'requires':
                 requires_name = ' '.join([component['name'], component['symbol'], component['version'].split('-')[0]])
-                new_component = dict(name=requires_name, dependence=component['dependence'])
+                new_component_dict = dict(name=requires_name, dependence=component['dependence'])
+                pretty_dump.setdefault(rpm_n, []).append(new_component_dict)
             else:
-                new_component = ' '.join([component['name'], component['symbol'], component['version']])
-            pretty_dump.setdefault(rpm_n, []).append(new_component)
+                new_component_str = ' '.join([component['name'], component['symbol'], component['version']])
+                pretty_dump.setdefault(rpm_n, []).append(new_component_str)
         return rpm_n, pretty_dump
 
     def get_all_requires_rpm(self, dump, all_mapping):
@@ -163,5 +164,5 @@ class NVSCompareExecutor(CompareExecutor):
     def run(self):
         result = self.compare()
         if not result:
-            logger.warning('compare result empty, %s, %s' % (self.dump_a, self.dump_b))
+            logger.warning('compare result empty, %s, %s', self.dump_a, self.dump_b)
         return result

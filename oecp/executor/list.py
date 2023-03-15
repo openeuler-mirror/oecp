@@ -50,6 +50,23 @@ class ListCompareExecutor(CompareExecutor):
             one2more.setdefault(rpm_n_a, []).append(rpm_a)
         return one2more
 
+    @staticmethod
+    def cmp_rpms_similarity(similar_pairs, compare_list, row):
+        for rpm_pair in similar_pairs:
+            rpm_a, rpm_b = rpm_pair[0], rpm_pair[1]
+            rpm_a_n, rpm_a_v, rpm_a_r, rpm_a_d, _ = RPMProxy.rpm_n_v_r_d_a(rpm_a)
+            rpm_b_n, rpm_b_v, rpm_b_r, rpm_b_d, _ = RPMProxy.rpm_n_v_r_d_a(rpm_b)
+            # eg: custom_build_tool-1.0-17.oe1.oe1.aarch64.rpm
+            if rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r == rpm_b_r and rpm_a_d == rpm_b_d:
+                row = [rpm_a, rpm_b, CMP_LEVEL_SAME]
+            elif rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r == rpm_b_r and rpm_a_d != rpm_b_d:
+                row = [rpm_a, rpm_b, CMP_LEVEL_NEARLY_SAME]
+            elif rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r != rpm_b_r:
+                row = [rpm_a, rpm_b, CMP_LEVEL_BIG_VERSION_SAME]
+            elif rpm_a_n == rpm_b_n and rpm_a_v != rpm_b_v:
+                row = [rpm_a, rpm_b, CMP_LEVEL_VERSION_DIFF]
+            compare_list.append(row)
+
     def _strict_compare(self, dump_a, dump_b, single_result):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         category = dump_a['category'] if dump_a['category'] == dump_b[
@@ -74,12 +91,10 @@ class ListCompareExecutor(CompareExecutor):
 
     def _directory_compare(self, dump_a, dump_b, single_result):
         result = CompareResultComposite(CMP_TYPE_DIRECTORY, single_result, self.dump_a['path'], self.dump_b['path'])
-        rpm_set_a, rpm_set_b = set(list(dump_a.keys())), set(list(dump_b.keys()))
         # rpm 完全相同集合
-        rpm_sames = rpm_set_a & rpm_set_b
-
+        rpm_sames = set(dump_a.keys()) & set(dump_b.keys())
         # 去除rpm完全相同项
-        rpm_diffs_a, rpm_diffs_b = rpm_set_a - rpm_sames, rpm_set_b - rpm_sames
+        rpm_diffs_a, rpm_diffs_b = set(dump_a.keys()) - rpm_sames, set(dump_b.keys()) - rpm_sames
 
         # 使用字典保存rpm name 对应的多版本rpm包, key值为rpm name + rpm arch
         one2more_a = self.rpm_n_a_lists(rpm_diffs_a)
@@ -108,21 +123,7 @@ class ListCompareExecutor(CompareExecutor):
                 rpm_list_a, rpm_list_b = one2more_a[rpm_n], one2more_b[rpm_n]
                 # 根据side_b取rpm相似度最高的对进行比较，side_a中未被取走的rpm不在最终结果中显示
                 rpm_similar_pairs = self.get_similar_rpm_pairs(rpm_list_a, rpm_list_b)
-                if rpm_similar_pairs:
-                    for rpm_pair in rpm_similar_pairs:
-                        rpm_a, rpm_b = rpm_pair[0], rpm_pair[1]
-                        rpm_a_n, rpm_a_v, rpm_a_r, rpm_a_d, _ = RPMProxy.rpm_n_v_r_d_a(rpm_a)
-                        rpm_b_n, rpm_b_v, rpm_b_r, rpm_b_d, _ = RPMProxy.rpm_n_v_r_d_a(rpm_b)
-                        # eg: custom_build_tool-1.0-17.oe1.oe1.aarch64.rpm
-                        if rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r == rpm_b_r and rpm_a_d == rpm_b_d:
-                            row = [rpm_a, rpm_b, CMP_LEVEL_SAME]
-                        elif rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r == rpm_b_r and rpm_a_d != rpm_b_d:
-                            row = [rpm_a, rpm_b, CMP_LEVEL_NEARLY_SAME]
-                        elif rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r != rpm_b_r:
-                            row = [rpm_a, rpm_b, CMP_LEVEL_BIG_VERSION_SAME]
-                        elif rpm_a_n == rpm_b_n and rpm_a_v != rpm_b_v:
-                            row = [rpm_a, rpm_b, CMP_LEVEL_VERSION_DIFF]
-                        compare_list.append(row)
+                self.cmp_rpms_similarity(rpm_similar_pairs, compare_list, row)
             else:
                 row = [', '.join(one2more_a[rpm_n]), '', CMP_LEVEL_LESS]
                 compare_list.append(row)
@@ -151,5 +152,5 @@ class ListCompareExecutor(CompareExecutor):
     def run(self):
         result = self.compare()
         if not result:
-            logger.debug('compare result empty, %s, %s' % (self.dump_a, self.dump_b))
+            logger.debug('compare result empty, %s, %s', self.dump_a, self.dump_b)
         return result
