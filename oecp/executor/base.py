@@ -33,9 +33,9 @@ logger = logging.getLogger('oecp')
 
 class CompareExecutor(ABC):
 
-    def __init__(self, dump_a, dump_b, config):
-        self.dump_a = dump_a
-        self.dump_b = dump_b
+    def __init__(self, base_dump, other_dump, config):
+        self.base_dump = base_dump
+        self.other_dump = other_dump
         self.config = config
         self.split_flag = '__rpm__'
 

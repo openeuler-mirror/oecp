@@ -25,10 +25,10 @@ logger = logging.getLogger('oecp')
 
 class ServiceCompareExecutor(CompareExecutor):
 
-    def __init__(self, dump_a, dump_b, config=None):
-        super(ServiceCompareExecutor, self).__init__(dump_a, dump_b, config)
-        self.dump_a = dump_a.run()
-        self.dump_b = dump_b.run()
+    def __init__(self, base_dump, other_dump, config=None):
+        super(ServiceCompareExecutor, self).__init__(base_dump, other_dump, config)
+        self.base_dump = base_dump.run()
+        self.base_dump = other_dump.run()
         self.data = 'data'
 
     @staticmethod
@@ -55,13 +55,13 @@ class ServiceCompareExecutor(CompareExecutor):
         return item
 
     @staticmethod
-    def _detail_set(dump_a, dump_b, component_results, detail_filename, single_result=CMP_RESULT_SAME):
+    def _detail_set(base_dump, other_dump, component_results, detail_filename, single_result=CMP_RESULT_SAME):
         """
         格式化比较文件结果并输出对比结果
-        :param component_results:side_a and side_b service 文件的对比结果
+        :param component_results:base_side and other_side service 文件的对比结果
         :return:
         """
-        result = CompareResultComposite(CMP_TYPE_SERVICE_DETAIL, single_result, dump_a['rpm'], dump_b['rpm'])
+        result = CompareResultComposite(CMP_TYPE_SERVICE_DETAIL, single_result, base_dump['rpm'], other_dump['rpm'])
         for component_result in component_results:
             for sub_component_result in component_result:
                 data = CompareResultComponent(CMP_TYPE_SERVICE_DETAIL, sub_component_result[-1],
@@ -73,43 +73,44 @@ class ServiceCompareExecutor(CompareExecutor):
                 result.add_component(data)
         return result
 
-    def _compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
+    def _compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
-        category = dump_a['category']
-        flag_v_r_d = self.extract_version_flag(dump_a['rpm'], dump_b['rpm'])
-        result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
-        dump_a_files = self.split_files_mapping(dump_a[self.data])
-        dump_b_files = self.split_files_mapping(dump_b[self.data])
-        common_file_pairs, only_file_a, only_file_b = self.format_fullpath_files(dump_a_files, dump_b_files, flag_v_r_d)
-        if not common_file_pairs and not only_file_a and not only_file_b:
-            logger.debug(f"No service package found, ignored with {dump_b['rpm']} and {dump_b['rpm']}")
+        category = base_dump['category']
+        rpm_version_release_dist = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
+        result = CompareResultComposite(CMP_TYPE_RPM, single_result, base_dump['rpm'], other_dump['rpm'], category)
+        base_dump_files = self.split_files_mapping(base_dump[self.data])
+        other_dump_files = self.split_files_mapping(other_dump[self.data])
+        common_file_pairs, only_base_files, only_other_file = self.format_fullpath_files(base_dump_files,
+                                                                            other_dump_files, rpm_version_release_dist)
+        if not common_file_pairs and not only_base_files and not only_other_file:
+            logger.debug(f"No service package found, ignored with {other_dump['rpm']} and {other_dump['rpm']}")
             return result
-        details_path = os.path.join(DETAIL_PATH, 'service-detail', dump_b['rpm']) + '.csv'
+        details_path = os.path.join(DETAIL_PATH, 'service-detail', other_dump['rpm']) + '.csv'
         for pair in common_file_pairs:
-            base_a = pair[0].split(self.split_flag)[-1]
-            base_b = pair[1].split(self.split_flag)[-1]
-            details_a = self._load_details(pair[0])
-            details_b = self._load_details(pair[1])
-            file_result, component_results = self.format_service_detail(details_a, details_b)
+            base_service = pair[0].split(self.split_flag)[-1]
+            other_service = pair[1].split(self.split_flag)[-1]
+            base_details = self._load_details(pair[0])
+            other_details = self._load_details(pair[1])
+            file_result, component_results = self.format_service_detail(base_details, other_details)
             if file_result == CMP_RESULT_DIFF:
                 self.count_cmp_result(count_result, CMP_RESULT_DIFF)
-                data = CompareResultComponent(CMP_TYPE_SERVICE, file_result, base_a, base_b, details_path)
+                data = CompareResultComponent(CMP_TYPE_SERVICE, file_result, base_service, other_service, details_path)
                 result.set_cmp_result(file_result)
             else:
                 self.count_cmp_result(count_result, file_result)
-                data = CompareResultComponent(CMP_TYPE_SERVICE, file_result, base_a, base_b)
+                data = CompareResultComponent(CMP_TYPE_SERVICE, file_result, base_service, other_service)
             result.add_component(data)
-            result_detail = self._detail_set(dump_a, dump_b, component_results, base_a)
+            result_detail = self._detail_set(base_dump, other_dump, component_results, base_service)
             result.add_component(result_detail)
 
-        for file_a in only_file_a:
+        for base_file in only_base_files:
             self.count_cmp_result(count_result, CMP_RESULT_LESS)
-            data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_LESS, file_a, '')
+            data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_LESS, base_file, '')
             result.add_component(data)
 
-        for file_b in only_file_b:
+        for other_file in only_other_file:
             self.count_cmp_result(count_result, CMP_RESULT_MORE)
-            data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_MORE, '', file_b)
+            data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_MORE, '', other_file)
             result.add_component(data)
 
         result.add_count_info(count_result)
@@ -118,11 +119,11 @@ class ServiceCompareExecutor(CompareExecutor):
 
     def compare(self):
         compare_list = []
-        similar_dumpers = self.get_similar_rpm_pairs(self.dump_a, self.dump_b)
+        similar_dumpers = self.get_similar_rpm_pairs(self.base_dump, self.base_dump)
         for single_pair in similar_dumpers:
             if single_pair:
-                dump_a, dump_b = single_pair[0], single_pair[1]
-                result = self._compare_result(dump_a, dump_b)
+                base_dump, other_dump = single_pair[0], single_pair[1]
+                result = self._compare_result(base_dump, other_dump)
                 compare_list.append(result)
         return compare_list
 

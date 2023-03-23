@@ -34,10 +34,10 @@ CMP_LEVEL_MORE = '5'
 
 class ListCompareExecutor(CompareExecutor):
 
-    def __init__(self, dump_a, dump_b, config=None):
-        super(ListCompareExecutor, self).__init__(dump_a, dump_b, config)
-        self.dump_a = dump_a.run()
-        self.dump_b = dump_b.run()
+    def __init__(self, base_dump, other_dump, config=None):
+        super(ListCompareExecutor, self).__init__(base_dump, other_dump, config)
+        self.base_dump = base_dump.run()
+        self.other_dump = other_dump.run()
         self.config = config if config else {}
         self.data = 'data'
 
@@ -53,27 +53,30 @@ class ListCompareExecutor(CompareExecutor):
     @staticmethod
     def cmp_rpms_similarity(similar_pairs, compare_list, row):
         for rpm_pair in similar_pairs:
-            rpm_a, rpm_b = rpm_pair[0], rpm_pair[1]
-            rpm_a_n, rpm_a_v, rpm_a_r, rpm_a_d, _ = RPMProxy.rpm_n_v_r_d_a(rpm_a)
-            rpm_b_n, rpm_b_v, rpm_b_r, rpm_b_d, _ = RPMProxy.rpm_n_v_r_d_a(rpm_b)
+            base_rpm, other_rpm = rpm_pair[0], rpm_pair[1]
+            base_rpm_name, base_rpm_version, base_rpm_release, base_rpm_dist, _ = RPMProxy.rpm_n_v_r_d_a(base_rpm)
+            other_rpm_name, other_rpm_version, other_rpm_release, other_rpm_dist, _ = RPMProxy.rpm_n_v_r_d_a(other_rpm)
             # eg: custom_build_tool-1.0-17.oe1.oe1.aarch64.rpm
-            if rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r == rpm_b_r and rpm_a_d == rpm_b_d:
-                row = [rpm_a, rpm_b, CMP_LEVEL_SAME]
-            elif rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r == rpm_b_r and rpm_a_d != rpm_b_d:
-                row = [rpm_a, rpm_b, CMP_LEVEL_NEARLY_SAME]
-            elif rpm_a_n == rpm_b_n and rpm_a_v == rpm_b_v and rpm_a_r != rpm_b_r:
-                row = [rpm_a, rpm_b, CMP_LEVEL_BIG_VERSION_SAME]
-            elif rpm_a_n == rpm_b_n and rpm_a_v != rpm_b_v:
-                row = [rpm_a, rpm_b, CMP_LEVEL_VERSION_DIFF]
+            if base_rpm_name == other_rpm_name and base_rpm_version == other_rpm_version and base_rpm_release == \
+                    other_rpm_release and base_rpm_dist == other_rpm_dist:
+                row = [base_rpm, other_rpm, CMP_LEVEL_SAME]
+            elif base_rpm_name == other_rpm_name and base_rpm_version == other_rpm_version and base_rpm_release == \
+                    other_rpm_release and base_rpm_dist != other_rpm_dist:
+                row = [base_rpm, other_rpm, CMP_LEVEL_NEARLY_SAME]
+            elif base_rpm_name == other_rpm_name and base_rpm_version == other_rpm_version and base_rpm_release != \
+                    other_rpm_release:
+                row = [base_rpm, other_rpm, CMP_LEVEL_BIG_VERSION_SAME]
+            elif base_rpm_name == other_rpm_name and base_rpm_version != other_rpm_version:
+                row = [base_rpm, other_rpm, CMP_LEVEL_VERSION_DIFF]
             compare_list.append(row)
 
-    def _strict_compare(self, dump_a, dump_b, single_result):
+    def _strict_compare(self, base_dump, other_dump, single_result):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
-        category = dump_a['category'] if dump_a['category'] == dump_b[
+        category = base_dump['category'] if base_dump['category'] == other_dump[
             'category'] else CPM_CATEGORY_DIFF
-        result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
-        flag_v_r_d = self.extract_version_flag(dump_a['rpm'], dump_b['rpm'])
-        component_results = self.format_dump(dump_a[self.data], dump_b[self.data], flag_v_r_d)
+        result = CompareResultComposite(CMP_TYPE_RPM, single_result, base_dump['rpm'], other_dump['rpm'], category)
+        flag_v_r_d = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
+        component_results = self.format_dump(base_dump[self.data], other_dump[self.data], flag_v_r_d)
         for component_result in component_results:
             for sub_component_result in component_result:
                 self.count_cmp_result(count_result, sub_component_result[-1])
@@ -89,47 +92,48 @@ class ListCompareExecutor(CompareExecutor):
 
         return result
 
-    def _directory_compare(self, dump_a, dump_b, single_result):
-        result = CompareResultComposite(CMP_TYPE_DIRECTORY, single_result, self.dump_a['path'], self.dump_b['path'])
+    def _directory_compare(self, base_dump, other_dump, single_result):
+        result = CompareResultComposite(CMP_TYPE_DIRECTORY, single_result, self.base_dump['path'],
+                                        self.other_dump['path'])
         # rpm 完全相同集合
-        rpm_sames = set(dump_a.keys()) & set(dump_b.keys())
+        rpm_sames = set(base_dump.keys()) & set(other_dump.keys())
         # 去除rpm完全相同项
-        rpm_diffs_a, rpm_diffs_b = set(dump_a.keys()) - rpm_sames, set(dump_b.keys()) - rpm_sames
+        rpm_diffs_in_base, rpm_diffs_in_other = set(base_dump.keys()) - rpm_sames, set(other_dump.keys()) - rpm_sames
 
         # 使用字典保存rpm name 对应的多版本rpm包, key值为rpm name + rpm arch
-        one2more_a = self.rpm_n_a_lists(rpm_diffs_a)
-        one2more_b = self.rpm_n_a_lists(rpm_diffs_b)
-        rpm_levels = self.compare_rpm_level(rpm_sames, one2more_a, one2more_b)
+        one2more_base = self.rpm_n_a_lists(rpm_diffs_in_base)
+        one2more_other = self.rpm_n_a_lists(rpm_diffs_in_other)
+        rpm_levels = self.compare_rpm_level(rpm_sames, one2more_base, one2more_other)
         for rpm_level in rpm_levels:
-            attr_a = dump_a.get(rpm_level[0].split(',')[0])
-            attr_b = dump_b.get(rpm_level[1].split(',')[0])
-            # 可能出现a包有，b包没有情况
+            attr_base = base_dump.get(rpm_level[0].split(',')[0])
+            attr_other = other_dump.get(rpm_level[1].split(',')[0])
+            # 可能出现base包有，other包没有情况
 
-            attr = {'source_package_a': attr_a['source_package'] if attr_a else '',
-                    'source_package_b': attr_b['source_package'] if attr_b else '',
-                    'category': attr_a['category'] if attr_a else attr_b['category']}
+            attr = {'source_package_a': attr_base['source_package'] if attr_base else '',
+                    'source_package_b': attr_other['source_package'] if attr_other else '',
+                    'category': attr_base['category'] if attr_base else attr_other['category']}
             if rpm_level[-1] != CMP_LEVEL_SAME and single_result == CMP_RESULT_SAME:
                 result.set_cmp_result(CMP_RESULT_DIFF)
             result.add_component(
                 CompareResultComponent(CMP_TYPE_RPM_LEVEL, rpm_level[-1], rpm_level[0], rpm_level[1], attr))
         return result
 
-    def compare_rpm_level(self, rpm_sames, one2more_a, one2more_b):
+    def compare_rpm_level(self, rpm_sames, one2more_base, one2more_other):
         compare_list, row = [], []
         for rpm_same in rpm_sames:
             compare_list.append([rpm_same, rpm_same, CMP_LEVEL_SAME])
-        for rpm_n in one2more_a.keys():
-            if rpm_n in one2more_b.keys():
-                rpm_list_a, rpm_list_b = one2more_a[rpm_n], one2more_b[rpm_n]
+        for rpm_name in one2more_base.keys():
+            if rpm_name in one2more_other.keys():
+                rpm_list_base, rpm_list_other = one2more_base[rpm_name], one2more_other[rpm_name]
                 # 根据side_b取rpm相似度最高的对进行比较，side_a中未被取走的rpm不在最终结果中显示
-                rpm_similar_pairs = self.get_similar_rpm_pairs(rpm_list_a, rpm_list_b)
+                rpm_similar_pairs = self.get_similar_rpm_pairs(rpm_list_base, rpm_list_other)
                 self.cmp_rpms_similarity(rpm_similar_pairs, compare_list, row)
             else:
-                row = [', '.join(one2more_a[rpm_n]), '', CMP_LEVEL_LESS]
+                row = [', '.join(one2more_base[rpm_name]), '', CMP_LEVEL_LESS]
                 compare_list.append(row)
-        for rpm_n in one2more_b.keys():
-            if rpm_n not in one2more_a.keys():
-                row = ['', ', '.join(one2more_b[rpm_n]), CMP_LEVEL_MORE]
+        for rpm_name in one2more_other.keys():
+            if rpm_name not in one2more_base.keys():
+                row = ['', ', '.join(one2more_other[rpm_name]), CMP_LEVEL_MORE]
                 compare_list.append(row)
         compare_list.sort(key=lambda x: x[2])
         return compare_list
@@ -137,20 +141,20 @@ class ListCompareExecutor(CompareExecutor):
     def compare(self):
         if self.config.get('strict', False):
             compare_list = []
-            similar_dumpers = self.get_similar_rpm_pairs(self.dump_a, self.dump_b)
+            similar_dumpers = self.get_similar_rpm_pairs(self.base_dump, self.other_dump)
             for single_pair in similar_dumpers:
                 if single_pair:
-                    # dump_a: single_pair[0], dump_b: single_pair[1]
+                    # dump_base: single_pair[0], dump_other: single_pair[1]
                     result = self._strict_compare(single_pair[0], single_pair[1], CMP_RESULT_SAME)
                     compare_list.append(result)
             return compare_list
         if self.config.get('only_directory', False):
-            dump_a = self.dump_a[self.data]
-            dump_b = self.dump_b[self.data]
-            return self._directory_compare(dump_a, dump_b, CMP_RESULT_SAME)
+            base_dump = self.base_dump[self.data]
+            other_dump = self.other_dump[self.data]
+            return self._directory_compare(base_dump, other_dump, CMP_RESULT_SAME)
 
     def run(self):
         result = self.compare()
         if not result:
-            logger.debug('compare result empty, %s, %s', self.dump_a, self.dump_b)
+            logger.debug('compare result empty, %s, %s', self.base_dump, self.other_dump)
         return result

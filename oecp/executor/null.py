@@ -18,11 +18,11 @@ from oecp.executor.base import CompareExecutor
 
 class NullExecutor(CompareExecutor):
 
-    def __init__(self, dump_a, dump_b, config=None):
-        super(NullExecutor, self).__init__(dump_a, dump_b, config)
-        if hasattr(dump_a, 'run') and hasattr(dump_b, 'run'):
-            dump_a.run()
-            dump_b.run()
+    def __init__(self, base_dump, other_dump, config=None):
+        super(NullExecutor, self).__init__(base_dump, other_dump, config)
+        if hasattr(base_dump, 'run') and hasattr(other_dump, 'run'):
+            base_dump.run()
+            other_dump.run()
 
     def run(self):
         return []

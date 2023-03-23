@@ -27,29 +27,31 @@ logger = logging.getLogger('oecp')
 
 class PlainCompareExecutor(CompareExecutor):
 
-    def __init__(self, dump_a, dump_b, config):
-        super(PlainCompareExecutor, self).__init__(dump_a, dump_b, config)
-        self.dump_a = dump_a.run()
-        self.dump_b = dump_b.run()
+    def __init__(self, base_dump, other_dump, config):
+        super(PlainCompareExecutor, self).__init__(base_dump, other_dump, config)
+        self.base_dump = base_dump.run()
+        self.other_dump = other_dump.run()
         self.data = 'data'
         self.lack_conf_flag = False
 
-    def _compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
+    def _compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
-        category = dump_a['category'] if dump_a['category'] == dump_b['category'] else CPM_CATEGORY_DIFF
-        result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
-        dump_a_files = self.split_files_mapping(dump_a[self.data])
-        dump_b_files = self.split_files_mapping(dump_b[self.data])
-        flag_v_r_d = self.extract_version_flag(dump_a['rpm'], dump_b['rpm'])
-        common_file_pairs, only_file_a, only_file_b = self.format_fullpath_files(dump_a_files, dump_b_files, flag_v_r_d)
-        if not common_file_pairs and not only_file_a and not only_file_b:
-            logger.debug(f"No config package found, ignored with {dump_b['rpm']} and {dump_b['rpm']}")
+        category = base_dump['category'] if base_dump['category'] == other_dump['category'] else CPM_CATEGORY_DIFF
+        result = CompareResultComposite(CMP_TYPE_RPM, single_result, base_dump['rpm'], other_dump['rpm'], category)
+        base_dump_files = self.split_files_mapping(base_dump[self.data])
+        other_dump_files = self.split_files_mapping(other_dump[self.data])
+        rpm_version_release_dist = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
+        common_file_pairs, only_base_files, only_other_files = self.format_fullpath_files(base_dump_files,
+                                                                                          other_dump_files,
+                                                                                          rpm_version_release_dist)
+        if not common_file_pairs and not only_base_files and not only_other_files:
+            logger.debug(f"No config package found, ignored with {other_dump['rpm']} and {other_dump['rpm']}")
             return result
         for pair in common_file_pairs:
             cmd = "diff -uN {} {}".format(pair[0], pair[1])
             ret, out, err = shell_cmd(cmd.split())
-            base_a = os.path.basename(pair[0])
-            base_b = os.path.basename(pair[1])
+            base_conf_file = os.path.basename(pair[0])
+            other_conf_file = os.path.basename(pair[1])
             for compare_line in out.split('\n')[3:]:
                 if compare_line:
                     lack_conf = re.match('-', compare_line)
@@ -64,23 +66,25 @@ class PlainCompareExecutor(CompareExecutor):
                     out = re.sub("\\+\\+\\+\\s+\\S+\\s+", "+++ {} ".format(pair[1]), out)
                     logger.info("plain files are diff")
                     self.count_cmp_result(count_result, CMP_RESULT_DIFF)
-                    data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_DIFF, base_a, base_b, detail_file=out)
+                    data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_DIFF, base_conf_file, other_conf_file,
+                                                  detail_file=out)
                     result.set_cmp_result(CMP_RESULT_DIFF)
                 except IOError:
                     logger.exception("save compare result exception")
-                    data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_EXCEPTION, base_a, base_b)
+                    data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_EXCEPTION, base_conf_file,
+                                                  other_conf_file)
             else:
                 self.count_cmp_result(count_result, CMP_RESULT_SAME)
-                data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_SAME, base_a, base_b)
+                data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_SAME, base_conf_file, other_conf_file)
             result.add_component(data)
 
-        for file_a in only_file_a:
+        for base_file in only_base_files:
             self.count_cmp_result(count_result, CMP_RESULT_LESS)
-            data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_LESS, file_a, '')
+            data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_LESS, base_file, '')
             result.add_component(data)
-        for file_b in only_file_b:
+        for other_file in only_other_files:
             self.count_cmp_result(count_result, CMP_RESULT_MORE)
-            data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_MORE, '', file_b)
+            data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_MORE, '', other_file)
             result.add_component(data)
         result.add_count_info(count_result)
 
@@ -88,11 +92,11 @@ class PlainCompareExecutor(CompareExecutor):
 
     def compare(self):
         compare_list = []
-        similar_dumpers = self.get_similar_rpm_pairs(self.dump_a, self.dump_b)
+        similar_dumpers = self.get_similar_rpm_pairs(self.base_dump, self.other_dump)
         for single_pair in similar_dumpers:
             if single_pair:
-                dump_a, dump_b = single_pair[0], single_pair[1]
-                result = self._compare_result(dump_a, dump_b)
+                base_dump, other_dump = single_pair[0], single_pair[1]
+                result = self._compare_result(base_dump, other_dump)
                 compare_list.append(result)
         return compare_list
 

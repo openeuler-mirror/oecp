@@ -76,36 +76,36 @@ class RPMProxy(object):
                 # 名称-版本号-发布号.发行商.体系.rpm
                 # eg: grpc-1.31.0-6.oe1.x86_64.rpm
                 name, version = cls.rpm_name_version(rpm)
-                m = re.match(r"-(.+)\.(.+)\.rpm", rpm.replace(name + '-' + version, "", 1))
-                if not m:
+                matchs = re.match(r"-(.+)\.(.+)\.rpm", rpm.replace(name + '-' + version, "", 1))
+                if not matchs:
                     # eg: RAID-3858_3758-EulerOS2.10-hiraid-1.0.0.18-aarch64.rpm
-                    m = re.match(r"-(.+)\.rpm", rpm.replace(name + '-' + version, "", 1))
-                    return name, version, '', '', m.group(1)
-                r_d, arch = m.group(1), m.group(2)
-                for d_flag in STAND_DISTS.values():
-                    if not d_flag or d_flag not in r_d:
+                    matchs = re.match(r"-(.+)\.rpm", rpm.replace(name + '-' + version, "", 1))
+                    return name, version, '', '', matchs.group(1)
+                release_dist, arch = matchs.group(1), matchs.group(2)
+                for dist_flag in STAND_DISTS.values():
+                    if not dist_flag or dist_flag not in release_dist:
                         continue
                     else:
-                        sp_release = r_d.split(d_flag)[0].rstrip('.')
+                        sp_release = release_dist.split(dist_flag)[0].rstrip('.')
                         release = re.sub(r'.module[_+]+', '.module', sp_release)
-                        initial_d = r_d.split(sp_release)[-1].strip('.')
+                        initial_dist = release_dist.split(sp_release)[-1].strip('.')
                         # eg: caja-core-extensions-1.22.0-1.ky3.kb58.x86_64.rpm
-                        kb_num = re.search(r"kb\d+", initial_d)
+                        kb_num = re.search(r"kb\d+", initial_dist)
                         if kb_num:
                             release = release + '.' + kb_num.group()
-                        return name, version, release, d_flag, arch
-                m = re.match(r"([\d._]+)\.(.+)", r_d)
-                if m:
-                    return name, version, m.group(1), m.group(2), arch
+                        return name, version, release, dist_flag, arch
+                matchs = re.match(r"([\d._]+)\.(.+)", release_dist)
+                if matchs:
+                    return name, version, matchs.group(1), matchs.group(2), arch
                 else:
                     # 名称-版本号-发布号.体系.rpm
                     # eg: grpc-1.31.0-6.x86_64.rpm
-                    return name, version, r_d, '', arch
+                    return name, version, release_dist, '', arch
             elif dist == "category":
                 # 名称-版本号-发布号.发行商-类型
                 # eg: texlive-base-20180414-28.oe1.oecp
-                m = re.match(r"^(.+)-(.+)-(.+)\.(.+)\.(.+)", rpm)
-                return m.group(1), m.group(2), m.group(3), m.group(4), m.group(5)
+                matchs = re.match(r"^(.+)-(.+)-(.+)\.(.+)\.(.+)", rpm)
+                return matchs.group(1), matchs.group(2), matchs.group(3), matchs.group(4), matchs.group(5)
 
             return (None,) * 5
         except AttributeError as attr_error:

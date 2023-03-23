@@ -21,15 +21,15 @@ logger = logging.getLogger('oecp')
 
 class FindSensitiveInfoExecutor(CompareExecutor):
 
-    def __init__(self, dump_a, config=None):
-        super(FindSensitiveInfoExecutor, self).__init__(dump_a, None, config)
-        assert hasattr(dump_a, 'run'), 'dump should be a object with "run" method'
-        self.dump_a = dump_a.run()
+    def __init__(self, base_dump, config=None):
+        super(FindSensitiveInfoExecutor, self).__init__(base_dump, None, config)
+        assert hasattr(base_dump, 'run'), 'dump should be a object with "run" method'
+        self.base_dump = base_dump.run()
         self._data = 'data'
         self.config = config if config else {}
 
     def run(self):
-        result = self.dump_a
+        result = self.base_dump
         if not result:
-            logger.warning(f"Can not find sensitive info in {self.dump_a}")
+            logger.warning(f"Can not find sensitive info in {self.base_dump}")
         return result
