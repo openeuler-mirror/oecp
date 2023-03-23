@@ -23,7 +23,6 @@ class FindSensitiveInfoExecutor(CompareExecutor):
 
     def __init__(self, base_dump, config=None):
         super(FindSensitiveInfoExecutor, self).__init__(base_dump, None, config)
-        assert hasattr(base_dump, 'run'), 'dump should be a object with "run" method'
         self.base_dump = base_dump.run()
         self._data = 'data'
         self.config = config if config else {}

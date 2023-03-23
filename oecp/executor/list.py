@@ -72,8 +72,7 @@ class ListCompareExecutor(CompareExecutor):
 
     def _strict_compare(self, base_dump, other_dump, single_result):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
-        category = base_dump['category'] if base_dump['category'] == other_dump[
-            'category'] else CPM_CATEGORY_DIFF
+        category = base_dump['category'] if base_dump['category'] == other_dump['category'] else CPM_CATEGORY_DIFF
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, base_dump['rpm'], other_dump['rpm'], category)
         flag_v_r_d = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
         component_results = self.format_dump(base_dump[self.data], other_dump[self.data], flag_v_r_d)
@@ -92,7 +91,7 @@ class ListCompareExecutor(CompareExecutor):
 
         return result
 
-    def _directory_compare(self, base_dump, other_dump, single_result):
+    def directory_compare(self, base_dump, other_dump, single_result):
         result = CompareResultComposite(CMP_TYPE_DIRECTORY, single_result, self.base_dump['path'],
                                         self.other_dump['path'])
         # rpm 完全相同集合
@@ -151,7 +150,7 @@ class ListCompareExecutor(CompareExecutor):
         if self.config.get('only_directory', False):
             base_dump = self.base_dump[self.data]
             other_dump = self.other_dump[self.data]
-            return self._directory_compare(base_dump, other_dump, CMP_RESULT_SAME)
+            return self.directory_compare(base_dump, other_dump, CMP_RESULT_SAME)
 
     def run(self):
         result = self.compare()

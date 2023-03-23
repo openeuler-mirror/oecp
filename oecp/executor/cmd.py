@@ -30,7 +30,7 @@ class CmdCompareExecutor(CompareExecutor):
         self.other_dump = other_dump.run()
         self.data = 'data'
 
-    def _compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
+    def compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         category = base_dump['category']
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, base_dump['rpm'], other_dump['rpm'], category)
@@ -39,7 +39,8 @@ class CmdCompareExecutor(CompareExecutor):
         flag_v_r_d = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
         if not base_cmd_files and not other_cmd_files:
             logger.debug(
-                f"No {self.config.get('compare_type')} package found, ignored with {base_dump['rpm']} and {other_dump['rpm']}")
+                f"No {self.config.get('compare_type')} package found, "
+                f"ignored with {base_dump['rpm']} and {other_dump['rpm']}")
             return result
         component_results = self.format_dump(base_cmd_files, other_cmd_files, flag_v_r_d)
         for component_result in component_results:
@@ -63,7 +64,7 @@ class CmdCompareExecutor(CompareExecutor):
         for single_pair in similar_dumpers:
             if single_pair:
                 base_dump, other_dump = single_pair[0], single_pair[1]
-                result = self._compare_result(base_dump, other_dump)
+                result = self.compare_result(base_dump, other_dump)
                 compare_list.append(result)
         return compare_list
 

@@ -30,8 +30,6 @@ class NVSCompareExecutor(CompareExecutor):
 
     def __init__(self, base_dump, other_dump, config=None):
         super(NVSCompareExecutor, self).__init__(base_dump, other_dump, config)
-        assert hasattr(base_dump, 'run'), 'dump should be a object with "run" method'
-        assert hasattr(other_dump, 'run'), 'dump should be a object with "run" method'
         self.base_dump = base_dump.run()
         self.other_dump = other_dump.run()
         self.mapping = {}
@@ -57,13 +55,13 @@ class NVSCompareExecutor(CompareExecutor):
                 self.mapping.setdefault(side, [])
                 if isinstance(base_sqlite, dict):
                     for sqlite in base_sqlite.values():
-                        self.mapping[side].append(SQLiteMapping(sqlite))
+                        self.mapping.get(side).append(SQLiteMapping(sqlite))
                 elif not isinstance(base_sqlite, str):
                     repo_path = os.path.join(base_sqlite.name, 'repodata')
                     for repo_file in os.listdir(repo_path):
                         if '-primary.sqlite.' in repo_file:
                             sqlite = os.path.join(repo_path, repo_file)
-                            self.mapping[side].append(SQLiteMapping(sqlite))
+                            self.mapping.get(side).append(SQLiteMapping(sqlite))
 
     def to_pretty_dump(self, dump):
         """
@@ -156,8 +154,8 @@ class NVSCompareExecutor(CompareExecutor):
                         base_components = base_pretty_dump.get(base_rpm_version)
                         other_components = other_pretty_dump.get(other_rpm_version)
                     else:
-                        base_components = set(base_pretty_dump[base_rpm_version])
-                        other_components = set(other_pretty_dump[other_rpm_version])
+                        base_components = set(base_pretty_dump.get(base_rpm_version))
+                        other_components = set(other_pretty_dump.get(other_rpm_version))
                 result = self.cmp_component_set(base_dump, other_dump, base_components, other_components)
                 compare_list.append(result)
         return compare_list

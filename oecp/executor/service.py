@@ -73,7 +73,7 @@ class ServiceCompareExecutor(CompareExecutor):
                 result.add_component(data)
         return result
 
-    def _compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
+    def compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         category = base_dump['category']
         rpm_version_release_dist = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
@@ -123,7 +123,7 @@ class ServiceCompareExecutor(CompareExecutor):
         for single_pair in similar_dumpers:
             if single_pair:
                 base_dump, other_dump = single_pair[0], single_pair[1]
-                result = self._compare_result(base_dump, other_dump)
+                result = self.compare_result(base_dump, other_dump)
                 compare_list.append(result)
         return compare_list
 

@@ -34,7 +34,7 @@ class PlainCompareExecutor(CompareExecutor):
         self.data = 'data'
         self.lack_conf_flag = False
 
-    def _compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
+    def compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         category = base_dump['category'] if base_dump['category'] == other_dump['category'] else CPM_CATEGORY_DIFF
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, base_dump['rpm'], other_dump['rpm'], category)
@@ -96,7 +96,7 @@ class PlainCompareExecutor(CompareExecutor):
         for single_pair in similar_dumpers:
             if single_pair:
                 base_dump, other_dump = single_pair[0], single_pair[1]
-                result = self._compare_result(base_dump, other_dump)
+                result = self.compare_result(base_dump, other_dump)
                 compare_list.append(result)
         return compare_list
 
