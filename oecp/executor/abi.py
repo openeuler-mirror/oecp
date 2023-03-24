@@ -93,25 +93,23 @@ class ABICompareExecutor(CompareExecutor):
         count_result.update(COUNT_ABI_DETAILS)
         base_rpm, other_rpm = base_dump['rpm'], other_dump['rpm']
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, base_rpm, other_rpm, base_dump['category'])
-        base_debuginfo_rpm_path, other_debuginfo_rpm_path = base_dump['debuginfo_extract_path'], other_dump[
+        base_debuginfo_path, other_debuginfo_path = base_dump['debuginfo_extract_path'], other_dump[
             'debuginfo_extract_path']
         base_dump_files, other_dump_files = base_dump[self.data], other_dump[self.data]
         library_pairs = self.get_library_pairs(base_dump_files, other_dump_files)
         if not library_pairs:
             return result
-        base_debuginfo_rpm_path = os.path.join(base_debuginfo_rpm_path,
-                                               'usr/lib/debug') if base_debuginfo_rpm_path else ''
-        other_debuginfo_rpm_path = os.path.join(other_debuginfo_rpm_path,
-                                                'usr/lib/debug') if other_debuginfo_rpm_path else ''
+        base_debuginfo_path = os.path.join(base_debuginfo_path, 'usr/lib/debug') if base_debuginfo_path else ''
+        other_debuginfo_path = os.path.join(other_debuginfo_path, 'usr/lib/debug') if other_debuginfo_path else ''
         for pair in library_pairs:
             base_so = os.path.basename(pair[0])
             other_so = os.path.basename(pair[1])
-            if all([base_debuginfo_rpm_path, other_debuginfo_rpm_path]):
+            if all([base_debuginfo_path, other_debuginfo_path]):
                 cmd = "abidiff {} {} --d1 {} --d2 {} --no-unreferenced-symbols --changed-fns --deleted-fns".format(
-                    pair[0], pair[1], base_debuginfo_rpm_path, other_debuginfo_rpm_path)
+                    pair[0], pair[1], base_debuginfo_path, other_debuginfo_path)
             else:
                 cmd = "abidiff {} {} --d1 {} --d2 {} --changed-fns --deleted-fns".format(
-                    pair[0], pair[1], base_debuginfo_rpm_path, other_debuginfo_rpm_path)
+                    pair[0], pair[1], base_debuginfo_path, other_debuginfo_path)
 
             logger.debug(cmd)
             ret, out, err = shell_cmd(cmd.split())

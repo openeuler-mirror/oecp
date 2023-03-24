@@ -73,7 +73,7 @@ class HeaderCompareExecutor(CompareExecutor):
                 file_bak.write(new_contents)
                 os.remove(file_path)
                 os.rename("%s.bak" % file_path, file_path)
-        except (IOError, UnicodeDecodeError, OSError, FileNotFoundError):
+        except (IOError, UnicodeDecodeError, OSError):
             logger.exception("an error occurred while removing the contents of the file")
 
     def compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
