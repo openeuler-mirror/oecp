@@ -51,7 +51,7 @@ class NVSCompareExecutor(CompareExecutor):
 
     def instantiation_mapping(self):
         for side in self.config.get('sqlite_path', {}).keys():
-            for base_sqlite in self.config['sqlite_path'].get(side, []):
+            for base_sqlite in self.config.get('sqlite_path').get(side, []):
                 self.mapping.setdefault(side, [])
                 if isinstance(base_sqlite, dict):
                     for sqlite in base_sqlite.values():
@@ -70,17 +70,17 @@ class NVSCompareExecutor(CompareExecutor):
         @return: 比较所需的dump
         """
         pretty_dump = {}
-        rpm_n = RPMProxy.rpm_name(dump['rpm'])
+        rpm_name = RPMProxy.rpm_name(dump['rpm'])
         for component in dump[self._data]:
             # requires 比较忽视release版本号，加上依赖类型（强依赖或弱依赖）
             if dump['kind'] == 'requires':
                 requires_name = ' '.join([component['name'], component['symbol'], component['version'].split('-')[0]])
                 new_component_dict = dict(name=requires_name, dependence=component['dependence'])
-                pretty_dump.setdefault(rpm_n, []).append(new_component_dict)
+                pretty_dump.setdefault(rpm_name, []).append(new_component_dict)
             else:
                 new_component_str = ' '.join([component['name'], component['symbol'], component['version']])
-                pretty_dump.setdefault(rpm_n, []).append(new_component_str)
-        return rpm_n, pretty_dump
+                pretty_dump.setdefault(rpm_name, []).append(new_component_str)
+        return rpm_name, pretty_dump
 
     def get_all_requires_rpm(self, dump, all_mapping):
         all_requires_rpm = []

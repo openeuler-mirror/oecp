@@ -36,7 +36,7 @@ class HeaderCompareExecutor(CompareExecutor):
         self.lack_conf_flag = False
 
     @staticmethod
-    def _get_file_encoding_format(file_path):
+    def get_file_encoding_format(file_path):
         """
         get the encoding format of the file
         Args:
@@ -50,7 +50,7 @@ class HeaderCompareExecutor(CompareExecutor):
             file_type = chardet.detect(contents)['encoding']
             return file_type
 
-    def _exclude_comments(self, file_path):
+    def exclude_comments(self, file_path):
         """
         remove the comments from the header file and
         save it in the original file format
@@ -61,7 +61,7 @@ class HeaderCompareExecutor(CompareExecutor):
             None
         """
         try:
-            file_format = self._get_file_encoding_format(file_path)
+            file_format = self.get_file_encoding_format(file_path)
             with open(file_path, "r", encoding=file_format,
                       errors='ignore') as file, open("%s.bak" % file_path,
                                                      "w",
@@ -89,8 +89,8 @@ class HeaderCompareExecutor(CompareExecutor):
             logger.debug(f"No header package found, ignored with {other_dump['rpm']} and {other_dump['rpm']}")
             return result
         for pair in common_file_pairs:
-            self._exclude_comments(pair[0])
-            self._exclude_comments(pair[1])
+            self.exclude_comments(pair[0])
+            self.exclude_comments(pair[1])
             cmd = "diff -uBHN {} {}".format(pair[0], pair[1])
             ret, out, err = shell_cmd(cmd.split())
             base_file_path = pair[0].split(self.split_flag)[-1]

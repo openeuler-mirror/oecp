@@ -70,7 +70,7 @@ class ListCompareExecutor(CompareExecutor):
                 row = [base_rpm, other_rpm, CMP_LEVEL_VERSION_DIFF]
             compare_list.append(row)
 
-    def _strict_compare(self, base_dump, other_dump, single_result):
+    def strict_compare(self, base_dump, other_dump, single_result):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         category = base_dump['category'] if base_dump['category'] == other_dump['category'] else CPM_CATEGORY_DIFF
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, base_dump['rpm'], other_dump['rpm'], category)
@@ -144,7 +144,7 @@ class ListCompareExecutor(CompareExecutor):
             for single_pair in similar_dumpers:
                 if single_pair:
                     # dump_base: single_pair[0], dump_other: single_pair[1]
-                    result = self._strict_compare(single_pair[0], single_pair[1], CMP_RESULT_SAME)
+                    result = self.strict_compare(single_pair[0], single_pair[1], CMP_RESULT_SAME)
                     compare_list.append(result)
             return compare_list
         if self.config.get('only_directory', False):

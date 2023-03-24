@@ -99,10 +99,10 @@ class ABICompareExecutor(CompareExecutor):
         library_pairs = self.get_library_pairs(base_dump_files, other_dump_files)
         if not library_pairs:
             return result
-        base_debuginfo_rpm_path = os.path.join(base_debuginfo_rpm_path, 'usr/lib/debug') \
-            if base_debuginfo_rpm_path else ''
-        other_debuginfo_rpm_path = os.path.join(other_debuginfo_rpm_path, 'usr/lib/debug') \
-            if other_debuginfo_rpm_path else ''
+        base_debuginfo_rpm_path = os.path.join(base_debuginfo_rpm_path,
+                                               'usr/lib/debug') if base_debuginfo_rpm_path else ''
+        other_debuginfo_rpm_path = os.path.join(other_debuginfo_rpm_path,
+                                                'usr/lib/debug') if other_debuginfo_rpm_path else ''
         for pair in library_pairs:
             base_so = os.path.basename(pair[0])
             other_so = os.path.basename(pair[1])
