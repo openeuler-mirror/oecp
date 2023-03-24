@@ -28,22 +28,22 @@ logger = logging.getLogger('oecp')
 
 class ABICompareExecutor(CompareExecutor):
 
-    def __init__(self, dump_a, dump_b, config):
-        super(ABICompareExecutor, self).__init__(dump_a, dump_b, config)
-        self.dump_a = dump_a.run()
-        self.dump_b = dump_b.run()
+    def __init__(self, base_dump, other_dump, config):
+        super(ABICompareExecutor, self).__init__(base_dump, other_dump, config)
+        self.base_dump = base_dump.run()
+        self.other_dump = other_dump.run()
         self.data = 'data'
         self.link_file = 'link_file'
 
     @staticmethod
-    def compare_link_files(dump_a_linkfiles, dump_b_linkfiles, rpm):
-        for file_a in dump_a_linkfiles:
-            for file_b in dump_b_linkfiles:
-                if file_a[0] == file_b[0]:
-                    if file_a[1] == file_b[1]:
+    def compare_link_files(base_dump_linkfiles, other_dump_linkfiles, rpm):
+        for base_linkfile in base_dump_linkfiles:
+            for other_linkfile in other_dump_linkfiles:
+                if base_linkfile[0] == other_linkfile[0]:
+                    if base_linkfile[1] == other_linkfile[1]:
                         continue
                     else:
-                        logger.info(f"{rpm} {file_a[0]} link file is change!")
+                        logger.info(f"{rpm} {base_linkfile[0]} link file is change!")
 
     @staticmethod
     def extract_abi_change_detail(str_content):
@@ -79,44 +79,44 @@ class ABICompareExecutor(CompareExecutor):
                     so_mapping.setdefault(so_name, library_file)
         return so_mapping
 
-    def get_library_pairs(self, files_a, files_b):
+    def get_library_pairs(self, base_files, other_files):
         library_pairs = []
-        so_mapping_a = self._set_so_mapping(files_a)
-        so_mapping_b = self._set_so_mapping(files_b)
-        for so_name in so_mapping_a:
-            if so_name in so_mapping_b:
-                library_pairs.append([so_mapping_a[so_name], so_mapping_b[so_name]])
+        base_so_mapping = self._set_so_mapping(base_files)
+        other_so_mapping = self._set_so_mapping(other_files)
+        for so_name in base_so_mapping:
+            if so_name in other_so_mapping:
+                library_pairs.append([base_so_mapping[so_name], other_so_mapping[so_name]])
         return library_pairs
 
-    def compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
+    def compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         count_result.update(COUNT_ABI_DETAILS)
-        rpm_a, rpm_b = dump_a['rpm'], dump_b['rpm']
-        result = CompareResultComposite(CMP_TYPE_RPM, single_result, rpm_a, rpm_b, dump_a['category'])
-        debuginfo_rpm_path_a, debuginfo_rpm_path_b = dump_a['debuginfo_extract_path'], dump_b['debuginfo_extract_path']
-
-        dump_a_files, dump_b_files = dump_a[self.data], dump_b[self.data]
-        library_pairs = self.get_library_pairs(dump_a_files, dump_b_files)
+        base_rpm, other_rpm = base_dump['rpm'], other_dump['rpm']
+        result = CompareResultComposite(CMP_TYPE_RPM, single_result, base_rpm, other_rpm, base_dump['category'])
+        base_debuginfo_path, other_debuginfo_path = base_dump['debuginfo_extract_path'], other_dump[
+            'debuginfo_extract_path']
+        base_dump_files, other_dump_files = base_dump[self.data], other_dump[self.data]
+        library_pairs = self.get_library_pairs(base_dump_files, other_dump_files)
         if not library_pairs:
             return result
-        debuginfo_rpm_path_a = os.path.join(debuginfo_rpm_path_a, 'usr/lib/debug') if debuginfo_rpm_path_a else ''
-        debuginfo_rpm_path_b = os.path.join(debuginfo_rpm_path_b, 'usr/lib/debug') if debuginfo_rpm_path_b else ''
+        base_debuginfo_path = os.path.join(base_debuginfo_path, 'usr/lib/debug') if base_debuginfo_path else ''
+        other_debuginfo_path = os.path.join(other_debuginfo_path, 'usr/lib/debug') if other_debuginfo_path else ''
         for pair in library_pairs:
-            base_a = os.path.basename(pair[0])
-            base_b = os.path.basename(pair[1])
-            if all([debuginfo_rpm_path_a, debuginfo_rpm_path_b]):
+            base_so = os.path.basename(pair[0])
+            other_so = os.path.basename(pair[1])
+            if all([base_debuginfo_path, other_debuginfo_path]):
                 cmd = "abidiff {} {} --d1 {} --d2 {} --no-unreferenced-symbols --changed-fns --deleted-fns".format(
-                    pair[0], pair[1], debuginfo_rpm_path_a, debuginfo_rpm_path_b)
+                    pair[0], pair[1], base_debuginfo_path, other_debuginfo_path)
             else:
                 cmd = "abidiff {} {} --d1 {} --d2 {} --changed-fns --deleted-fns".format(
-                    pair[0], pair[1], debuginfo_rpm_path_a, debuginfo_rpm_path_b)
+                    pair[0], pair[1], base_debuginfo_path, other_debuginfo_path)
 
             logger.debug(cmd)
             ret, out, err = shell_cmd(cmd.split())
             if ret == 0:
                 logger.debug("check abi same")
                 self.count_cmp_result(count_result, CMP_RESULT_SAME)
-                data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_SAME, base_a, base_b)
+                data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_SAME, base_so, other_so)
             else:
                 logger.debug("check abi diff")
                 removed_abi, changed_abi, added_abi = self.extract_abi_change_detail(out)
@@ -125,22 +125,22 @@ class ABICompareExecutor(CompareExecutor):
                 count_result['add_abi'] += added_abi
                 if changed_abi or removed_abi:
                     self.count_cmp_result(count_result, CMP_RESULT_DIFF)
-                    data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_DIFF, base_a, base_b, detail_file=out)
+                    data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_DIFF, base_so, other_so, detail_file=out)
                     result.set_cmp_result(CMP_RESULT_DIFF)
                 else:
                     logger.debug("check abi functions that are not deleted or changed.")
                     self.count_cmp_result(count_result, CMP_RESULT_SAME)
-                    data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_SAME, base_a, base_b, detail_file=out)
+                    data = CompareResultComponent(CMP_TYPE_RPM_ABI, CMP_RESULT_SAME, base_so, other_so, detail_file=out)
             result.add_component(data)
-        dump_a_linkfiles, dump_b_linkfiles = dump_a[self.link_file], dump_b[self.link_file]
-        self.compare_link_files(dump_a_linkfiles, dump_b_linkfiles, rpm_a)
+        base_dump_linkfiles, other_dump_linkfiles = base_dump[self.link_file], other_dump[self.link_file]
+        self.compare_link_files(base_dump_linkfiles, other_dump_linkfiles, base_rpm)
         result.add_count_info(count_result)
 
         return result
 
     def compare(self):
         compare_list = []
-        similar_dumpers = self.get_similar_rpm_pairs(self.dump_a, self.dump_b)
+        similar_dumpers = self.get_similar_rpm_pairs(self.base_dump, self.other_dump)
         for single_pair in similar_dumpers:
             if single_pair:
                 # dump_a: single_pair[0], dump_b: single_pair[1]

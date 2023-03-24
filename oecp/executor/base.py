@@ -14,6 +14,7 @@
 """
 import os
 import re
+import logging
 import difflib
 from abc import ABC, abstractmethod
 from datetime import datetime
@@ -27,13 +28,16 @@ from oecp.result.constants import STAND_DISTS, CMP_SAME_RESULT, CMP_TYPE_KCONFIG
 
 CPM_CATEGORY_DIFF = 4
 
+logger = logging.getLogger('oecp')
+
 
 class CompareExecutor(ABC):
 
-    def __init__(self, dump_a, dump_b, config):
-        self.dump_a = dump_a
-        self.dump_b = dump_b
+    def __init__(self, base_dump, other_dump, config):
+        self.base_dump = base_dump
+        self.other_dump = other_dump
         self.config = config
+        self.split_flag = '__rpm__'
 
     @staticmethod
     def format_dump_kv(data_a, data_b, kind):
@@ -154,6 +158,28 @@ class CompareExecutor(ABC):
         return v
 
     @staticmethod
+    def extract_version_flag(rpm_a, rpm_b):
+        """
+        获取俩比较rpm包的version、release标识
+        @param rpm_a: rpm包名
+        @param rpm_b: rpm包名
+        @return:
+        """
+        n_a, _, _, _, a_a = RPMProxy.rpm_n_v_r_d_a(rpm_a)
+        n_b, _, _, _, a_b = RPMProxy.rpm_n_v_r_d_a(rpm_b)
+
+        v_r_d_a = rpm_a.split(a_a)[0].split(n_a)[-1]
+        v_r_d_b = rpm_b.split(a_b)[0].split(n_b)[-1]
+        flag = [
+            v_r_d_a.strip('-.'),
+            v_r_d_b.strip('-.')
+        ]
+        if not v_r_d_a or not v_r_d_b:
+            logging.warning(f"{rpm_a} and {rpm_b} extract version_release_dist flag failed!")
+
+        return flag
+
+    @staticmethod
     def _cmp_rpm_arch(arch_a, arch_b):
         # Check the arch of RPM packages is consistent or not.
         if arch_a == arch_b:
@@ -161,10 +187,10 @@ class CompareExecutor(ABC):
         return False
 
     @staticmethod
-    def get_version_change_files(side_a_file, side_b_file):
+    def get_version_change_files(side_a_file, side_b_file, flag_v=None):
         side_a_floders = side_a_file.split('/')
         side_b_floders = side_b_file.split('/')
-        compare_result = CMP_RESULT_SAME
+        compare_result = CMP_RESULT_CHANGE
         if len(side_a_floders) == len(side_b_floders):
             for index in range(1, len(side_a_floders) - 1):
                 floder_a = side_a_floders[index]
@@ -173,9 +199,9 @@ class CompareExecutor(ABC):
                     continue
                 elif floder_a.split(STAND_DISTS.get(BASE_SIDE)) == floder_b.split(STAND_DISTS.get(OSV_SIDE)):
                     continue
-                elif re.search('\\d+\\.\\d+', side_a_floders[index]) and re.search('\\d+\\.\\d+',
-                                                                                   side_b_floders[index]):
-                    compare_result = CMP_RESULT_CHANGE
+                elif flag_v and floder_a.replace(flag_v[0], '') == floder_b.replace(flag_v[1], ''):
+                    continue
+                elif re.search('\\d+\\.\\d+', floder_a) and re.search('\\d+\\.\\d+', floder_b):
                     continue
                 else:
                     compare_result = CMP_RESULT_DIFF
@@ -209,41 +235,123 @@ class CompareExecutor(ABC):
 
         return all_dump
 
-    def format_dump(self, data_a, data_b):
-        dump_set_a, dump_set_b = set(data_a), set(data_b)
-        common_dump = dump_set_a & dump_set_b
-        only_dump_a = dump_set_a - dump_set_b
-        only_dump_b = dump_set_b - dump_set_a
-        change_dump, common_dump_add = [], []
-        self.format_changed_files(only_dump_a, only_dump_b, change_dump, common_dump_add)
+    @staticmethod
+    def pretty_provide_datas(datas, v_r_d):
+        # provides 版本固定时，不比较版本号
+        pretty_result = {}
+        for pvd in datas:
+            pvd_name = pvd['name']
+            pvd_symbol = pvd['symbol']
+            new_component = ' '.join([pvd_name, pvd_symbol, pvd['version'].split('-')[0]])
+            # so动态库
+            so_version = re.search("(([-.]\\d+){0,3}\\.so([-.]\\d+){0,3})\\((.*?)\\)", pvd_name)
+            if so_version:
+                component_so_name = pvd_name.split(so_version.group(1))[0] + so_version.group(4)
+                pretty_result.setdefault(component_so_name, []).append(new_component)
+            # provides版本不固定
+            elif pvd_symbol in [">=", "<="]:
+                simple_name = ''.join(new_component.split(v_r_d))
+                pretty_result.setdefault(simple_name, []).append(new_component)
+            else:
+                # "application(java-1.8.0-openjdk-1.8.0.272.b10-7.oe1.aarch64-policytool.desktop)"
+                simple_name = ''.join(pvd_name.split(v_r_d))
+                pretty_result.setdefault(simple_name, []).append(new_component)
+
+        return pretty_result
+
+    @staticmethod
+    def component_new_provide(datas):
+        all_pvds = [' '.join([pvd['name'], pvd['symbol'], pvd['version'].split('-')[0]]) for pvd in datas]
+
+        return set(all_pvds)
+
+    @staticmethod
+    def mapping_files(files, flag):
+        map_result = {}
+        for file in files:
+            pat_other = re.compile(r"(\d+\.\d+\.\d+)|(\d+\.\d+)|(v\d{8}-\d{4})|(-[a-z0-9]{32})")
+            simple_file = file.replace(flag, '')
+            remove_version_file = re.sub(pat_other, '', simple_file)
+            map_result.setdefault(remove_version_file, file)
+
+        return map_result
+
+    def format_dump(self, data_a, data_b, flag_v_r_d):
+        """
+        抓取相对路径相同或版本变化的文件对
+        @param data_a: dump_a获取的文件全路径
+        @param data_b: dump_b获取的文件全路径
+        @param flag_v_r_d: version+release+dist标识
+        @return: 返回相对路径
+        """
+        set_files_a = set([f.split(self.split_flag)[-1] for f in data_a])
+        set_files_b = set([f.split(self.split_flag)[-1] for f in data_b])
+        common_dump, change_dump, only_a, only_b = self.format_changed_files(set_files_a, set_files_b, flag_v_r_d)
         all_dump = [
             [[x, x, CMP_RESULT_SAME] for x in common_dump],
             [[x[0], x[1], CMP_RESULT_CHANGE] for x in change_dump],
-            [[x, '', CMP_RESULT_LESS] for x in only_dump_a],
-            [['', x, CMP_RESULT_MORE] for x in only_dump_b]
+            [[x, '', CMP_RESULT_LESS] for x in only_a],
+            [['', x, CMP_RESULT_MORE] for x in only_b]
         ]
-        if common_dump_add:
-            for common_cmp_pair in common_dump_add:
-                all_dump[0].append([common_cmp_pair[0], common_cmp_pair[1], CMP_RESULT_SAME])
+
         return all_dump
 
-    def format_changed_files(self, only_dump_a, only_dump_b, change_dump, common_dump_add):
+    def format_fullpath_files(self, data_a, data_b, flag_v_r_d):
+        """
+        抓取相对路径相同或版本变化的文件对
+        @param data_a: 相对路径与文件绝对能路径映射
+        @param data_b: 同上
+        @param flag_v_r_d:
+        @return: 返回绝对路径
+        """
+        set_files_a, set_files_b = set(data_a.keys()), set(data_b.keys())
+        common_dump, change_dump, only_a, only_b = self.format_changed_files(set_files_a, set_files_b, flag_v_r_d)
+        common_pairs = [[data_a.get(y), data_b.get(y)] for y in common_dump]
+        common_pairs.extend([[data_a.get(y[0]), data_b.get(y[1])] for y in change_dump])
+
+        return common_pairs, only_a, only_b
+
+    def format_changed_files(self, dump_set_a, dump_set_b, flag_v_r_d):
+        """
+        识别文件路径、文件名中存在以rpm包（version+release+dist/dist标识/x.x.x版本号）命名的相同文件对
+        @param dump_set_a: 缺失文件
+        @param dump_set_b: 新增文件
+        @param flag_v_r_d: version+release+dist标识
+        """
+        common_dump = dump_set_a & dump_set_b
+        only_dump_a = dump_set_a - dump_set_b
+        only_dump_b = dump_set_b - dump_set_a
+        change_dump = []
+
+        datas_a = self.mapping_files(only_dump_a, flag_v_r_d[0])
+        datas_b = self.mapping_files(only_dump_b, flag_v_r_d[1])
+        """
+        eg: /usr/src/kernels/6.1.6-1.0.0.3.oe1.aarch64
+            /usr/src/kernels/6.1.8-1.0.0.5.oe1.aarch64
+        """
+        for simple_a in datas_a.keys():
+            if datas_b.get(simple_a):
+                file_a = datas_a.get(simple_a)
+                file_b = datas_b.get(simple_a)
+                change_dump.append([file_a, file_b])
+                only_dump_a.discard(file_a)
+                only_dump_b.discard(file_b)
+
         for side_a_file in list(only_dump_a):
             for side_b_file in list(only_dump_b):
-                get_result = ''
+                get_result = CMP_RESULT_DIFF
+                so_pattern = re.compile(r"(([-.]\d+){0,3}\.so([-.]\d+){0,3})|-[a-z0-9]{16}.so")
                 file_a, file_b = os.path.basename(side_a_file), os.path.basename(side_b_file)
+                so_version_a = re.search(so_pattern, file_a)
+                so_version_b = re.search(so_pattern, file_b)
                 if file_a == file_b or file_a.split(STAND_DISTS.get(BASE_SIDE)) == file_b.split(
                         STAND_DISTS.get(OSV_SIDE)):
                     get_result = self.get_version_change_files(side_a_file, side_b_file)
-                elif file_a.endswith('.so') and file_b.endswith('.so'):
-                    file_a_version_1 = re.search('\\d+\\.\\d+', file_a.split('-')[-1])
-                    file_b_version_1 = re.search('\\d+\\.\\d+', file_a.split('-')[-1])
-                    if file_a_version_1 and file_b_version_1 and file_a.split('-')[0] == file_b.split('-')[0]:
-                        get_result = self.get_version_change_files(side_a_file, side_b_file)
-                elif file_a.split('.so.')[0] == file_b.split('.so.')[0]:
-                    file_a_version_2 = re.search('\\d+\\.\\d+\\.\\d+', file_a.split('.so.')[-1])
-                    file_b_version_2 = re.search('\\d+\\.\\d+\\.\\d+', file_a.split('.so.')[-1])
-                    if file_a_version_2 and file_b_version_2:
+                # 识别so库文件版本变化
+                elif so_version_a and so_version_b:
+                    so_name_a = file_a.split(so_version_a.group())[0]
+                    so_name_b = file_b.split(so_version_b.group())[0]
+                    if so_name_a == so_name_b:
                         get_result = self.get_version_change_files(side_a_file, side_b_file)
 
                 if get_result == CMP_RESULT_CHANGE:
@@ -251,11 +359,15 @@ class CompareExecutor(ABC):
                     only_dump_a.discard(side_a_file)
                     only_dump_b.discard(side_b_file)
                     break
-                elif get_result == CMP_RESULT_SAME:
-                    common_dump_add.append([side_a_file, side_b_file])
-                    only_dump_a.discard(side_a_file)
-                    only_dump_b.discard(side_b_file)
-                    break
+
+        return common_dump, change_dump, only_dump_a, only_dump_b
+
+    def split_files_mapping(self, dump_files):
+        map_files = {}
+        for file in dump_files:
+            map_files.setdefault(file.split(self.split_flag)[-1], file)
+
+        return map_files
 
     def split_common_files(self, files_a, files_b):
         common_file_pairs, common_file_a, common_file_b = [], [], []
@@ -275,6 +387,31 @@ class CompareExecutor(ABC):
         only_file_a = list(set(files_a) - set(common_file_a))
         only_file_b = list(set(files_b) - set(common_file_b))
         return common_file_pairs, only_file_a, only_file_b
+
+    def format_dump_provides(self, datas_a, datas_b, flag_v_r_d):
+        common_files, common_file_a, common_file_b = [], [], []
+        sides_a = self.pretty_provide_datas(datas_a, flag_v_r_d[0])
+        sides_b = self.pretty_provide_datas(datas_b, flag_v_r_d[1])
+        for k_a in sides_a.keys():
+            if sides_b.get(k_a):
+                pvds_a = sorted(sides_a.get(k_a))
+                pvds_b = sorted(sides_b.get(k_a))
+                common_files.append([','.join(pvds_a), ','.join(pvds_b), CMP_RESULT_SAME])
+                common_file_a.extend(pvds_a)
+                common_file_b.extend(pvds_b)
+
+        all_components_a = self.component_new_provide(datas_a)
+        all_components_b = self.component_new_provide(datas_b)
+        only_file_a = all_components_a - set(common_file_a)
+        only_file_b = all_components_b - set(common_file_b)
+
+        all_dump = [
+            common_files,
+            [[x, '', CMP_RESULT_LESS] for x in only_file_a],
+            [['', x, CMP_RESULT_MORE] for x in only_file_b]
+        ]
+
+        return all_dump
 
     def prase_version(self, version):
         """

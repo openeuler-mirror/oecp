@@ -24,31 +24,25 @@ logger = logging.getLogger('oecp')
 
 class CmdCompareExecutor(CompareExecutor):
 
-    def __init__(self, dump_a, dump_b, config=None):
-        super(CmdCompareExecutor, self).__init__(dump_a, dump_b, config)
-        self.dump_a = dump_a.run()
-        self.dump_b = dump_b.run()
+    def __init__(self, base_dump, other_dump, config=None):
+        super(CmdCompareExecutor, self).__init__(base_dump, other_dump, config)
+        self.base_dump = base_dump.run()
+        self.other_dump = other_dump.run()
         self.data = 'data'
-        self.split_flag = '__rpm__'
 
-    def _split_files(self, cmd_file):
-        split_file = []
-        if cmd_file:
-            for file in cmd_file:
-                split_file.append(file.split(self.split_flag)[-1])
-        return split_file
-
-    def _compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
+    def compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
-        category = dump_a['category']
-        result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
-        file_a = self._split_files(dump_a[self.data])
-        file_b = self._split_files(dump_b[self.data])
-        if not file_a and not file_b:
+        category = base_dump['category']
+        result = CompareResultComposite(CMP_TYPE_RPM, single_result, base_dump['rpm'], other_dump['rpm'], category)
+        base_cmd_files = base_dump[self.data]
+        other_cmd_files = other_dump[self.data]
+        flag_v_r_d = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
+        if not base_cmd_files and not other_cmd_files:
             logger.debug(
-                f"No {self.config.get('compare_type')} package found, ignored with {dump_a['rpm']} and {dump_b['rpm']}")
+                f"No {self.config.get('compare_type')} package found, "
+                f"ignored with {base_dump['rpm']} and {other_dump['rpm']}")
             return result
-        component_results = self.format_dump(file_a, file_b)
+        component_results = self.format_dump(base_cmd_files, other_cmd_files, flag_v_r_d)
         for component_result in component_results:
             for sub_component_result in component_result:
                 self.count_cmp_result(count_result, sub_component_result[-1])
@@ -66,11 +60,11 @@ class CmdCompareExecutor(CompareExecutor):
 
     def compare(self):
         compare_list = []
-        similar_dumpers = self.get_similar_rpm_pairs(self.dump_a, self.dump_b)
+        similar_dumpers = self.get_similar_rpm_pairs(self.base_dump, self.other_dump)
         for single_pair in similar_dumpers:
             if single_pair:
-                dump_a, dump_b = single_pair[0], single_pair[1]
-                result = self._compare_result(dump_a, dump_b)
+                base_dump, other_dump = single_pair[0], single_pair[1]
+                result = self.compare_result(base_dump, other_dump)
                 compare_list.append(result)
         return compare_list
 

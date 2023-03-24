@@ -109,6 +109,8 @@ class Directory(UserDict):
         for path, dirs, files in os.walk(rpm_full_path):
             for file in sorted(files):
                 file_path = os.path.join(path, file)
+                if RPMProxy.filter_specific_rpm(file):
+                    continue
                 if os.path.isfile(file_path) and RPMProxy.is_rpm_file(file_path) and RPMProxy.is_rpm_focus_on(file):
                     all_rpm[file] = file_path
         sort_all_rpm = dict(sorted(all_rpm.items(), key=lambda x: x[1]))
@@ -239,6 +241,8 @@ class Directory(UserDict):
         :param plan: 比较计划
         :return:
         """
+        logger.info(f"compare dist info: {self.verbose_path} -> {STAND_DISTS.get(BASE_SIDE)}   {that.verbose_path}"
+                    f" -> {STAND_DISTS.get(OSV_SIDE)}")
         result = CompareResultComposite(self._cmp_type, CMP_RESULT_TO_BE_DETERMINED, self.verbose_path,
                                         that.verbose_path)
 
@@ -339,7 +343,7 @@ class DistISO(Directory):
             self.mount_iso(self.debuginfo_iso)
             self.set_iso_packages_paths(self.rpm_iso, plan, 'side_a')
             self.set_iso_packages_paths(self.debuginfo_iso)
-            logger.debug("self _iso_packages_sqlite", self.iso_packages_sqlite)
+            logger.debug(f"self.iso_packages_sqlite: {self.iso_packages_sqlite}")
             self_all_debuginfo_rpm = self.all_debuginfo_rpm(self.debuginfo_iso)
             _packages_sqlite = self.iso_packages_sqlite.get(self.rpm_iso)
             for dir_package in _packages_sqlite:
@@ -354,7 +358,7 @@ class DistISO(Directory):
             that.mount_iso(that.debuginfo_iso)
             that.set_iso_packages_paths(that.rpm_iso, plan, 'side_b')
             that.set_iso_packages_paths(that.debuginfo_iso)
-            logger.debug("that _iso_packages_sqlite", that.iso_packages_sqlite)
+            logger.debug(f"that.iso_packages_sqlite: {that.iso_packages_sqlite}")
             that_all_debuginfo_rpm = that.all_debuginfo_rpm(that.debuginfo_iso)
             _packages_sqlite = that.iso_packages_sqlite.get(that.rpm_iso)
             for dir_package in _packages_sqlite:
