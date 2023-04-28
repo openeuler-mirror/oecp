@@ -28,10 +28,10 @@ logger = logging.getLogger('oecp')
 
 class HeaderCompareExecutor(CompareExecutor):
 
-    def __init__(self, dump_a, other_dump, config):
-        super(HeaderCompareExecutor, self).__init__(dump_a, other_dump, config)
-        self.dump_a = dump_a.run()
-        self.dump_b = other_dump.run()
+    def __init__(self, base_dump, other_dump, config):
+        super(HeaderCompareExecutor, self).__init__(base_dump, other_dump, config)
+        self.base_dump = base_dump.run()
+        self.other_dump = other_dump.run()
         self.data = 'data'
         self.lack_conf_flag = False
 
@@ -133,7 +133,7 @@ class HeaderCompareExecutor(CompareExecutor):
 
     def compare(self):
         compare_list = []
-        similar_dumpers = self.get_similar_rpm_pairs(self.dump_a, self.dump_b)
+        similar_dumpers = self.get_similar_rpm_pairs(self.base_dump, self.other_dump)
         for single_pair in similar_dumpers:
             if single_pair:
                 base_dump, other_dump = single_pair[0], single_pair[1]

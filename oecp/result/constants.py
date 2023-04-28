@@ -154,7 +154,7 @@ PLATFORM_RESULT_ITEMS = ['rpm test', 'AT', 'performance', 'ciconfig']
 DETAIL_PATH = "details_analyse"
 
 # The Column names of the Details in the RPM REPORT
-ALL_DETAILS_NAME = ['effect drivers', 'details path', 'file_name']
+ALL_DETAILS_NAME = ['effect drivers', 'details path', 'file_name', 'category level']
 
 # Get base and osv distribution.
 BASE_SIDE = 'base'
