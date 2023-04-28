@@ -95,7 +95,10 @@ if __name__ == "__main__":
         logger.info(f"start compare {args.compare_files[0]} with {args.compare_files[1]}")
         product_a = Factory.create(args.compare_files[0], args, "none", BASE_SIDE)
         product_b = Factory.create(args.compare_files[1], args, "none", OSV_SIDE)
-
+    for side, repository in enumerate([product_a, product_b]):
+        if not repository:
+            logger.error(f"Please check {args.compare_files[side]} does not contain the focus on rpm packages.")
+            sys.exit(1)
     result = product_a.compare(product_b, plan)
     e_args = (args.output_file, args.output_format, args.compare_files, args.platform_test)
     osv_title = result.export(*e_args)

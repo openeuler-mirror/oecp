@@ -19,6 +19,7 @@ import os
 from oecp.executor.base import CompareExecutor
 from oecp.result.compare_result import CMP_RESULT_SAME, CompareResultComposite, CMP_TYPE_RPM, CMP_RESULT_DIFF, \
     CompareResultComponent, CMP_TYPE_SERVICE, CMP_TYPE_SERVICE_DETAIL, CMP_RESULT_LESS, CMP_RESULT_MORE, DETAIL_PATH
+from oecp.result.constants import CMP_SERVICE_SAME
 
 logger = logging.getLogger('oecp')
 
@@ -66,7 +67,7 @@ class ServiceCompareExecutor(CompareExecutor):
             for sub_component_result in component_result:
                 data = CompareResultComponent(CMP_TYPE_SERVICE_DETAIL, sub_component_result[-1],
                                               sub_component_result[0], sub_component_result[1])
-                if sub_component_result[-1] != CMP_RESULT_SAME and single_result == CMP_RESULT_SAME:
+                if sub_component_result[-1] not in CMP_SERVICE_SAME and single_result == CMP_RESULT_SAME:
                     single_result = CMP_RESULT_DIFF
                     result.set_cmp_result(single_result)
                 result.detail = {"file_name": detail_filename}
