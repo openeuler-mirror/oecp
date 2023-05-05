@@ -19,6 +19,7 @@ import os
 from oecp.executor.base import CompareExecutor
 from oecp.result.compare_result import CMP_RESULT_SAME, CompareResultComposite, CMP_TYPE_RPM, CMP_RESULT_DIFF, \
     CompareResultComponent, CMP_TYPE_SERVICE, CMP_TYPE_SERVICE_DETAIL, CMP_RESULT_LESS, CMP_RESULT_MORE, DETAIL_PATH
+from oecp.result.constants import CMP_SERVICE_SAME
 
 logger = logging.getLogger('oecp')
 
@@ -28,7 +29,7 @@ class ServiceCompareExecutor(CompareExecutor):
     def __init__(self, base_dump, other_dump, config=None):
         super(ServiceCompareExecutor, self).__init__(base_dump, other_dump, config)
         self.base_dump = base_dump.run()
-        self.base_dump = other_dump.run()
+        self.other_dump = other_dump.run()
         self.data = 'data'
 
     @staticmethod
@@ -66,7 +67,7 @@ class ServiceCompareExecutor(CompareExecutor):
             for sub_component_result in component_result:
                 data = CompareResultComponent(CMP_TYPE_SERVICE_DETAIL, sub_component_result[-1],
                                               sub_component_result[0], sub_component_result[1])
-                if sub_component_result[-1] != CMP_RESULT_SAME and single_result == CMP_RESULT_SAME:
+                if sub_component_result[-1] not in CMP_SERVICE_SAME and single_result == CMP_RESULT_SAME:
                     single_result = CMP_RESULT_DIFF
                     result.set_cmp_result(single_result)
                 result.detail = {"file_name": detail_filename}
@@ -98,7 +99,7 @@ class ServiceCompareExecutor(CompareExecutor):
                 result.set_cmp_result(file_result)
             else:
                 self.count_cmp_result(count_result, file_result)
-                data = CompareResultComponent(CMP_TYPE_SERVICE, file_result, base_service, other_service)
+                data = CompareResultComponent(CMP_TYPE_SERVICE, file_result, base_service, other_service, details_path)
             result.add_component(data)
             result_detail = self._detail_set(base_dump, other_dump, component_results, base_service)
             result.add_component(result_detail)
@@ -119,7 +120,7 @@ class ServiceCompareExecutor(CompareExecutor):
 
     def compare(self):
         compare_list = []
-        similar_dumpers = self.get_similar_rpm_pairs(self.base_dump, self.base_dump)
+        similar_dumpers = self.get_similar_rpm_pairs(self.base_dump, self.other_dump)
         for single_pair in similar_dumpers:
             if single_pair:
                 base_dump, other_dump = single_pair[0], single_pair[1]

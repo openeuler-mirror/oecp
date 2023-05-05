@@ -104,25 +104,30 @@ class CompareExecutor(ABC):
         return all_dump
 
     @staticmethod
-    def format_service_detail(data_a, data_b):
+    def format_service_detail(data_base, data_other, file_result=CMP_RESULT_SAME):
         same = []
-        changed = []
-        losted = []
-        all_dump = []
-        file_result = CMP_RESULT_SAME
-        for k, va in data_a.items():
-            vb = data_b.get(k, None)
-            if vb is None:
-                losted.append([' '.join([k, "=", va]), '', CMP_RESULT_LESS])
-            elif va == vb:
-                same.append([' '.join([k, "=", va]), ' '.join([k, "=", vb]), CMP_RESULT_SAME])
+        diff = []
+        data_conf_base, data_conf_other = list(data_base.keys()), list(data_other.keys())
+        same_conf = set(data_conf_base) & set(data_conf_other)
+        lost_conf = set(data_conf_base) - set(data_conf_other)
+        more_conf = set(data_conf_other) - set(data_conf_base)
+        for conf in same_conf:
+            detail_base = data_base.get(conf)
+            detail_other = data_other.get(conf)
+            if detail_base == detail_other:
+                same.append([' '.join([conf, "=", detail_base]), ' '.join([conf, "=", detail_other]), CMP_RESULT_SAME])
             else:
-                changed.append([' '.join([k, "=", va]), ' '.join([k, "=", vb]), CMP_RESULT_CHANGE])
-        all_dump.append(same)
-        all_dump.append(changed)
-        all_dump.append(losted)
-        if changed or losted:
+                diff.append(
+                    [' '.join([conf, "=", detail_base]), ' '.join([conf, "=", detail_other]), CMP_RESULT_DIFF])
+        if diff or lost_conf:
             file_result = CMP_RESULT_DIFF
+        all_dump = [
+            same,
+            diff,
+            [[' '.join([conf, "=", data_base.get(conf)]), '', CMP_RESULT_LESS] for conf in lost_conf],
+            [['', ' '.join([conf, "=", data_other.get(conf)]), CMP_RESULT_MORE] for conf in more_conf]
+        ]
+
         return file_result, all_dump
 
     @staticmethod

@@ -101,6 +101,8 @@ PKG_SIMILARITY_SON_TYPES = {
 
 CMP_SAME_RESULT = [CMP_RESULT_SAME, CMP_RESULT_CHANGE]
 
+CMP_SERVICE_SAME = [CMP_RESULT_SAME, CMP_RESULT_MORE]
+
 # EXCEL COMMON PARAMETERS
 REQUIRED_ROW = [9, 10, 12, 15, 16, 17, 18]
 FONT_SIZE = 18
@@ -152,7 +154,7 @@ PLATFORM_RESULT_ITEMS = ['rpm test', 'AT', 'performance', 'ciconfig']
 DETAIL_PATH = "details_analyse"
 
 # The Column names of the Details in the RPM REPORT
-ALL_DETAILS_NAME = ['effect drivers', 'details path', 'file_name']
+ALL_DETAILS_NAME = ['effect drivers', 'details path', 'file_name', 'category level']
 
 # Get base and osv distribution.
 BASE_SIDE = 'base'
