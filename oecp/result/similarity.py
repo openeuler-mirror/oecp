@@ -129,7 +129,7 @@ def count_single_result(count, result, cmp_type):
                 count[cmp_type][category_level]['diff'] += 1
     if result["compare result"] in RESULT_SAME:
         count[cmp_type]['all']['same'] += 1
-    else:
+    elif result["compare result"] in [CMP_RESULT_DIFF, CMP_RESULT_LESS]:
         count[cmp_type]['all']['diff'] += 1
 
 

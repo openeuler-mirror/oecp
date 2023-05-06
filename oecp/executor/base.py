@@ -104,6 +104,20 @@ class CompareExecutor(ABC):
         return all_dump
 
     @staticmethod
+    def check_diff_info(out):
+        lack_conf_flag = False
+        for compare_line in out.split('\n')[3:]:
+            if not compare_line:
+                continue
+            lack_conf = re.match('-', compare_line)
+            openeuler_conf = re.search('openEuler', compare_line)
+            if lack_conf and not openeuler_conf:
+                lack_conf_flag = True
+                break
+
+        return lack_conf_flag
+
+    @staticmethod
     def format_service_detail(data_base, data_other, file_result=CMP_RESULT_SAME):
         same = []
         diff = []

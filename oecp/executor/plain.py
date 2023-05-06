@@ -32,7 +32,6 @@ class PlainCompareExecutor(CompareExecutor):
         self.base_dump = base_dump.run()
         self.other_dump = other_dump.run()
         self.data = 'data'
-        self.lack_conf_flag = False
 
     def compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
@@ -52,14 +51,8 @@ class PlainCompareExecutor(CompareExecutor):
             ret, out, err = shell_cmd(cmd.split())
             base_conf_file = os.path.basename(pair[0])
             other_conf_file = os.path.basename(pair[1])
-            for compare_line in out.split('\n')[3:]:
-                if compare_line:
-                    lack_conf = re.match('-', compare_line)
-                    openeuler_conf = re.search('openEuler', compare_line)
-                    if lack_conf and not openeuler_conf:
-                        self.lack_conf_flag = True
-                        break
-            if ret and out and self.lack_conf_flag:
+            lack_conf_flag = self.check_diff_info(out)
+            if ret and out and lack_conf_flag:
                 try:
                     # 替换diff中的文件名
                     out = re.sub("---\\s+\\S+\\s+", "--- {} ".format(pair[0]), out)

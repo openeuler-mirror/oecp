@@ -21,22 +21,22 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | texlive-2018-22.oe1.src | texlive-tikzpeople-svn43978-22.oe1.noarch  | level3 |  |
 | texlive-2018-22.oe1.src | texlive-xsim-svn46634-22.oe1.noarch  | level3 |  |
 | texlive-2018-22.oe1.src | texlive-yfonts-t1-svn36013-22.oe1.noarch | level3 |  |
-| glibc-2.28-36.oe1.src | glibc-2.28-36.oe1.aarch64  | level1 |  |
-| glibc-2.28-36.oe1.src | libnsl-2.28-36.oe1.aarch64  | level1 |  |
-| glibc-2.28-36.oe1.src | nss_modules-2.28-36.oe1.aarch64 | level1 |  |
+| glibc-2.28-36.oe1.src | glibc-2.28-36.oe1.aarch64  | level0.5 |  |
+| glibc-2.28-36.oe1.src | libnsl-2.28-36.oe1.aarch64  | level0.5 |  |
+| glibc-2.28-36.oe1.src | nss_modules-2.28-36.oe1.aarch64 | level0.5 |  |
 | coreutils-8.31-4.oe1.src | coreutils-8.31-4.oe1.aarch64 | level2 |  |
 | bash-5.0-12.oe1.src |  | level2 |  |
-| gcc-7.3.0-20190804.h31.oe1.src | gcc-7.3.0-20190804.h31.oe1.aarch64  | level1 |  |
-| gcc-7.3.0-20190804.h31.oe1.src | gcc-plugin-devel-7.3.0-20190804.h31.oe1.aarch64  | level1 |  |
-| gcc-7.3.0-20190804.h31.oe1.src | libasan-7.3.0-20190804.h31.oe1.aarch64  | level1 |  |
-| gcc-7.3.0-20190804.h31.oe1.src | libatomic-7.3.0-20190804.h31.oe1.aarch64  | level1 |  |
-| gcc-7.3.0-20190804.h31.oe1.src | libgcc-7.3.0-20190804.h31.oe1.aarch64  | level1 |  |
-| gcc-7.3.0-20190804.h31.oe1.src | libgfortran-7.3.0-20190804.h31.oe1.aarch64  | level1 |  |
-| gcc-7.3.0-20190804.h31.oe1.src | libgomp-7.3.0-20190804.h31.oe1.aarch64  | level1 |  |
-| gcc-7.3.0-20190804.h31.oe1.src | libitm-7.3.0-20190804.h31.oe1.aarch64  | level1 |  |
-| gcc-7.3.0-20190804.h31.oe1.src | libobjc-7.3.0-20190804.h31.oe1.aarch64  | level1 |  |
-| gcc-7.3.0-20190804.h31.oe1.src | libstdc++-7.3.0-20190804.h31.oe1.aarch64  | level1 |  |
-| gcc-7.3.0-20190804.h31.oe1.src | libtsan-7.3.0-20190804.h31.oe1.aarch64 | level1 |  |
+| gcc-7.3.0-20190804.h31.oe1.src | gcc-7.3.0-20190804.h31.oe1.aarch64  | level0.5 |  |
+| gcc-7.3.0-20190804.h31.oe1.src | gcc-plugin-devel-7.3.0-20190804.h31.oe1.aarch64  | level0.5 |  |
+| gcc-7.3.0-20190804.h31.oe1.src | libasan-7.3.0-20190804.h31.oe1.aarch64  | level0.5 |  |
+| gcc-7.3.0-20190804.h31.oe1.src | libatomic-7.3.0-20190804.h31.oe1.aarch64  | level0.5 |  |
+| gcc-7.3.0-20190804.h31.oe1.src | libgcc-7.3.0-20190804.h31.oe1.aarch64  | level0.5 |  |
+| gcc-7.3.0-20190804.h31.oe1.src | libgfortran-7.3.0-20190804.h31.oe1.aarch64  | level0.5 |  |
+| gcc-7.3.0-20190804.h31.oe1.src | libgomp-7.3.0-20190804.h31.oe1.aarch64  | level0.5 |  |
+| gcc-7.3.0-20190804.h31.oe1.src | libitm-7.3.0-20190804.h31.oe1.aarch64  | level0.5 |  |
+| gcc-7.3.0-20190804.h31.oe1.src | libobjc-7.3.0-20190804.h31.oe1.aarch64  | level0.5 |  |
+| gcc-7.3.0-20190804.h31.oe1.src | libstdc++-7.3.0-20190804.h31.oe1.aarch64  | level0.5 |  |
+| gcc-7.3.0-20190804.h31.oe1.src | libtsan-7.3.0-20190804.h31.oe1.aarch64 | level0.5 |  |
 | perl-5.28.0-434.oe1.src | perl-libs-5.28.0-434.oe1.aarch64 | level3 |  |
 | man-db-2.8.7-5.oe1.src | man-db-2.8.7-5.oe1.aarch64 | level3 |  |
 | texinfo-6.6-2.oe1.src |  | level3 |  |
@@ -45,18 +45,18 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | glib2-2.62.1-1.oe1.src | glib2-devel-2.62.1-1.oe1.aarch64 | level2 |  |
 | python3-3.7.4-8.oe1.src | python3-3.7.4-8.oe1.aarch64  | level1 |  |
 | python3-3.7.4-8.oe1.src | python3-debug-3.7.4-8.oe1.aarch64 | level1 |  |
-| zlib-1.2.11-17.oe1.src | minizip-1.2.11-17.oe1.aarch64  | level1 |  |
-| zlib-1.2.11-17.oe1.src | zlib-1.2.11-17.oe1.aarch64 | level1 |  |
-| systemd-243-18.oe1.src | systemd-243-18.oe1.aarch64  | level1 |  |
-| systemd-243-18.oe1.src | systemd-container-243-18.oe1.aarch64  | level1 |  |
-| systemd-243-18.oe1.src | systemd-libs-243-18.oe1.aarch64 | level1 |  |
+| zlib-1.2.11-17.oe1.src | minizip-1.2.11-17.oe1.aarch64  | level0.5 |  |
+| zlib-1.2.11-17.oe1.src | zlib-1.2.11-17.oe1.aarch64 | level0.5 |  |
+| systemd-243-18.oe1.src | systemd-243-18.oe1.aarch64  | level0.5 |  |
+| systemd-243-18.oe1.src | systemd-container-243-18.oe1.aarch64  | level0.5 |  |
+| systemd-243-18.oe1.src | systemd-libs-243-18.oe1.aarch64 | level0.5 |  |
 | python2-2.7.16-15.oe1.src | python2-2.7.16-15.oe1.aarch64  | level2 |  |
 | python2-2.7.16-15.oe1.src | python2-debug-2.7.16-15.oe1.aarch64 | level2 |  |
 | openssl-1.1.1d-9.oe1.src | openssl-libs-1.1.1d-9.oe1.aarch64 | level1 |  |
 | libX11-1.6.9-2.oe1.src | libX11-1.6.9-2.oe1.aarch64 | level1 |  |
-| libxml2-2.9.8-9.oe1.src | libxml2-2.9.8-9.oe1.aarch64  | level1 |  |
-| libxml2-2.9.8-9.oe1.src | python2-libxml2-2.9.8-9.oe1.aarch64  | level1 |  |
-| libxml2-2.9.8-9.oe1.src | python3-libxml2-2.9.8-9.oe1.aarch64 | level1 |  |
+| libxml2-2.9.8-9.oe1.src | libxml2-2.9.8-9.oe1.aarch64  | level0.5 |  |
+| libxml2-2.9.8-9.oe1.src | python2-libxml2-2.9.8-9.oe1.aarch64  | level0.5 |  |
+| libxml2-2.9.8-9.oe1.src | python3-libxml2-2.9.8-9.oe1.aarch64 | level0.5 |  |
 | perl-Exporter-5.73-420.oe1.src |  | level3 |  |
 | perl-Carp-1.50-418.oe1.src |  | level3 |  |
 | cairo-1.15.14-3.oe1.src | cairo-1.15.14-3.oe1.aarch64  |  | Subject to modification |
@@ -67,9 +67,9 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | util-linux-2.34-8.oe1.src | libsmartcols-2.34-8.oe1.aarch64  | level3 |  |
 | util-linux-2.34-8.oe1.src | libuuid-2.34-8.oe1.aarch64 | level3 |  |
 | gdk-pixbuf2-2.38.0-9.oe1.src | gdk-pixbuf2-2.38.0-9.oe1.aarch64 |  | Subject to modification |
-| qt5-qtbase-5.11.1-9.oe1.src | qt5-qtbase-5.11.1-9.oe1.aarch64  |  | Subject to modification |
-| qt5-qtbase-5.11.1-9.oe1.src | qt5-qtbase-devel-5.11.1-9.oe1.aarch64  |  | Subject to modification |
-| qt5-qtbase-5.11.1-9.oe1.src | qt5-qtbase-gui-5.11.1-9.oe1.aarch64 |  | Subject to modification |
+| qt5-qtbase-5.11.1-9.oe1.src | qt5-qtbase-5.11.1-9.oe1.aarch64  | level2 |  |
+| qt5-qtbase-5.11.1-9.oe1.src | qt5-qtbase-devel-5.11.1-9.oe1.aarch64  | level2 |  |
+| qt5-qtbase-5.11.1-9.oe1.src | qt5-qtbase-gui-5.11.1-9.oe1.aarch64 | level2 |  |
 | pcp-4.1.3-3.oe1.src | pcp-4.1.3-3.oe1.aarch64 | level2 |  |
 | pango-1.43.0-3.oe1.src | pango-1.43.0-3.oe1.aarch64 |  | Subject to modification |
 | libselinux-2.9-1.oe1.src | libselinux-2.9-1.oe1.aarch64 | level2 |  |
@@ -89,7 +89,7 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | python-setuptools-40.4.3-4.oe1.src |  | level3 |  |
 | libglvnd-1.2.0-3.oe1.src | libglvnd-1.2.0-3.oe1.aarch64 |  | Subject to modification |
 | libvirt-5.5.0-6.oe1.src | libvirt-wireshark-5.5.0-6.oe1.aarch64 | level2 |  |
-| e2fsprogs-1.45.3-4.oe1.src | e2fsprogs-1.45.3-4.oe1.aarch64 | level2 |  |
+| e2fsprogs-1.45.3-4.oe1.src | e2fsprogs-1.45.3-4.oe1.aarch64 | level0.5 |  |
 | krb5-1.17-9.oe1.src | krb5-1.17-9.oe1.aarch64  | level1 |  |
 | krb5-1.17-9.oe1.src | krb5-libs-1.17-9.oe1.aarch64  | level1 |  |
 | krb5-1.17-9.oe1.src | krb5-server-1.17-9.oe1.aarch64 | level1 |  |
@@ -117,7 +117,7 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | ceph-12.2.8-6.oe1.src | librgw2-12.2.8-6.oe1.aarch64 | level2 |  |
 | gnutls-3.6.9-5.oe1.src | gnutls-3.6.9-5.oe1.aarch64 | level1 |  |
 | perl-constant-1.33-421.oe1.src |  | level3 |  |
-| curl-7.66.0-2.oe1.src | curl-7.66.0-2.oe1.aarch64 | level1 |  |
+| curl-7.66.0-2.oe1.src | curl-7.66.0-2.oe1.aarch64 | level0.5 |  |
 | rpm-4.15.1-12.oe1.src | rpm-libs-4.15.1-12.oe1.aarch64 | level3 |  |
 | shadow-4.7-10.oe1.src |  | level2 |  |
 | libjpeg-turbo-2.0.0-4.oe1.src | libjpeg-turbo-2.0.0-4.oe1.aarch64 |  | Subject to modification |
@@ -191,7 +191,7 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | openldap-2.4.46-15.oe1.src | openldap-2.4.46-15.oe1.aarch64 | level2 |  |
 | libICE-1.0.10-2.oe1.src | libICE-1.0.10-2.oe1.aarch64 | level2 |  |
 | perl-File-Temp-0.230.800-4.oe1.src |  | level3 |  |
-| grep-3.4-0.oe1.src |  | level3 |  |
+| grep-3.4-0.oe1.src |  | level0.5 |  |
 | libSM-1.2.3-2.oe1.src | libSM-1.2.3-2.oe1.aarch64 |  | Subject to modification |
 | libXfixes-5.0.3-11.oe1.src | libXfixes-5.0.3-11.oe1.aarch64 | level3 |  |
 | perl-File-Path-2.16-4.oe1.src |  | level3 |  |
@@ -209,8 +209,8 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | libcanberra-0.30-25.oe1.src | libcanberra-0.30-25.oe1.aarch64  | level3 |  |
 | libcanberra-0.30-25.oe1.src | libcanberra-gtk2-0.30-25.oe1.aarch64  | level3 |  |
 | libcanberra-0.30-25.oe1.src | libcanberra-gtk3-0.30-25.oe1.aarch64 | level3 |  |
-| qt5-qtdeclarative-5.11.1-5.oe1.src | qt5-qtdeclarative-5.11.1-5.oe1.aarch64  | level3 |  |
-| qt5-qtdeclarative-5.11.1-5.oe1.src | qt5-qtdeclarative-devel-5.11.1-5.oe1.aarch64 | level3 |  |
+| qt5-qtdeclarative-5.11.1-5.oe1.src | qt5-qtdeclarative-5.11.1-5.oe1.aarch64  | level2 |  |
+| qt5-qtdeclarative-5.11.1-5.oe1.src | qt5-qtdeclarative-devel-5.11.1-5.oe1.aarch64 | level2 |  |
 | json-glib-1.4.4-2.oe1.src | json-glib-1.4.4-2.oe1.aarch64 | level2 |  |
 | libXrender-0.9.10-10.oe1.src | libXrender-0.9.10-10.oe1.aarch64 |  | Subject to modification |
 | gawk-5.0.1-2.oe1.src |  | level3 |  |
@@ -308,9 +308,9 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | poppler-0.67.0-5.oe1.src | poppler-qt-0.67.0-5.oe1.aarch64  | level3 |  |
 | poppler-0.67.0-5.oe1.src | poppler-qt5-0.67.0-5.oe1.aarch64 | level3 |  |
 | tcl-8.6.8-8.oe1.src | tcl-8.6.8-8.oe1.aarch64 | level3 |  |
-| kernel-4.19.90-2003.4.0.0036.oe1.src | kernel-4.19.90-2003.4.0.0036.oe1.aarch64  | level3 | Subject to modification |
-| kernel-4.19.90-2003.4.0.0036.oe1.src | kernel-devel-4.19.90-2003.4.0.0036.oe1.aarch64  | level3 |  |
-| kernel-4.19.90-2003.4.0.0036.oe1.src | kernel-tools-4.19.90-2003.4.0.0036.oe1.aarch64 | level3 |  |
+| kernel-4.19.90-2003.4.0.0036.oe1.src | kernel-4.19.90-2003.4.0.0036.oe1.aarch64  | level0 | Subject to modification |
+| kernel-4.19.90-2003.4.0.0036.oe1.src | kernel-devel-4.19.90-2003.4.0.0036.oe1.aarch64  | level0 |  |
+| kernel-4.19.90-2003.4.0.0036.oe1.src | kernel-tools-4.19.90-2003.4.0.0036.oe1.aarch64 | level0 |  |
 | dracut-049-8.oe1.src |  | level3 |  |
 | httpd-2.4.34-15.oe1.src |  | level3 |  |
 | libwebp-1.0.0-5.oe1.src | libwebp-1.0.0-5.oe1.aarch64  |  | Subject to modification |
@@ -320,8 +320,8 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | findutils-4.7.0-4.oe1.src |  | level3 |  |
 | libXft-2.3.2-13.oe1.src | libXft-2.3.2-13.oe1.aarch64 |  | Subject to modification |
 | nbdkit-1.6.2-2.oe1.src | nbdkit-ocaml-plugin-1.6.2-2.oe1.aarch64 | level3 |  |
-| qt-4.8.7-47.oe1.src | qt-4.8.7-47.oe1.aarch64  |  | Subject to modification |
-| qt-4.8.7-47.oe1.src | qt-devel-4.8.7-47.oe1.aarch64 |  | Subject to modification |
+| qt-4.8.7-47.oe1.src | qt-4.8.7-47.oe1.aarch64  |  level2 |  |
+| qt-4.8.7-47.oe1.src | qt-devel-4.8.7-47.oe1.aarch64 |  level2 |  |
 | atf-0.20-13.oe1.src | libatf-c++-0.20-13.oe1.aarch64  | level3 |  |
 | atf-0.20-13.oe1.src | libatf-c-0.20-13.oe1.aarch64 | level3 |  |
 | dbus-glib-0.110-5.oe1.src | dbus-glib-0.110-5.oe1.aarch64 | level3 |  |
@@ -521,7 +521,7 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | openwsman-2.6.5-12.oe1.src | openwsman-client-2.6.5-12.oe1.aarch64  | level3 |  |
 | openwsman-2.6.5-12.oe1.src | openwsman-server-2.6.5-12.oe1.aarch64 | level3 |  |
 | mesa-libGLU-9.0.1-1.oe1.src | mesa-libGLU-9.0.1-1.oe1.aarch64 |  | Subject to modification |
-| openssh-7.8p1-8.oe1.src |  | level3 |  |
+| openssh-7.8p1-8.oe1.src |  | level0.5 |  |
 | perl-Module-Install-1.19-6.oe1.src |  | level3 |  |
 | perl-Term-ANSIColor-4.06-511.oe1.src |  | level3 |  |
 | perl-podlators-4.11-5.oe1.src |  | level3 |  |
@@ -816,7 +816,7 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | hwloc-1.11.9-3.oe1.src | hwloc-1.11.9-3.oe1.aarch64 | level3 |  |
 | hyphen-2.8.8-13.oe1.src | hyphen-2.8.8-13.oe1.aarch64 | level3 |  |
 | i2c-tools-4.1-1.oe1.src | i2c-tools-4.1-1.oe1.aarch64 | level3 |  |
-| iputils-20190709-2.oe1.src |  | level3 |  |
+| iputils-20190709-2.oe1.src |  | level0.5 |  |
 | irrlicht-1.8.4-11.oe1.src | irrlicht-1.8.4-11.oe1.aarch64 | level3 |  |
 | kbd-2.0.4-11.oe1.src |  | level3 |  |
 | kexec-tools-2.0.17-15.oe1.src |  | level3 |  |
@@ -1214,7 +1214,7 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | libstemmer-0-12.oe1.src | libstemmer-0-12.oe1.aarch64 | level3 |  |
 | libtimezonemap-0.4.5.1-6.oe1.src | libtimezonemap-0.4.5.1-6.oe1.aarch64 | level3 |  |
 | libvirt-glib-1.0.0-8.oe1.src | libvirt-glib-1.0.0-8.oe1.aarch64 | level1 |  |
-| libwebsockets-2.4.2-3.oe1.src | libwebsockets-2.4.2-3.oe1.aarch64 | level3 |  |
+| libwebsockets-2.4.2-3.oe1.src | libwebsockets-2.4.2-3.oe1.aarch64 | level2 |  |
 | libwmf-0.2.12-2.oe1.src | libwmf-0.2.12-2.oe1.aarch64 | level3 |  |
 | libwnck3-3.31.4-3.oe1.src | libwnck3-3.31.4-3.oe1.aarch64 | level3 |  |
 | libxmlb-0.1.13-2.oe1.src | libxmlb-0.1.13-2.oe1.aarch64 | level3 |  |
@@ -1505,7 +1505,7 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | gnome-video-effects-0.4.3-5.oe1.src |  | level3 |  |
 | gnu-efi-3.0.8-8.oe1.src |  | level3 |  |
 | gnulib-0-27.20180720git.oe1.src |  | level3 |  |
-| golang-github-coreos-go-iptables-0.4.0-2.oe1.src |  | level3 |  |
+| golang-github-coreos-go-iptables-0.4.0-2.oe1.src |  | level2 |  |
 | golang-github-golang-sys-0-0.22.20200305git7c87d13.oe1.src |  | level3 |  |
 | golang-github-russross-blackfriday-2.0.0-3.20191204git55d61fa.oe1.src |  | level3 |  |
 | golang-github-vishvananda-netlink-0-0.18.oe1.src |  | level3 |  |

@@ -32,15 +32,13 @@ def transform(in_file, out_file):
 
         categories = []
         for line in f:
-            # if not "|" in line:
-            #     break
-            m = re.match("\|(.*)\|(.*)\|(.*)\|(.*)\|", line)
+            m = re.match(r"\|(.*)\|(.*)\|(.*)\|(.*)\|", line)
             src_rpm, bin_rpm, level, status = m.groups()
-            categories.append({"oecp": src_rpm.strip(), "bin": bin_rpm.strip(),
+            categories.append({"src": src_rpm.strip(), "bin": bin_rpm.strip(),
                                "level": level.strip(), "status": status.strip()})
 
     with open(out_file, "w") as f:
-        json.dump(categories, f)
+        json.dump(categories, f, indent=4)
 
 
 def init_args():
