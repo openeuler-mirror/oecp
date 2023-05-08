@@ -16,8 +16,10 @@
 # **********************************************************************************
 """
 import json
+import os
 import re
 import argparse
+import stat
 import tempfile
 
 from oecp.utils.misc import path_is_remote
@@ -25,20 +27,22 @@ from oecp.proxy.requests_proxy import do_download
 
 
 def transform(in_file, out_file):
-    with open(in_file, "r", encoding='utf-8') as f:
-        for line in f:
+    flags = os.O_RDWR | os.O_CREAT
+    modes = stat.S_IROTH | stat.S_IRWXU
+    with os.fdopen(os.open(in_file, flags, modes), 'w', encoding='utf-8') as f_in:
+        for line in f_in:
             if "|---|---|---|---|" in line:
                 break
 
         categories = []
-        for line in f:
+        for line in f_in:
             m = re.match(r"\|(.*)\|(.*)\|(.*)\|(.*)\|", line)
             src_rpm, bin_rpm, level, status = m.groups()
             categories.append({"src": src_rpm.strip(), "bin": bin_rpm.strip(),
                                "level": level.strip(), "status": status.strip()})
 
-    with open(out_file, "w") as f:
-        json.dump(categories, f, indent=4)
+    with os.fdopen(os.open(out_file, flags, modes), 'w', encoding='utf-8') as f_out:
+        json.dump(categories, f_out, indent=4)
 
 
 def init_args():
@@ -55,14 +59,12 @@ def init_args():
 
 
 if __name__ == "__main__":
-    """
-    category_transform.py category.md category
-    """
+    # transform category.md to category.json
     args = init_args()
-
+    md_file = args.in_path
     if path_is_remote(args.in_path):
-        with tempfile.NamedTemporaryFile() as f:
-            do_download(args.in_path, f.name)
-            transform(f.name, args.out_path)
-    else:
-        transform(args.in_path, args.out_path)
+        with tempfile.NamedTemporaryFile() as f_md:
+            do_download(args.in_path, f_md.name)
+            md_file = f_md.name
+
+    transform(md_file, args.out_path)
