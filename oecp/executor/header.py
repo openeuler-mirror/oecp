@@ -33,7 +33,6 @@ class HeaderCompareExecutor(CompareExecutor):
         self.base_dump = base_dump.run()
         self.other_dump = other_dump.run()
         self.data = 'data'
-        self.lack_conf_flag = False
 
     @staticmethod
     def get_file_encoding_format(file_path):
@@ -95,14 +94,8 @@ class HeaderCompareExecutor(CompareExecutor):
             ret, out, err = shell_cmd(cmd.split())
             base_file_path = pair[0].split(self.split_flag)[-1]
             other_file_path = pair[1].split(self.split_flag)[-1]
-            for compare_line in out.split('\n')[3:]:
-                if compare_line:
-                    lack_conf = re.match('-', compare_line)
-                    openeuler_conf = re.search('openEuler', compare_line)
-                    if lack_conf and not openeuler_conf:
-                        self.lack_conf_flag = True
-                        break
-            if ret and out and self.lack_conf_flag:
+            lack_conf_flag = self.check_diff_info(out)
+            if ret and out and lack_conf_flag:
                 try:
                     # 替换diff中的文件名
                     out = re.sub("---\\s+\\S+\\s+", "--- {} ".format(pair[0]), out)

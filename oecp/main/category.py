@@ -34,8 +34,12 @@ class CategoryLevel(Enum):
 
     @classmethod
     def level_name_2_enum(cls, name):
-        return {"level1": cls.CATEGORY_LEVEL_ONE, "level2": cls.CATEGORY_LEVEL_TWO,
-                "level3": cls.CATEGORY_LEVEL_THREE}.get(name, cls.CATEGORY_LEVEL_NOT_SPECIFIED)
+        return {
+            "level0": cls.CATEGORY_LEVEL_ZERO,
+            "level0.5": cls.CATEGORY_LEVEL_ZERO,
+            "level1": cls.CATEGORY_LEVEL_ONE,
+            "level2": cls.CATEGORY_LEVEL_TWO,
+            "level3": cls.CATEGORY_LEVEL_THREE}.get(name, cls.CATEGORY_LEVEL_NOT_SPECIFIED)
 
 
 class Category(object):
@@ -46,8 +50,6 @@ class Category(object):
         """
         self._src_categories = {}
         self._bin_categories = {}
-        self.CORE_PKG = {'gcc', 'glibc', 'qemu', 'libvirt', 'docker-engine', 'java-11-openjdk', 'java-1.8.0-openjdk',
-                         'systemd', 'openssh', 'lvm2', 'busybox', 'initscripts'}
         self._load(path)
 
     def _load(self, path):
@@ -90,6 +92,4 @@ class Category(object):
         :param name:
         :return:
         """
-        if name in self.CORE_PKG:
-            return CategoryLevel.CATEGORY_LEVEL_ZERO
         return self._bin_categories.get(name, CategoryLevel.CATEGORY_LEVEL_NOT_SPECIFIED)
