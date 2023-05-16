@@ -182,3 +182,6 @@ COUNT_RESULTS = [CMP_RESULT_MORE, CMP_RESULT_LESS, CMP_RESULT_SAME, CMP_RESULT_D
 CMP_TYPE = "compare type"
 CMP_RESULT = "compare result"
 CTG_LEVEL = "category level"
+
+# RE PATTERNS
+PAT_SO = "(-?\d*([-_.]\d+){0,3}(\.cpython-(.*)-linux-gnu)?\.so([-_.][\dA-Za-z]+){0,4})|-[a-z0-9]{16}.so"
