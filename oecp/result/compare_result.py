@@ -413,8 +413,7 @@ def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, 
     rows[parent_side].setdefault(result.cmp_type, [])
     rows[parent_side][result.cmp_type].append(row)
     if result.detail_file:
-        dir_path = os.path.join(report_path, DETAIL_PATH, result.cmp_type.split()[-1],
-                                f'{parent_side_a}__cmp__{parent_side_b}')
+        dir_path = os.path.join(report_path, DETAIL_PATH, result.cmp_type.split()[-1], parent_side_b)
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
         file_a = os.path.basename(result.cmp_side_a)
