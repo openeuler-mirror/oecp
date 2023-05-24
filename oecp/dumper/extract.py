@@ -36,6 +36,7 @@ class RPMExtractDumper(AbstractDumper):
         # 文件类型
         self._text_mime = ["text/plain"]
         self._library_mime = ["application/x-sharedlib", "application/x-pie-executable"]
+        self._archive_mime = ["application/x-archive"]
         self._head_mime = ["text/x-c"]
 
         # 保存解压目录到对应类型文件列表的映射
@@ -83,16 +84,19 @@ class RPMExtractDumper(AbstractDumper):
         if 'debuginfo' in extract_dir_name:
             return
         extract_path_obj = Path(extract_dir_name)
-        all_files = [extract_path_obj.glob('lib/**/*'), extract_path_obj.glob('lib64/**/*'),
-                     extract_path_obj.glob('usr/lib/**/*'), extract_path_obj.glob('usr/lib64/**/*')]
+        all_share_files = [extract_path_obj.glob('lib/**/*'), extract_path_obj.glob('lib64/**/*'),
+                    extract_path_obj.glob('usr/lib/**/*'), extract_path_obj.glob('usr/lib64/**/*'),
+                    extract_path_obj.glob('**/*.a')]
         self._library_files.setdefault(extract_dir_name, [])
         self._library_files.setdefault(link_so_file, [])
-        for glob in all_files:
+        for glob in all_share_files:
             for file in glob:
                 if file.is_file():
                     file_path = file.as_posix()
                     file_type = magic.from_file(file_path, mime=True)
                     if file_type in self._library_mime and ".so" in file_path:
+                        self._library_files.setdefault(extract_dir_name, []).append(file_path)
+                    elif file_type in self._archive_mime:
                         self._library_files.setdefault(extract_dir_name, []).append(file_path)
                 elif os.path.islink(file.as_posix()):
                     link_file_name = os.readlink(file.as_posix())

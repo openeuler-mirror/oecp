@@ -20,7 +20,7 @@ import re
 from oecp.utils.shell import shell_cmd
 from oecp.result.compare_result import CMP_RESULT_SAME, CompareResultComposite, CMP_TYPE_RPM, CMP_TYPE_RPM_ABI, \
     CompareResultComponent, CMP_RESULT_DIFF
-from oecp.result.constants import COUNT_ABI_DETAILS, PAT_SO, CMP_RESULT_CHANGE
+from oecp.result.constants import COUNT_ABI_DETAILS
 from oecp.executor.base import CompareExecutor
 
 logger = logging.getLogger('oecp')
@@ -63,56 +63,6 @@ class ABICompareExecutor(CompareExecutor):
                 add_abi += int(n_match.group(3))
         return remove_abi, change_abi, add_abi
 
-    @staticmethod
-    def _get_soname(library_file):
-        cmd = f'objdump -p {library_file}'
-        ret, out, err = shell_cmd(cmd.split())
-        if not ret and out:
-            match = re.search(r'SONAME\s(.+)\s', out)
-            if match:
-                so_name = match.groups()[0].strip()
-                return so_name
-
-        return library_file
-
-    def get_library_pairs(self, base_file, other_file):
-        base_soname = self._get_soname(base_file)
-        other_soname = self._get_soname(other_file)
-        if base_soname == other_soname:
-            return True
-
-        return False
-
-    def get_common_lib_pairs(self, base_datas, other_datas, flag_vrd):
-        dump_os_changed, dump_exist = [], []
-        base_files, other_files = set(base_datas.keys()), set(other_datas.keys())
-        common_dump = base_files & other_files
-        only_dump_base = base_files - other_files
-        only_dump_other = other_files - base_files
-        so_pattern = re.compile(PAT_SO)
-        for other_so in sorted(only_dump_other):
-            for base_so in sorted(only_dump_base):
-                if base_so in dump_exist:
-                    continue
-                os_base_name, os_other_name = os.path.basename(base_so), os.path.basename(other_so)
-                cut_base_name = re.sub(so_pattern, '', os_base_name)
-                cut_other_name = re.sub(so_pattern, '', os_other_name)
-                if cut_base_name.lstrip('_') != cut_other_name.lstrip('_'):
-                    continue
-                full_base_so = base_datas.get(base_so)
-                full_other_so = other_datas.get(other_so)
-                path_result = self.get_version_change_files(base_so, other_so, flag_vrd)
-                soname_result = self.get_library_pairs(full_base_so, full_other_so)
-                if path_result == CMP_RESULT_CHANGE or soname_result:
-                    dump_os_changed.append([full_base_so, full_other_so])
-                    dump_exist.append(base_so)
-                    break
-
-        common_so = [[base_datas.get(so), other_datas.get(so)] for so in common_dump]
-        common_so.extend(dump_os_changed)
-
-        return common_so
-
     def compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         count_result.update(COUNT_ABI_DETAILS)
@@ -120,10 +70,10 @@ class ABICompareExecutor(CompareExecutor):
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, base_rpm, other_rpm, base_dump['category'])
         base_debuginfo_path, other_debuginfo_path = base_dump['debuginfo_extract_path'], other_dump[
             'debuginfo_extract_path']
-        map_files_a = self.split_files_mapping(base_dump[self.data])
-        map_files_b = self.split_files_mapping(other_dump[self.data])
         flag_vrd = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
-        library_pairs = self.get_common_lib_pairs(map_files_a, map_files_b, flag_vrd)
+        base_libs = base_dump[self.data]
+        other_libs = other_dump[self.data]
+        library_pairs = self.match_library_pairs(base_libs, other_libs, flag_vrd, CMP_TYPE_RPM_ABI)
 
         if not library_pairs:
             return result
@@ -170,7 +120,7 @@ class ABICompareExecutor(CompareExecutor):
         similar_dumpers = self.get_similar_rpm_pairs(self.base_dump, self.other_dump)
         for single_pair in similar_dumpers:
             if single_pair:
-                # dump_a: single_pair[0], dump_b: single_pair[1]
+                # dump_base: single_pair[0], dump_other: single_pair[1]
                 result = self.compare_result(single_pair[0], single_pair[1])
                 logger.debug(result)
                 compare_list.append(result)

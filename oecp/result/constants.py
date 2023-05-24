@@ -133,12 +133,8 @@ FILTER_PATTERN = {
     "header": ".*\\.h$",
     "service": "^/usr/lib/systemd/system/.*\\.service$",
     "jabi": ".*\\.jar$",
-    "abi": ".*\\.so$",
-    "cmd_1": "^/usr/bin/.*",
-    "cmd_2": "^/usr/sbin/.*",
-    "cmd_3": "^/usr/local/bin/.*",
-    "cmd_4": "^/usr/local/sbin/.*",
-    "cmd_5": "^/bin/.*",
+    "abi": ".*\\.so$|.*\\.a$|.*\\.rlib$",
+    "cmd": "^/usr/(local/)?(s)?bin/.*|^/bin/.*",
     "build": "^/usr/lib/.build-id/.*",
     "ima": "^/etc/ima/.*"
 }
@@ -184,4 +180,4 @@ CMP_RESULT = "compare result"
 CTG_LEVEL = "category level"
 
 # RE PATTERNS
-PAT_SO = "(-?\d*([-_.]\d+){0,3}(\.cpython-(.*)-linux-gnu)?\.so([-_.][\dA-Za-z]+){0,4})|-[a-z0-9]{16}.so"
+PAT_SO = "(-?\d*([-_.]\d+){0,3}(\.cpython-(.*)-linux-gnu)?\.(so|a)([-_.][\dA-Za-z]+){0,4})|-[a-z0-9]{16}.(so|rlib)"
