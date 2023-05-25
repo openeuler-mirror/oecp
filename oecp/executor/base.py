@@ -20,11 +20,11 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 
 from oecp.proxy.rpm_proxy import RPMProxy
-from oecp.result.compare_result import CMP_RESULT_MORE, CMP_RESULT_LESS, CMP_RESULT_SAME, CMP_RESULT_DIFF, \
-    CMP_RESULT_CHANGE
+from oecp.utils.shell import shell_cmd
+from oecp.result.constants import STAND_DISTS, CMP_SAME_RESULT, CMP_TYPE_KCONFIG, BASE_SIDE, OSV_SIDE, PAT_SO, \
+    CMP_TYPE_RPM_ABI, CMP_RESULT_MORE, CMP_RESULT_LESS, CMP_RESULT_SAME, CMP_RESULT_DIFF, CMP_RESULT_CHANGE
 
 # 两者category指定的级别不同或者未指定
-from oecp.result.constants import STAND_DISTS, CMP_SAME_RESULT, CMP_TYPE_KCONFIG, BASE_SIDE, OSV_SIDE
 
 CPM_CATEGORY_DIFF = 4
 
@@ -295,6 +295,26 @@ class CompareExecutor(ABC):
 
         return map_result
 
+    @staticmethod
+    def get_soname(library_file):
+        cmd = f'objdump -p {library_file}'
+        ret, out, err = shell_cmd(cmd.split())
+        if not ret and out:
+            match = re.search(r'SONAME\s(.+)\s', out)
+            if match:
+                so_name = match.groups()[0].strip()
+                return so_name
+
+        return library_file
+
+    def get_library_pairs(self, base_file, other_file):
+        base_soname = self.get_soname(base_file)
+        other_soname = self.get_soname(other_file)
+        if base_soname == other_soname:
+            return True
+
+        return False
+
     def format_dump(self, data_a, data_b, flag_v_r_d):
         """
         抓取相对路径相同或版本变化的文件对
@@ -359,19 +379,10 @@ class CompareExecutor(ABC):
         for side_a_file in list(only_dump_a):
             for side_b_file in list(only_dump_b):
                 get_result = CMP_RESULT_DIFF
-                so_pattern = re.compile(r"(([-.]\d+){0,3}\.so([-.]\d+){0,3})|-[a-z0-9]{16}.so")
                 file_a, file_b = os.path.basename(side_a_file), os.path.basename(side_b_file)
-                so_version_a = re.search(so_pattern, file_a)
-                so_version_b = re.search(so_pattern, file_b)
                 if file_a == file_b or file_a.split(STAND_DISTS.get(BASE_SIDE)) == file_b.split(
                         STAND_DISTS.get(OSV_SIDE)):
                     get_result = self.get_version_change_files(side_a_file, side_b_file)
-                # 识别so库文件版本变化
-                elif so_version_a and so_version_b:
-                    so_name_a = file_a.split(so_version_a.group())[0]
-                    so_name_b = file_b.split(so_version_b.group())[0]
-                    if so_name_a == so_name_b:
-                        get_result = self.get_version_change_files(side_a_file, side_b_file)
 
                 if get_result == CMP_RESULT_CHANGE:
                     change_dump.append([side_a_file, side_b_file])
@@ -381,10 +392,13 @@ class CompareExecutor(ABC):
 
         return common_dump, change_dump, only_dump_a, only_dump_b
 
-    def split_files_mapping(self, dump_files):
+    def split_files_mapping(self, dump_files, model=''):
         map_files = {}
-        for file in dump_files:
-            map_files.setdefault(file.split(self.split_flag)[-1], file)
+        for focus_file in dump_files:
+            # 剔除rlib库
+            if model == CMP_TYPE_RPM_ABI and focus_file.endswith('.rlib'):
+                continue
+            map_files.setdefault(focus_file.split(self.split_flag)[-1], focus_file)
 
         return map_files
 
@@ -406,6 +420,50 @@ class CompareExecutor(ABC):
         only_file_a = list(set(files_a) - set(common_file_a))
         only_file_b = list(set(files_b) - set(common_file_b))
         return common_file_pairs, only_file_a, only_file_b
+
+    def match_library_pairs(self, base_datas, other_datas, flag_vrd, model):
+        map_files_base = self.split_files_mapping(base_datas, model)
+        map_files_other = self.split_files_mapping(other_datas, model)
+        base_files, other_files = set(map_files_base.keys()), set(map_files_other.keys())
+        common_dump = base_files & other_files
+        only_base_dump = base_files - other_files
+        only_other_dump = other_files - base_files
+        dump_os_changed, dump_exist = [], []
+        less_dump, more_dump = only_base_dump, only_other_dump
+        so_pattern = re.compile(PAT_SO)
+        for other_so in sorted(only_other_dump):
+            for base_so in sorted(only_base_dump):
+                if base_so in dump_exist:
+                    continue
+                os_base_name, os_other_name = os.path.basename(base_so), os.path.basename(other_so)
+                cut_base_name = re.sub(so_pattern, '', os_base_name)
+                cut_other_name = re.sub(so_pattern, '', os_other_name)
+                if cut_base_name.lstrip('_') != cut_other_name.lstrip('_'):
+                    continue
+                full_base_so = map_files_base.get(base_so)
+                full_other_so = map_files_other.get(other_so)
+                path_result = self.get_version_change_files(base_so, other_so, flag_vrd)
+                soname_result = self.get_library_pairs(full_base_so, full_other_so)
+                if path_result == CMP_RESULT_CHANGE or soname_result:
+                    dump_exist.append(base_so)
+                    less_dump.discard(base_so)
+                    more_dump.discard(other_so)
+                    if model == CMP_TYPE_RPM_ABI:
+                        dump_os_changed.append([full_base_so, full_other_so])
+                    else:
+                        dump_os_changed.append([base_so, other_so])
+                    break
+        if model == CMP_TYPE_RPM_ABI:
+            common_dump = [[map_files_base.get(x), map_files_other.get(x)] for x in common_dump]
+            common_dump.extend(dump_os_changed)
+            return common_dump
+
+        return [
+            [[x, x, CMP_RESULT_SAME] for x in common_dump],
+            [[x[0], x[1], CMP_RESULT_CHANGE] for x in dump_os_changed],
+            [[x, '', CMP_RESULT_LESS] for x in less_dump],
+            [['', x, CMP_RESULT_MORE] for x in more_dump]
+        ]
 
     def format_dump_provides(self, datas_a, datas_b, flag_v_r_d):
         common_files, common_file_a, common_file_b = [], [], []
