@@ -88,80 +88,80 @@ Mulan V2
 ## 3.4、开发视图
 
 
-| 主目录      | 二级目录               | 三级目录                | 描述                                   |
-| ----------- | ---------------------- | ----------------------- | -------------------------------------- |
-| cli.py      |                        |                         | 命令启动脚本                           |
-| requirement |                        |                         | 工具依赖清单                           |
-| README.md   |                        |                         | 用户指导手册                           |
-| test        |                        |                         | 测试脚本夹                             |
-| doc         |                        |                         | 设计文档文件夹                         |
-|             | oecpimg                |                         | 存放文档图片                           |
-|             | oecp-dev-1.0.md        |                         | 设计文档                               |
-|             | oecp工具报告说明.md     |                         | 输出csv格式报告说明解析                 |
-|             | oecp工具检测标准.md     |                         | 工具检测标准说明                        |
-|             | oecp-module-dev-1.0.md |                         | 模块设计文档                           |
-| oecp        |                        |                         |                                        |
-|             | main                   |                         | 主模块                                 |
-|             |                        | factory.py              | 工厂方法，生产ISO、REPO等比较对象      |
-|             |                        | directory.py            | 目录级别对象、ISO对象、REPO对象        |
-|             |                        | repository.py           | 仓库级别对象                           |
-|             |                        | mapping                 | 二进制包和源码包映射                   |
-|             |                        | category.py             | 软件包、二进制包等级                   |
-|             |                        | plan.py                 | 比较计划                               |
-|             | executor               |                         | 比较模块                               |
-|             |                        | base.py                 | 比较器基类                             |
-|             |                        | abi.py                  | abi比较器                             |
-|             |                        | jabi.py                 | jar abi比较器                         |
-|             |                        | cmd.py                  | 命令文件比较器                         |
-|             |                        | header.py               | 头文件比较器                          |
-|             |                        | list.py                 | 比较文件列表、包列表                   |
-|             |                        | null.py                 | 空比较，当比较计划项只需要dumper时使用  |
-|             |                        | nvs.py                  | 符号、版本、名称比较器                 |
-|             |                        | plain.py                | 配置文件比较器                         |
-|             |                        | service.py              | 服务文件比较器                         |
-|             | dumper                 |                         | dumper模块                             |
-|             |                        | base.py                 | dumper基类                             |
-|             |                        | abi.py                  | 动态库abi                              |
-|             |                        | config.py               | rpm包的配置文件                        |
-|             |                        | cmd.py                  | 命令文件                               |
-|             |                        | extract.py              | 提取rpm包内容                          |
-|             |                        | filelist.py             | 文件列表                               |
-|             |                        | header.py               | 头文件                                 |
-|             |                        | jabi.py                 | jar包abi                               |
-|             |                        | kabi.py                 | 内核abi                                |
-|             |                        | kconfig.py              | 内核配置                               |
-|             |                        | kconfig_drive.py        | 内核驱动abi、配置                       |
-|             |                        | null.py                 | 当比较计划项只需要执行比较时使用         |
-|             |                        | packagelist.py          | ISO中包列表                            |
-|             |                        | provides.py             | rpm包提供的符号                        |
-|             |                        | requires.py             | rpm包依赖的符号                        |
-|             |                        | service.py              | 服务文件                               |
-|             | result                 |                         | 结果模块                               |
-|             |                        | compare_result.py       | 保存结果对象                           |
-|             |                        | constants.py            | 比较类型、比较结果宏                   |
-|             |                        | export.py               | 导出比较结果到csv文件                  |
-|             |                        | test_result.py          | 导出compass-ci比较的结果               |
-|             |                        | json_result.py          | 导出结果为json格式                     |
-|             |                        | similarity.py           | 检测项结果计算                         |
-|             |                        | constants.py            | 定义常量                               |
-|             |                        | compress.py             | 打包工具输出结果文件                    |
-|             | proxy                  |                         | 第三方代理模块                         |
-|             |                        | rpm_proxy.py            | rpm包常用方法                          |
-|             |                        | proxy/requests_proxy.py | requests功能封装下载功能               |
-|             | utils                  |                         | 工具模块                               |
-|             |                        | utils/logger.py         | 日志                                   |
-|             |                        | utils/misc.py           | 常用工具                               |
-|             |                        | utils/shell.py          | shell命令                              |
-|             |                        | utils/unit_convert.py   | 单位转换                               |
-|             |                        | utils/kernel.py         | 提取内核目标文件                        |
-|             | conf                   |                         | 配置模块                               |
-|             |                        | category                | 包等级配置                             |
-|             |                        | performance             | compass-ci性能测试                     |
-|             |                        | plan                    | 比较计划                               |
-|             |                        | logger.conf             | 日志配置                               |
-|             |                        | kabi_whitelist          | 内核白名单                             |
-|             |                        | kernel_driver_range     | 内核驱动配置                           |
-|             |                        | directory_structure     | 结果目录结构                           |
+| 主目录      | 二级目录               | 三级目录                    | 描述                     |
+| ----------- | ---------------------- |-------------------------|------------------------|
+| cli.py      |                        |                         | 命令启动脚本                 |
+| requirement |                        |                         | 工具依赖清单                 |
+| README.md   |                        |                         | 用户指导手册                 |
+| test        |                        |                         | 测试脚本夹                  |
+| doc         |                        |                         | 设计文档文件夹                |
+|             | oecpimg                |                         | 存放文档图片                 |
+|             | oecp-dev-1.0.md        |                         | 设计文档                   |
+|             | oecp工具报告说明.md     |                         | 输出csv格式报告说明解析          |
+|             | oecp工具检测标准.md     |                         | 工具检测标准说明               |
+|             | oecp-module-dev-1.0.md |                         | 模块设计文档                 |
+| oecp        |                        |                         |                        |
+|             | main                   |                         | 主模块                    |
+|             |                        | factory.py              | 工厂方法，生产ISO、REPO等比较对象   |
+|             |                        | directory.py            | 目录级别对象、ISO对象、REPO对象    |
+|             |                        | repository.py           | 仓库级别对象                 |
+|             |                        | mapping                 | 二进制包和源码包映射             |
+|             |                        | category.py             | 软件包、二进制包等级             |
+|             |                        | plan.py                 | 比较计划                   |
+|             | executor               |                         | 比较模块                   |
+|             |                        | base.py                 | 比较器基类                  |
+|             |                        | abi.py                  | abi比较器                 |
+|             |                        | lib.py                  | 库文件比较器                 |
+|             |                        | cmd.py                  | 命令文件比较器                |
+|             |                        | header.py               | 头文件比较器                 |
+|             |                        | list.py                 | 比较文件列表、包列表             |
+|             |                        | null.py                 | 空比较，当比较计划项只需要dumper时使用 |
+|             |                        | nvs.py                  | 符号、版本、名称比较器            |
+|             |                        | plain.py                | 配置文件比较器                |
+|             |                        | service.py              | 服务文件比较器                |
+|             | dumper                 |                         | dumper模块               |
+|             |                        | base.py                 | dumper基类               |
+|             |                        | abi.py                  | 动态/静态库abi              |
+|             |                        | config.py               | rpm包的配置文件              |
+|             |                        | cmd.py                  | 命令文件                   |
+|             |                        | extract.py              | 提取rpm包内容               |
+|             |                        | filelist.py             | 文件列表                   |
+|             |                        | header.py               | 头文件                    |
+|             |                        | jabi.py                 | jar包abi                |
+|             |                        | kabi.py                 | 内核abi                  |
+|             |                        | kconfig.py              | 内核配置                   |
+|             |                        | kconfig_drive.py        | 内核驱动abi、配置             |
+|             |                        | null.py                 | 当比较计划项只需要执行比较时使用       |
+|             |                        | packagelist.py          | ISO中包列表                |
+|             |                        | provides.py             | rpm包提供的符号              |
+|             |                        | requires.py             | rpm包依赖的符号              |
+|             |                        | service.py              | 服务文件                   |
+|             | result                 |                         | 结果模块                   |
+|             |                        | compare_result.py       | 保存结果对象                 |
+|             |                        | constants.py            | 比较类型、比较结果宏             |
+|             |                        | export.py               | 导出比较结果到csv文件           |
+|             |                        | test_result.py          | 导出compass-ci比较的结果      |
+|             |                        | json_result.py          | 导出结果为json格式            |
+|             |                        | similarity.py           | 检测项结果计算                |
+|             |                        | constants.py            | 定义常量                   |
+|             |                        | compress.py             | 打包工具输出结果文件             |
+|             | proxy                  |                         | 第三方代理模块                |
+|             |                        | rpm_proxy.py            | rpm包常用方法               |
+|             |                        | proxy/requests_proxy.py | requests功能封装下载功能       |
+|             | utils                  |                         | 工具模块                   |
+|             |                        | utils/logger.py         | 日志                     |
+|             |                        | utils/misc.py           | 常用工具                   |
+|             |                        | utils/shell.py          | shell命令                |
+|             |                        | utils/unit_convert.py   | 单位转换                   |
+|             |                        | utils/kernel.py         | 提取内核目标文件               |
+|             | conf                   |                         | 配置模块                   |
+|             |                        | category                | 包等级配置                  |
+|             |                        | performance             | compass-ci性能测试         |
+|             |                        | plan                    | 比较计划                   |
+|             |                        | logger.conf             | 日志配置                   |
+|             |                        | kabi_whitelist          | 内核白名单                  |
+|             |                        | kernel_driver_range     | 内核驱动配置                 |
+|             |                        | directory_structure     | 结果目录结构                 |
 
 ## 3.5、部署视图
 _真实环境如何部署，网络和存储如何划分，业务程序如何部署，如何扩展、备份等_
@@ -234,50 +234,50 @@ _真实环境如何部署，网络和存储如何划分，业务程序如何部�
   * ` python3 cli.py /root/openEuler-20.03-LTS-aarch64-dvd.iso /root/openEuler-20.03-LTS-SP1-aarch64-dvd.iso -p src/conf/plan/test.json`
 
 ### 3.8.2、内部模块间接口清单
-| 接口名称                                         | 接口描述                                                     | 入参                                                         | 输出                                                         | 异常                                                         |
-| :----------------------------------------------- | :----------------------------------------------------------- | :----------------------------------------------------------- | :----------------------------------------------------------- | :----------------------------------------------------------- |
-| `Repository.upsert_a_rpm`                        | 增加一个rpm包                                                | 工作目录、rpm名、rpm路径、debuginfo包路径                          |                                                              | 无                                                           |
-| `Repository.compare`                             | 比较repository                                               | 比较对手、比较计划                                           | 比较结果对象                                                 | 无                                                           |
-| `Repository.\__getitem__`                        | 支持遍历所有rpm包                                            |                                                              | 每一个rpm包描述                                              | 无                                                           |
-| `Directory.upsert_a_group`                       | 增加一个子目录                                               | 子目录路径、debuginfo路径径                    |                                                              | 无                                                           |
-| `Directory.compare`                              | 比较目录                                                     | 比较对手、比较计划                                           | 比较结果对象                                                 | 无                                                           |
-| `DistISO.compare`                                | 比较发布的ISO                                                | 比较对手、比较计划                                           | 比较结果对象                                                 | 无                                                           |
-| `OBSRepo`                                        | OBS内部publish的repo                                         |                                                              |                                                              |                                                              |
-| `Plan.dumper_of`                                 | 比较项调用的dumper                                           | 比较项名称                                                   | dumper类对象                                                 | 无                                                           |
-| `Plan.executor_of`                               | 比较项调用的比较器                                           | 比较项名称                                                   | 比较器类对象                                                 | 无                                                           |
-| `Plan.config_of`                                 | 比较项相关的配置                                             | 比较项名称                                                   | 比较项配置字典                                               | 无                                                           |
-| `Plan.only_for_directory`                        | 比较项只针对目录级别对象有效                                 | 比较项名称                                                   | boolean                                                      | 无                                                           |
-| `Plan.check_specific_package`                    | 比较项只针对特定的包                                         | 比较项名称、包名                                             | boolean                                                      | 无                                                           |
-| `Plan.check_specific_category`                   | 比较项只针对特定分类的包                                     | 比较项名称、分类级别                                         | boolean                                                      | 无                                                           |
-| `CategoryLevel.level_name_2_enum`                | 包分类级别转换成枚举属性                                     | 包分类级别名称                                               | 包分类级别枚举属性                                           | 无                                                           |
-| `Category.category_of_src_package`               | 获取代码包分类级别                                           | 包名称                                                       | 分类级别                                                     | 无                                                           |
-| `Category.category_of_bin_package`               | 获取二进制包分类级别                                         | 包名称                                                       | 分类级别                                                     | 无                                                           |
-| `RepositoryPackageMapping.repository_of_package` | 二进制包对应的代码包                                         | 二进制包名称                                                 | 代码包名称                                                   | 无                                                           |
-| `RPMProxy.rpm_n_v_r_d_a`                         | 标准二进制包名解析                      | 二进制包名称                                                 | 包名、版本、发行号、厂商、架构                                                   | 无                                                           |
-| `compare_result`                                 | 解析result树中的比较结果，<br>输出scv格式的报告              | result树，例如：<br>{<br> &nbsp;&nbsp;"cmp_side_a": "openeEuler-20.03-LTS-aarch64-dvd.iso",<br>&nbsp;&nbsp;"cmp_side_b": "openeEuler-20.03-LTS-SP1-aarch64-dvd.iso",<br>&nbsp;&nbsp;"cmp_type": null, <br>&nbsp;&nbsp;"cmp_result": "diff",<br>&nbsp;&nbsp;"diff_components":[<br>&nbsp;&nbsp;&nbsp;&nbsp; repository_result_1,<br>&nbsp;&nbsp;&nbsp;&nbsp; repository_result_2, <br>&nbsp;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;]<br>} | work-dir/report: <br>&nbsp;&nbsp; all-rpm-report.csv, <br>&nbsp;&nbsp; rpm-\*/\*.csv |                                                              |
-| `test_result`                                    | 解析compass-ci测试结果，<br>输出对应csv格式报告              | compass-ci性能测试结果， 如：<br>&nbsp;&nbsp; work-dir/openeEuler-20.03-LTS-aarch64-dvd.iso.performance.json <br>&nbsp;&nbsp; work-dir/openeEuler-20.03-LTS-SP1-aarch64-dvd.iso.performance.json<br> compass-ci服务命令启停测试结果，如：<br>&nbsp;&nbsp; work-dir/openeEuler-20.03-LTS-aarch64-dvd.iso.tests.json <br>&nbsp;&nbsp; work-dir/openeEuler-20.03-LTS-aarch64-dvd.iso.tests.json | work-dir/report: <br>&nbsp;&nbsp; all-performance-report.csv， <br>&nbsp;&nbsp; rpm-tests/\*.csv | work-dir/openeEuler-20.03-LTS-aarch64-dvd.iso.tests.json not exists,<br> work-dir/openeEuler-20.03-LTS-SP1-aarch64-dvd.iso.tests.json not exists,<br> work-dir/openeEuler-20.03-LTS-SP1-aarch64-dvd.iso.performance.json not exists,<br> work-dir/openeEuler-20.03-LTS-SP1-aarch64-dvd.iso.performance.json not exists |
-| `RPMExtractDumper`                               | rpm提取的dumper，一次提取，多次使用                          | repository,cache,config                                      | rpm解压提取的内容                                            |                                                              |
-| `ABIDumper`                                      | 依赖RPMExtractDumper接口，从rpm解压dumper中提取so库文件      | repository,cahce,config                                      | so库文件字典封装                                             |                                                              |
-| `CmdDumper`                                      | 依赖RPMExtractDumper接口，从rpm解压dumper中提取cmd文件      | repository,cahce,config                                      | cmd文件字典封装                                             |                                                              |
-| `ConfigDumper`                                   | 依赖RPMExtractDumper，从rpm解压dumper中提取配置文件          | repository,cache,config                                      | 配置文件的字典封装                                           |                                                              |
-| `HeaderDumper`                                   | 依赖RPMExtractDumper，从rpm解压dumper中提取头文件          | repository,cache,config                                      | 头文件的字典封装                                           |                                                              |
-| `JABIDumper`                                     | 依赖RPMExtractDumper，从rpm解压dumper中提取jar包             | repository,cache,config                                      | jar包文件字典的封装                                          |                                                              |
-| `ServiceDumper`                                  | 依赖RPMExtractDumper，从rpm解压dumper中提取服务文件             | repository,cache,config                                      | 服务文件字典的封装                                          |                                                              |
-| `FileListDumper`                                 | 获取rpm包内文件列表                                          | repository,cache,config                                      | rpm包内文件列表的字典封装                                    |                                                              |
-| `PackageListDumper`                              | 获取仓库目录rpm包列表                                        | directory,config                                             | 仓库目录所有rpm列表的字典封装                                |                                                              |
-| `ProvidesDumper`                                 | 获取rpm的provides                                            | repository,cache,config                                      | rpm的provides列表的字典封装                                  |                                                              |
-| `RequiresDumper`                                 | 获取rpm的requires                                            | repository,cache,config                                      | rpm的requires列表的字典封装                                  |                                                              |
-| `KabiDumper`                                     | 依赖RPMExtractDumper，解压kernel rpm后从symvers gz中提取kabi文件，经过白名单过滤 | repository,cache,config                                      | 内核接口内容的封装成NVSCompareExecutor可处理的对象           |                                                              |
-| `KconfigDumper`                                  | 依赖RPMExtractDumper，解压kernel rpm后从config文件中提取编译配置文件 | repository,cache,config                                      | 内核编译配置内容封装成NVSCompareExecutor可处理的对象         |                                                              |
-| `ABICompareExecutor`                             | 比较两个abi的dumper                                          | dump_a,dump_b,config                                         | abi比较结果对象树和差异保存到文件                            |                                                              |
-| `CmdCompareExecutor`                             | 比较两个命令文件的dumper                                          | dump_a,dump_b,config                                         | cmd比较结果对象树和差异保存到文件                            |                                                              |
-| `HeaderCompareExecutor`                          | 比较两个头文件的内容及头文件增加删除                                          | dump_a,dump_b,config                                         | 头文件比较结果对象树和差异保存到文件                            |                                                              |
-| `JABICompareExecutor`                            | 比较两个jabi的dumper                                         | dump_a,dump_b,config                                         | jabi的比较结果对象树和差异保存到文件                         |                                                              |
-| `ServiceCompareExecutor`                         | 比较两个服务文件的配置及服务文件增加删除                                         | dump_a,dump_b,config                                         | 服务文件的比较结果对象树和差异保存到文件                         |
-| `ListCompareExecutor`                            | 支持FileListDumper和PackageListDumper对象的dumper比较        | dump_a,dump_b,config                                         | 比较结果对象树                                               |                                                              |
-| `NVSCompareExecutor`                             | 比较组件name/version/symbol的dumper                          | dump_a,dump_b,config                                         | 比较结果对象树                                               |                                                              |
-| `PlainCompareExecutor`                           | 比较config配置文件内容                                       | dump_a,dump_b,config                                         | 比较结果对象树和diff的文件内容                               |                                                              |
-| `CompareResultComposite.export`                           | 输出工具检测报告文件                                       | 输出地址、输出格式、比较对象地址、平台测试文件地址                                        | 报告目录名                             |                                                              |
+| 接口名称                                             | 接口描述                                                         | 入参                                                         | 输出                                                                                              | 异常                                                         |
+|:-------------------------------------------------|:-------------------------------------------------------------| :----------------------------------------------------------- |:------------------------------------------------------------------------------------------------| :----------------------------------------------------------- |
+| `Repository.upsert_a_rpm`                        | 增加一个rpm包                                                     | 工作目录、rpm名、rpm路径、debuginfo包路径                          |                                                                                                 | 无                                                           |
+| `Repository.compare`                             | 比较repository                                                 | 比较对手、比较计划                                           | 比较结果对象                                                                                          | 无                                                           |
+| `Repository.\__getitem__`                        | 支持遍历所有rpm包                                                   |                                                              | 每一个rpm包描述                                                                                       | 无                                                           |
+| `Directory.upsert_a_group`                       | 增加一个子目录                                                      | 子目录路径、debuginfo路径径                    |                                                                                                 | 无                                                           |
+| `Directory.compare`                              | 比较目录                                                         | 比较对手、比较计划                                           | 比较结果对象                                                                                          | 无                                                           |
+| `DistISO.compare`                                | 比较发布的ISO                                                     | 比较对手、比较计划                                           | 比较结果对象                                                                                          | 无                                                           |
+| `OBSRepo`                                        | OBS内部publish的repo                                            |                                                              |                                                                                                 |                                                              |
+| `Plan.dumper_of`                                 | 比较项调用的dumper                                                 | 比较项名称                                                   | dumper类对象                                                                                       | 无                                                           |
+| `Plan.executor_of`                               | 比较项调用的比较器                                                    | 比较项名称                                                   | 比较器类对象                                                                                          | 无                                                           |
+| `Plan.config_of`                                 | 比较项相关的配置                                                     | 比较项名称                                                   | 比较项配置字典                                                                                         | 无                                                           |
+| `Plan.only_for_directory`                        | 比较项只针对目录级别对象有效                                               | 比较项名称                                                   | boolean                                                                                         | 无                                                           |
+| `Plan.check_specific_package`                    | 比较项只针对特定的包                                                   | 比较项名称、包名                                             | boolean                                                                                         | 无                                                           |
+| `Plan.check_specific_category`                   | 比较项只针对特定分类的包                                                 | 比较项名称、分类级别                                         | boolean                                                                                         | 无                                                           |
+| `CategoryLevel.level_name_2_enum`                | 包分类级别转换成枚举属性                                                 | 包分类级别名称                                               | 包分类级别枚举属性                                                                                       | 无                                                           |
+| `Category.category_of_src_package`               | 获取代码包分类级别                                                    | 包名称                                                       | 分类级别                                                                                            | 无                                                           |
+| `Category.category_of_bin_package`               | 获取二进制包分类级别                                                   | 包名称                                                       | 分类级别                                                                                            | 无                                                           |
+| `RepositoryPackageMapping.repository_of_package` | 二进制包对应的代码包                                                   | 二进制包名称                                                 | 代码包名称                                                                                           | 无                                                           |
+| `RPMProxy.rpm_n_v_r_d_a`                         | 标准二进制包名解析                                                    | 二进制包名称                                                 | 包名、版本、发行号、厂商、架构                                                                                 | 无                                                           |
+| `compare_result`                                 | 解析result树中的比较结果，<br>输出scv格式的报告                               | result树，例如：<br>{<br> &nbsp;&nbsp;"cmp_side_a": "openeEuler-20.03-LTS-aarch64-dvd.iso",<br>&nbsp;&nbsp;"cmp_side_b": "openeEuler-20.03-LTS-SP1-aarch64-dvd.iso",<br>&nbsp;&nbsp;"cmp_type": null, <br>&nbsp;&nbsp;"cmp_result": "diff",<br>&nbsp;&nbsp;"diff_components":[<br>&nbsp;&nbsp;&nbsp;&nbsp; repository_result_1,<br>&nbsp;&nbsp;&nbsp;&nbsp; repository_result_2, <br>&nbsp;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;]<br>} | work-dir/report: <br>&nbsp;&nbsp; all-rpm-report.csv, <br>&nbsp;&nbsp; rpm-\*/\*.csv            |                                                              |
+| `test_result`                                    | 解析compass-ci测试结果，<br>输出对应csv格式报告                             | compass-ci性能测试结果， 如：<br>&nbsp;&nbsp; work-dir/openeEuler-20.03-LTS-aarch64-dvd.iso.performance.json <br>&nbsp;&nbsp; work-dir/openeEuler-20.03-LTS-SP1-aarch64-dvd.iso.performance.json<br> compass-ci服务命令启停测试结果，如：<br>&nbsp;&nbsp; work-dir/openeEuler-20.03-LTS-aarch64-dvd.iso.tests.json <br>&nbsp;&nbsp; work-dir/openeEuler-20.03-LTS-aarch64-dvd.iso.tests.json | work-dir/report: <br>&nbsp;&nbsp; all-performance-report.csv， <br>&nbsp;&nbsp; rpm-tests/\*.csv | work-dir/openeEuler-20.03-LTS-aarch64-dvd.iso.tests.json not exists,<br> work-dir/openeEuler-20.03-LTS-SP1-aarch64-dvd.iso.tests.json not exists,<br> work-dir/openeEuler-20.03-LTS-SP1-aarch64-dvd.iso.performance.json not exists,<br> work-dir/openeEuler-20.03-LTS-SP1-aarch64-dvd.iso.performance.json not exists |
+| `RPMExtractDumper`                               | rpm提取的dumper，一次提取，多次使用                                       | repository,cache,config                                      | rpm解压提取的内容                                                                                      |                                                              |
+| `ABIDumper`                                      | 依赖RPMExtractDumper接口，从rpm解压dumper中提取so库文件                    | repository,cahce,config                                      | so库文件字典封装                                                                                       |                                                              |
+| `CmdDumper`                                      | 依赖RPMExtractDumper接口，从rpm解压dumper中提取cmd文件                    | repository,cahce,config                                      | cmd文件字典封装                                                                                       |                                                              |
+| `ConfigDumper`                                   | 依赖RPMExtractDumper，从rpm解压dumper中提取配置文件                       | repository,cache,config                                      | 配置文件的字典封装                                                                                       |                                                              |
+| `HeaderDumper`                                   | 依赖RPMExtractDumper，从rpm解压dumper中提取头文件                        | repository,cache,config                                      | 头文件的字典封装                                                                                        |                                                              |
+| `JABIDumper`                                     | 依赖RPMExtractDumper，从rpm解压dumper中提取jar包                       | repository,cache,config                                      | jar包文件字典的封装                                                                                     |                                                              |
+| `ServiceDumper`                                  | 依赖RPMExtractDumper，从rpm解压dumper中提取服务文件                       | repository,cache,config                                      | 服务文件字典的封装                                                                                       |                                                              |
+| `FileListDumper`                                 | 获取rpm包内文件列表                                                  | repository,cache,config                                      | rpm包内文件列表的字典封装                                                                                  |                                                              |
+| `PackageListDumper`                              | 获取仓库目录rpm包列表                                                 | directory,config                                             | 仓库目录所有rpm列表的字典封装                                                                                |                                                              |
+| `ProvidesDumper`                                 | 获取rpm的provides                                               | repository,cache,config                                      | rpm的provides列表的字典封装                                                                             |                                                              |
+| `RequiresDumper`                                 | 获取rpm的requires                                               | repository,cache,config                                      | rpm的requires列表的字典封装                                                                             |                                                              |
+| `KabiDumper`                                     | 依赖RPMExtractDumper，解压kernel rpm后从symvers gz中提取kabi文件，经过白名单过滤 | repository,cache,config                                      | 内核接口内容的封装成NVSCompareExecutor可处理的对象                                                              |                                                              |
+| `KconfigDumper`                                  | 依赖RPMExtractDumper，解压kernel rpm后从config文件中提取编译配置文件           | repository,cache,config                                      | 内核编译配置内容封装成NVSCompareExecutor可处理的对象                                                             |                                                              |
+| `ABICompareExecutor`                             | 比较两个abi的dumper                                               | dump_a,dump_b,config                                         | abi比较结果对象树和差异保存到文件                                                                              |                                                              |
+| `CmdCompareExecutor`                             | 比较两个命令文件的dumper                                              | dump_a,dump_b,config                                         | cmd比较结果对象树和差异保存到文件                                                                              |                                                              |
+| `HeaderCompareExecutor`                          | 比较两个头文件的内容及头文件增加删除                                           | dump_a,dump_b,config                                         | 头文件比较结果对象树和差异保存到文件                                                                              |                                                              |
+| `LibCompareExecutor`                             | 比较两个动态(.so)/静态库(.a)的dumper                                   | dump_a,dump_b,config                                         | lib的比较结果对象树和差异保存到文件                                                                             |                                                              |
+| `ServiceCompareExecutor`                         | 比较两个服务文件的配置及服务文件增加删除                                         | dump_a,dump_b,config                                         | 服务文件的比较结果对象树和差异保存到文件                                                                            |
+| `ListCompareExecutor`                            | 支持FileListDumper和PackageListDumper对象的dumper比较                | dump_a,dump_b,config                                         | 比较结果对象树                                                                                         |                                                              |
+| `NVSCompareExecutor`                             | 比较组件name/version/symbol的dumper                               | dump_a,dump_b,config                                         | 比较结果对象树                                                                                         |                                                              |
+| `PlainCompareExecutor`                           | 比较config配置文件内容                                               | dump_a,dump_b,config                                         | 比较结果对象树和diff的文件内容                                                                               |                                                              |
+| `CompareResultComposite.export`                  | 输出工具检测报告文件                                                   | 输出地址、输出格式、比较对象地址、平台测试文件地址                                        | 报告目录名                                                                                           |                                                              |
 
 
 

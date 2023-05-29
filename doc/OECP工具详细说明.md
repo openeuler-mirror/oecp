@@ -49,7 +49,7 @@
 | cli.py      |                        |                         | 命令启动脚本          |
 | requirement |                        |                         | 工具依赖清单          |
 | README.md   |                        |                         | 用户指导手册          |
-| test        |                        |                         | 测试脚本文件夹           |
+| test        |                        |                         | 测试脚本文件夹         |
 | doc         |                        |                         | 设计文档文件夹         |
 |             | oecpimg                |                         | 存放文档图片          |
 |             | oecp-dev-1.0.md        |                         | 设计文档            |
@@ -68,8 +68,9 @@
 |             |                        | null.py                 | 空比较，当比较计划项只需要dumper时使用 |
 |             |                        | nvs.py                  | 符号、版本、名称比较器     |
 |             |                        | plain.py                | 配置文件比较          |
-|             |                        | abi.py                  | 比较abi           |
-|             |                        | cmd.py                  | 比较命令文件、库文件      |
+|             |                        | abi.py                  | 比较动态库、静态库abi    |
+|             |                        | lib.py                  | 比较库文件           |
+|             |                        | cmd.py                  | 比较命令文件          |
 |             |                        | header.py               | 比较头文件           |
 |             |                        | service.py              | 比较服务文件          |
 |             | dumper                 |                         | dumper模块        |
@@ -128,11 +129,16 @@ oecp工具适用于比较两个ISO镜像之间的差别，具体比较项有：
 - rpm provides
 - rpm requires
 
-4）unixbench, lmbench, mysql性能测试，对应报告比较类型如下：
+4）动态链接库(.so), 静态链接库（.a）abi比较，对应报告比较类型如下：
+
+- rpm abi
+- rpm lib
+
+5）unixbench, lmbench, mysql性能测试，对应报告比较类型如下：
 
 - performacne
 
-5）服务命令起停测试，对应报告比较类型如下：
+6）服务命令起停测试，对应报告比较类型如下：
 
 - rpm test
 
@@ -143,13 +149,11 @@ install oecp:
 '''
 git clone https://gitee.com/openeuler/oecp
 cd oecp
+使用前，安装python依赖库
 pip3 install -r requirement
 '''
 
 ## 5. oecp使用
-使用前，安装python依赖库
-pip3 install -r requirement
-
 `python3 cli.py [-h] [-n PARALLEL] [-w WORK_DIR] [-p PLAN_PATH]
                 [-c CATEGORY_PATH] [--platform PLATFORM_TEST_PATH]
                 [-f OUTPUT_FORMAT] [-o OUTPUT_FILE] [-d DEBUGINFO]
@@ -234,7 +238,7 @@ oecp工具会展示一份最终报告，用于展示最终的测试结果，测�
 |                   |                               | rpm-service        | rpm包服务文件比较结果目录   |
 |                   | rpm-test                      |                    | 测试repo中所有rpm安装结果目录 |
 |                   | details_analyse               |                    | rpm文件比较内容目录      |
-|                   |                               | abi                | so库文件接口变化详情      |
+|                   |                               | abi                | 库文件接口变化详情        |
 |                   |                               | config             | 配置文件内容变化详情       |
 |                   |                               | header             | 头文件内容变化详情        |
 |                   |                               | service-detail     | 服务文件配置变化详情       |
