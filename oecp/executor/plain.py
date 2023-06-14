@@ -18,8 +18,10 @@ import os
 import re
 
 from oecp.executor.base import CompareExecutor, CPM_CATEGORY_DIFF
-from oecp.result.compare_result import CMP_RESULT_SAME, CompareResultComposite, CMP_TYPE_RPM, CMP_TYPE_RPM_CONFIG, \
-    CompareResultComponent, CMP_RESULT_DIFF, CMP_RESULT_EXCEPTION, CMP_RESULT_LESS, CMP_RESULT_MORE
+from oecp.result.compare_result import CompareResultComposite, CompareResultComponent
+from oecp.result.constants import CMP_RESULT_SAME, CMP_TYPE_RPM, CMP_RESULT_DIFF, CMP_TYPE_RPM_CONFIG, \
+    CMP_RESULT_EXCEPTION, CMP_RESULT_LESS, CMP_RESULT_MORE
+
 from oecp.utils.shell import shell_cmd
 
 logger = logging.getLogger('oecp')

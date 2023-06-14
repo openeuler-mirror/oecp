@@ -22,7 +22,6 @@ import importlib
 from collections import UserDict
 from multiprocessing import cpu_count
 
-
 logger = logging.getLogger("oecp")
 
 
@@ -30,6 +29,7 @@ class Plan(UserDict):
     """
 
     """
+
     def __init__(self, path):
         """
 
@@ -67,7 +67,7 @@ class Plan(UserDict):
                         config = item.get("config", dict())
 
                         # update compare type
-                        from oecp.result.compare_result import compare_result_name_to_attr
+                        from oecp.result.constants import compare_result_name_to_attr
                         config["compare_type"] = compare_result_name_to_attr(config["compare_type"])
 
                         # load executor
@@ -95,7 +95,8 @@ class Plan(UserDict):
                             logger.debug(f"load {self._plan_name}.{name} dumper, {module_name}.{class_name}")
 
                             dumper = load_module_class("oecp.dumper", module_name, class_name)
-                            self[item["name"]] = {"name": name, "dumper": dumper, "executor": executor, "config": config}
+                            self[item["name"]] = {"name": name, "dumper": dumper, "executor": executor,
+                                                  "config": config}
                     except KeyError:
                         logger.exception(f"illegal plan, check {self._plan}")
                         raise
@@ -174,7 +175,7 @@ class Plan(UserDict):
         specific_category = self.config_of(name).get("category")
 
         return specific_category and specific_category < category_level
-        
+
     def check_sensitive_str(self, name):
         """
         
@@ -190,6 +191,7 @@ class Plan(UserDict):
         :return:
         """
         return self.config_of(name).get("sensitive_image", False)
+
 
 def load_module_class(package, module_name, class_name):
     """

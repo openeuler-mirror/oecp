@@ -15,10 +15,10 @@
 
 import logging
 from oecp.executor.base import CompareExecutor, CPM_CATEGORY_DIFF
-from oecp.result.compare_result import CompareResultComposite, CMP_TYPE_RPM, CompareResultComponent, \
-    CMP_TYPE_DIRECTORY, CMP_TYPE_RPM_LEVEL, CMP_RESULT_SAME, CMP_RESULT_DIFF
+from oecp.result.compare_result import CompareResultComposite, CompareResultComponent
 from oecp.proxy.rpm_proxy import RPMProxy
-from oecp.result.constants import CMP_SAME_RESULT
+from oecp.result.constants import CMP_SAME_RESULT, CMP_TYPE_DIRECTORY, CMP_TYPE_RPM, CMP_RESULT_SAME, CMP_RESULT_DIFF, \
+    CMP_TYPE_RPM_LEVEL
 
 logger = logging.getLogger('oecp')
 

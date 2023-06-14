@@ -15,6 +15,8 @@
 # Description: compare result
 # **********************************************************************************
 """
+import sys
+
 # COMPARE_RESULT
 CMP_RESULT_MORE = "more"
 CMP_RESULT_LESS = "less"
@@ -215,9 +217,9 @@ CTG_LEVEL = "category level"
 
 # RE PATTERNS
 PAT_VER_CHANGED = r"[-_.][a-z0-9]{16}\.|[-_.]\w{32}\.|[-_.]\w{64}\.|[-.]\d(.\d){2}_[0-9a-z]{9}|python3-|" \
-                  r"\.cpython-(.*)[-.]|python\d\.\w+|([-_]?\d+)(\.\d+)*|java-\d+-openjdk-"
+                  r"python[2,3]\.\w+|([-_]?\d+)(\.\d+){0,3}|java-(\d+\.){0,2}\d+-openjdk-"
 PAT_SO = r"(-?\d*([-_.]\d+){0,3}(\.cpython-(.*)-linux-gnu)?\.(so|a)([-_.][\dA-Za-z]+){0,4})|-[a-z0-9]{16}.(so|rlib)"
-PAT_DIR_VERSION = r"python\d\.\d|-?(\d+\.)+\d*|java-\d+-openjdk-"
+PAT_DIR_VERSION = r"[-/](\d+\.){0,3}\d+|java-(\d+\.){0,2}\d+-openjdk-|_(\d+\.){3}v\d{8}-\d{4}|python[2,3]\.\d+"
 
 # SOME UPSTREAM DIST COUPING WITH FILES DIRECTORY.
 OPENEULER = "openeuler"
@@ -225,3 +227,12 @@ UPSTREAM_DIST = {
     OPENEULER,
     "fedora"
 }
+
+
+def compare_result_name_to_attr(name):
+    """
+    plan中的compare_type对应的属性变量
+    :param name:
+    :return:
+    """
+    return getattr(sys.modules.get(__name__), name)

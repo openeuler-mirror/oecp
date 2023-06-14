@@ -15,8 +15,9 @@
 # Description: compare result
 # **********************************************************************************
 """
+import os
+import logging
 import stat
-import sys
 import shutil
 import operator
 import uuid
@@ -26,9 +27,15 @@ from oecp.excel.individual_statistics import IndividualStatistics
 from oecp.excel.osv_data_summary import DataExcelFile
 from oecp.result import export
 from oecp.result.export import get_second_path
+from oecp.result.json_result import json_result
 from oecp.result.similar_result_calculate import calculate_similarity
-from oecp.result.similarity import *
-from oecp.result.json_result import *
+from oecp.result.similarity import get_similarity
+from oecp.result.test_result import performance_result_parser, test_result_parser, ciconfig_result_parser, \
+    at_result_parser, assgin_rpm_summay
+from oecp.result.constants import CMP_RESULT_DIFF, CMP_TYPE_DIFFERENCES, ALL_DETAILS_NAME, CMP_TYPE, COMPOSITE_CMPS, \
+    CMP_TYPE_AT, CMP_TYPE_RPM, CMP_TYPE_CI_FILE_CONFIG, CMP_TYPE_CI_CONFIG, CMP_TYPE_PERFORMANCE, CMP_TYPE_RPMS_TEST, \
+    CMP_TYPE_DRIVE_KABI, CMP_TYPE_SERVICE, CMP_TYPE_RPM_CONFIG, CMP_TYPE_RPM_ABI, CMP_TYPE_RPM_HEADER, \
+    COUNT_ABI_DETAILS, CMP_TYPE_RPM_LEVEL, CMP_TYPE_RPM_REQUIRES, CMP_TYPE_SERVICE_DETAIL, DETAIL_PATH, CMP_RESULT_SAME
 
 logger = logging.getLogger("oecp")
 
@@ -462,8 +469,7 @@ def get_differences_info(rows):
 
 
 def get_require_differencs_info(single_result):
-    differencs_info = {}
-    differencs_info['binary rpm package'] = single_result['binary rpm package']
+    differencs_info = {'binary rpm package': single_result['binary rpm package']}
     result_keys = list(single_result.keys())
     side_a = result_keys[1].split(" ")[0]
     side_b = result_keys[4].split(" ")[0]
@@ -476,12 +482,3 @@ def get_require_differencs_info(single_result):
     differencs_info['category level'] = single_result['category level']
 
     return differencs_info
-
-
-def compare_result_name_to_attr(name):
-    """
-    plan中的compare_type对应的属性变量
-    :param name:
-    :return:
-    """
-    return getattr(sys.modules[__name__], name)
