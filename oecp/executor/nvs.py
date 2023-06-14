@@ -21,7 +21,7 @@ from oecp.executor.base import CompareExecutor, CPM_CATEGORY_DIFF
 from oecp.result.compare_result import CMP_TYPE_RPM, CompareResultComposite, CompareResultComponent, CMP_RESULT_SAME, \
     CMP_RESULT_DIFF, CMP_TYPE_DRIVE_KABI
 from oecp.proxy.rpm_proxy import RPMProxy
-from oecp.result.constants import CMP_TYPE_REQUIRES, CMP_SAME_RESULT, CMP_TYPE_PROVIDES
+from oecp.result.constants import CMP_TYPE_REQUIRES, CMP_TYPE_PROVIDES
 
 logger = logging.getLogger('oecp')
 
@@ -127,7 +127,7 @@ class NVSCompareExecutor(CompareExecutor):
                 else:
                     data = CompareResultComponent(self.config.get('compare_type'), sub_component_result[-1],
                                                   sub_component_result[0], sub_component_result[1])
-                if sub_component_result[-1] not in CMP_SAME_RESULT and single_result == CMP_RESULT_SAME:
+                if sub_component_result[-1] != CMP_RESULT_SAME and single_result == CMP_RESULT_SAME:
                     single_result = CMP_RESULT_DIFF
                     result.set_cmp_result(single_result)
                 result.add_component(data)

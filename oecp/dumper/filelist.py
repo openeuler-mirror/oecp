@@ -29,13 +29,18 @@ class FileListDumper(AbstractDumper):
 
     def __init__(self, repository, cache=None, config=None):
         super(FileListDumper, self).__init__(repository, cache, config)
+        cache_require_key = "extract"
+        self.cache_dumper = self.get_cache_dumper(cache_require_key)
+        self.extract_info = self.cache_dumper.get_extract_info()
         self._cmd = ['rpm', '-pql', '--nosignature']
+        self.link_flag = "_[link]_"
 
     def dump(self, repository):
         rpm_path = repository['path']
         rpm_name = repository['name']
         white_file = '/conf/rpm_white/rpm_name_list.json'
         white_file_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + white_file
+        rpm_extract_dir = self.extract_info.get(os.path.basename(rpm_path))
         with open(white_file_path, 'r') as rpm_name_list:
             white_list = json.load(rpm_name_list)
         dump_list = []
@@ -66,7 +71,13 @@ class FileListDumper(AbstractDumper):
                     if rpm_name in white_list['rpm_name_list']:
                         dump_list.append(os.path.basename(line))
                     else:
-                        dump_list.append(line)
+                        full_path = os.path.join(rpm_extract_dir.name, line.lstrip('/'))
+                        if os.path.islink(full_path):
+                            link_tar = [line, self.link_flag, os.readlink(full_path).lstrip('./')]
+                            link_file = ''.join(link_tar)
+                            dump_list.append(link_file)
+                        else:
+                            dump_list.append(line)
         item = {'rpm': os.path.basename(rpm_path), 'kind': 'filelist', 'data': dump_list}
         item.setdefault('category', repository['category'].value)
         return item

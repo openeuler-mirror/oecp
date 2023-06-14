@@ -37,13 +37,10 @@ class PlainCompareExecutor(CompareExecutor):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         category = base_dump['category'] if base_dump['category'] == other_dump['category'] else CPM_CATEGORY_DIFF
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, base_dump['rpm'], other_dump['rpm'], category)
-        base_dump_files = self.split_files_mapping(base_dump[self.data])
-        other_dump_files = self.split_files_mapping(other_dump[self.data])
-        rpm_version_release_dist = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
-        common_file_pairs, only_base_files, only_other_files = self.format_fullpath_files(base_dump_files,
-                                                                                          other_dump_files,
-                                                                                          rpm_version_release_dist)
-        if not common_file_pairs and not only_base_files and not only_other_files:
+        base_files, other_files = base_dump[self.data], other_dump[self.data]
+        flag_vrd = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
+        common_file_pairs, less_dumps, more_dumps = self.format_fullpath_files(base_files, other_files, flag_vrd)
+        if not common_file_pairs and not less_dumps and not more_dumps:
             logger.debug(f"No config package found, ignored with {other_dump['rpm']} and {other_dump['rpm']}")
             return result
         for pair in common_file_pairs:
@@ -71,11 +68,11 @@ class PlainCompareExecutor(CompareExecutor):
                 data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_SAME, base_conf_file, other_conf_file)
             result.add_component(data)
 
-        for base_file in only_base_files:
+        for base_file in less_dumps:
             self.count_cmp_result(count_result, CMP_RESULT_LESS)
             data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_LESS, base_file, '')
             result.add_component(data)
-        for other_file in only_other_files:
+        for other_file in more_dumps:
             self.count_cmp_result(count_result, CMP_RESULT_MORE)
             data = CompareResultComponent(CMP_TYPE_RPM_CONFIG, CMP_RESULT_MORE, '', other_file)
             result.add_component(data)

@@ -209,7 +209,7 @@ def is_same_rpm(rpm_cmp_result):
             continue
         for row in result:
             if row.get("compare type") == CMP_TYPE_RPM_FILES:
-                if row.get("compare result") == CMP_RESULT_MORE or row.get("compare result") == CMP_RESULT_CHANGE:
+                if row.get("compare result") in CMP_SAME_RESULT:
                     continue
             if row.get("compare result") not in RESULT_SAME:
                 return False

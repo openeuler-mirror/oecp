@@ -19,6 +19,7 @@ import stat
 import sys
 import shutil
 import operator
+import uuid
 
 from oecp.excel.create_web_show_result import WebShowResult
 from oecp.excel.individual_statistics import IndividualStatistics
@@ -215,7 +216,7 @@ class CompareResultComposite(CompareResultComponent):
                 headers = value[0].keys()
                 if node == CMP_TYPE_RPM:
                     # add explanation for rpm package name result
-                    explan = "rpm package name explan:\n\
+                    explan = "rpm package name explain:\n\
                     1   -- same name + version + release num + distributor\n\
                     1.1 -- same name + version + release num\n\
                     2   -- same name + version\n\
@@ -418,7 +419,7 @@ def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, 
             os.makedirs(dir_path)
         file_a = os.path.basename(result.cmp_side_a)
         file_b = os.path.basename(result.cmp_side_b)
-        file_path = os.path.join(dir_path, f'{file_a}__cmp__{file_b}.md')
+        file_path = os.path.join(dir_path, f'{file_a}__cmp__{file_b}_{uuid.uuid4().clock_seq}.md')
         row["details path"] = DETAIL_PATH + file_path.split(DETAIL_PATH)[-1]
         save_detail_result(file_path, result.detail_file)
 

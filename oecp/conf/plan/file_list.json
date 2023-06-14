@@ -2,6 +2,14 @@
   "name": "test",
   "plan": [
     {
+      "name": "extract",
+      "dumper": "RPMExtractDumper",
+      "executor": "null.NullExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_NULL"
+      }
+    },
+    {
       "name": "filelist",
       "dumper": "FileListDumper",
       "executor": "list.ListCompareExecutor",

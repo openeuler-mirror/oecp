@@ -23,6 +23,13 @@ CMP_RESULT_SAME = "same"
 CMP_RESULT_CHANGE = "changed"
 CMP_RESULT_EXCEPTION = "exception"
 CMP_RESULT_TO_BE_DETERMINED = "to be determined"
+CHANGE_FILE_VERSION = "File version changed"
+CHANGE_DIRECTORY_VERSION = "Directory version changed"
+CHANGE_LINKFILE_VERSION = "Linkfile version changed"
+CHANGE_FILE_TYPE = "File type changed"
+CHANGE_LINK_TARGET_FILE = "Link target file changed"
+CHANGE_LINK_TARGET_VERSION = "Link target version changed"
+CHANGE_DIST_IN_FILENAME = "Dist in filename changed"
 
 # COMPARE_TYPE
 CMP_TYPE_PLAIN = "plain"
@@ -99,8 +106,35 @@ PKG_SIMILARITY_SON_TYPES = {
     CMP_TYPE_RPM_FILES
 }
 
-CMP_SAME_RESULT = [CMP_RESULT_SAME, CMP_RESULT_CHANGE]
-CMP_SERVICE_SAME = [CMP_RESULT_SAME, CMP_RESULT_MORE]
+CMP_SAME_FILES = [
+    CMP_RESULT_SAME,
+    CHANGE_DIRECTORY_VERSION,
+    CHANGE_DIST_IN_FILENAME
+]
+
+CMP_DIFF_RESULT = [
+    CMP_RESULT_DIFF,
+    CHANGE_FILE_TYPE,
+    CHANGE_FILE_VERSION,
+    CHANGE_LINKFILE_VERSION,
+    CHANGE_LINK_TARGET_FILE,
+    CHANGE_LINK_TARGET_VERSION
+]
+
+CMP_SAME_RESULT = [
+    CMP_RESULT_SAME,
+    CMP_RESULT_MORE,
+    CHANGE_DIRECTORY_VERSION,
+    CHANGE_DIST_IN_FILENAME,
+    CHANGE_FILE_VERSION,
+    CHANGE_LINKFILE_VERSION,
+    CHANGE_LINK_TARGET_VERSION
+]
+
+CMP_SERVICE_SAME = [
+    CMP_RESULT_SAME,
+    CMP_RESULT_MORE
+]
 
 # EXCEL COMMON PARAMETERS
 REQUIRED_ROW = [9, 10, 12, 15, 16, 17, 18]
@@ -156,8 +190,8 @@ BASE_SIDE = 'base'
 OSV_SIDE = 'osv'
 
 STAND_DISTS = {
-    BASE_SIDE: None,
-    OSV_SIDE: None
+    BASE_SIDE: "",
+    OSV_SIDE: ""
 }
 
 # All Kernel Binary Package Name
@@ -180,4 +214,14 @@ CMP_RESULT = "compare result"
 CTG_LEVEL = "category level"
 
 # RE PATTERNS
+PAT_VER_CHANGED = r"[-_.][a-z0-9]{16}\.|[-_.]\w{32}\.|[-_.]\w{64}\.|[-.]\d(.\d){2}_[0-9a-z]{9}|python3-|" \
+                  r"\.cpython-(.*)[-.]|python\d\.\w+|([-_]?\d+)(\.\d+)*|java-\d+-openjdk-"
 PAT_SO = r"(-?\d*([-_.]\d+){0,3}(\.cpython-(.*)-linux-gnu)?\.(so|a)([-_.][\dA-Za-z]+){0,4})|-[a-z0-9]{16}.(so|rlib)"
+PAT_DIR_VERSION = r"python\d\.\d|-?(\d+\.)+\d*|java-\d+-openjdk-"
+
+# SOME UPSTREAM DIST COUPING WITH FILES DIRECTORY.
+OPENEULER = "openeuler"
+UPSTREAM_DIST = {
+    OPENEULER,
+    "fedora"
+}
