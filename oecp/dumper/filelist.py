@@ -41,8 +41,6 @@ class FileListDumper(AbstractDumper):
         for filter_pattern in FILTER_PATTERN.values():
             if re.match(filter_pattern, line) or "metadata_list-compact" in line:
                 return True
-        if ".so." in line and not line.endswith(".py"):
-            return True
 
         return False
 

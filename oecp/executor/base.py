@@ -307,6 +307,7 @@ class CompareExecutor(ABC):
     def mapping_files(self, files, flag_vrd, dist):
         map_result = {}
         for file in sorted(files):
+            # 文件目录中含软件包version-release.dist.arch标识
             truncate_vrd_dist = file.replace(flag_vrd, '').replace(dist, '')
             truncate_dir_version = re.sub(PAT_DIR_VERSION, '', os.path.dirname(truncate_vrd_dist))
             truncate_newfile = os.path.join(truncate_dir_version, os.path.basename(truncate_vrd_dist))
