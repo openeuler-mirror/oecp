@@ -37,7 +37,7 @@ class RPMExtractDumper(AbstractDumper):
         self._text_mime = ["text/plain"]
         self._library_mime = ["application/x-sharedlib", "application/x-pie-executable"]
         self._archive_mime = ["application/x-archive"]
-        self._head_mime = ["text/x-c"]
+        self._head_mime = ["text/x-c", "text/x-c++"]
 
         # 保存解压目录到对应类型文件列表的映射
         self._config_files = {}
