@@ -16,8 +16,11 @@
 # **********************************************************************************
 """
 import os
-from oecp.result.constants import *
-from oecp.main.category import *
+import json
+import logging
+
+from oecp.result.constants import CMP_RESULT_SAME, CMP_TYPE_CI_FILE_CONFIG, CMP_TYPE_CI_CONFIG, CMP_RESULT_MORE, \
+    CMP_RESULT_LESS, CMP_RESULT_DIFF, CMP_TYPE_RPMS_TEST
 
 logger = logging.getLogger("oecp")
 
@@ -108,9 +111,6 @@ def ciconfig_result_parser(side_a, side_b, root_path):
     config_file_result = []
     side_a_result = get_ciconfig_result(side_a, root_path)
     side_b_result = get_ciconfig_result(side_b, root_path)
-    # base_line_result = load_json_result(baseline)
-    # if not (side_a_result and side_b_result):
-    #     return ciconfig_result
     if not side_a_result or not side_b_result:
         logger.warning("json file not exist")
         return ciconfig_result, config_file_result

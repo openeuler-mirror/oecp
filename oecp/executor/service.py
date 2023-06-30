@@ -17,9 +17,9 @@ import logging
 import os
 
 from oecp.executor.base import CompareExecutor
-from oecp.result.compare_result import CMP_RESULT_SAME, CompareResultComposite, CMP_TYPE_RPM, CMP_RESULT_DIFF, \
-    CompareResultComponent, CMP_TYPE_SERVICE, CMP_TYPE_SERVICE_DETAIL, CMP_RESULT_LESS, CMP_RESULT_MORE, DETAIL_PATH
-from oecp.result.constants import CMP_SERVICE_SAME
+from oecp.result.compare_result import CompareResultComposite, CompareResultComponent
+from oecp.result.constants import CMP_SERVICE_SAME, CMP_RESULT_SAME, CMP_TYPE_RPM, CMP_RESULT_DIFF, CMP_TYPE_SERVICE, \
+    CMP_TYPE_SERVICE_DETAIL, CMP_RESULT_LESS, CMP_RESULT_MORE, DETAIL_PATH
 
 logger = logging.getLogger('oecp')
 
@@ -77,13 +77,11 @@ class ServiceCompareExecutor(CompareExecutor):
     def compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         category = base_dump['category']
-        rpm_version_release_dist = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
+        flag_vrd = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, base_dump['rpm'], other_dump['rpm'], category)
-        base_dump_files = self.split_files_mapping(base_dump[self.data])
-        other_dump_files = self.split_files_mapping(other_dump[self.data])
-        common_file_pairs, only_base_files, only_other_file = self.format_fullpath_files(base_dump_files,
-                                                                            other_dump_files, rpm_version_release_dist)
-        if not common_file_pairs and not only_base_files and not only_other_file:
+        base_files, other_files = base_dump[self.data], other_dump[self.data]
+        common_file_pairs, less_dumps, more_dumps = self.format_fullpath_files(base_files, other_files, flag_vrd)
+        if not common_file_pairs and not less_dumps and not more_dumps:
             logger.debug(f"No service package found, ignored with {other_dump['rpm']} and {other_dump['rpm']}")
             return result
         details_path = os.path.join(DETAIL_PATH, 'service-detail', other_dump['rpm']) + '.csv'
@@ -104,12 +102,12 @@ class ServiceCompareExecutor(CompareExecutor):
             result_detail = self._detail_set(base_dump, other_dump, component_results, base_service)
             result.add_component(result_detail)
 
-        for base_file in only_base_files:
+        for base_file in less_dumps:
             self.count_cmp_result(count_result, CMP_RESULT_LESS)
             data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_LESS, base_file, '')
             result.add_component(data)
 
-        for other_file in only_other_file:
+        for other_file in more_dumps:
             self.count_cmp_result(count_result, CMP_RESULT_MORE)
             data = CompareResultComponent(CMP_TYPE_SERVICE, CMP_RESULT_MORE, '', other_file)
             result.add_component(data)

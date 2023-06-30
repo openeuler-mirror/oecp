@@ -21,8 +21,10 @@ from datetime import datetime
 
 from oecp.proxy.rpm_proxy import RPMProxy
 from oecp.utils.shell import shell_cmd
-from oecp.result.constants import STAND_DISTS, CMP_SAME_RESULT, CMP_TYPE_KCONFIG, BASE_SIDE, OSV_SIDE, PAT_SO, \
-    CMP_TYPE_RPM_ABI, CMP_RESULT_MORE, CMP_RESULT_LESS, CMP_RESULT_SAME, CMP_RESULT_DIFF, CMP_RESULT_CHANGE
+from oecp.result.constants import CMP_DIFF_RESULT, CMP_TYPE_KCONFIG, BASE_SIDE, OSV_SIDE, PAT_SO, CMP_SAME_FILES, \
+    CMP_TYPE_RPM_ABI, CMP_RESULT_MORE, CMP_RESULT_LESS, CMP_RESULT_SAME, CMP_RESULT_DIFF, CMP_RESULT_CHANGE, \
+    PAT_DIR_VERSION, PAT_VER_CHANGED, UPSTREAM_DIST, CHANGE_DIRECTORY_VERSION, CHANGE_DIST_IN_FILENAME, STAND_DISTS, \
+    CHANGE_FILE_VERSION, CHANGE_FILE_TYPE, CHANGE_LINKFILE_VERSION, CHANGE_LINK_TARGET_VERSION, CHANGE_LINK_TARGET_FILE
 
 # 两者category指定的级别不同或者未指定
 
@@ -37,7 +39,11 @@ class CompareExecutor(ABC):
         self.base_dump = base_dump
         self.other_dump = other_dump
         self.config = config
+        self.base_dist = STAND_DISTS.get(BASE_SIDE)
+        self.osv_dist = STAND_DISTS.get(OSV_SIDE)
+        self.re_version = re.compile(PAT_VER_CHANGED)
         self.split_flag = '__rpm__'
+        self.link = '_[link]_'
 
     @staticmethod
     def format_dump_kv(data_a, data_b, kind):
@@ -146,13 +152,13 @@ class CompareExecutor(ABC):
 
     @staticmethod
     def count_cmp_result(count_result, cmp_result):
-        if cmp_result in CMP_SAME_RESULT:
+        if cmp_result in CMP_SAME_FILES:
             count_result["same"] += 1
         elif cmp_result == CMP_RESULT_LESS:
             count_result["less"] += 1
         elif cmp_result == CMP_RESULT_MORE:
             count_result["more"] += 1
-        elif cmp_result == CMP_RESULT_DIFF:
+        elif cmp_result in CMP_DIFF_RESULT:
             count_result["diff"] += 1
 
     @staticmethod
@@ -204,30 +210,6 @@ class CompareExecutor(ABC):
         if arch_a == arch_b:
             return True
         return False
-
-    @staticmethod
-    def get_version_change_files(side_a_file, side_b_file, flag_v=None):
-        side_a_floders = side_a_file.split('/')
-        side_b_floders = side_b_file.split('/')
-        compare_result = CMP_RESULT_CHANGE
-        if len(side_a_floders) == len(side_b_floders):
-            for index in range(1, len(side_a_floders) - 1):
-                floder_a = side_a_floders[index]
-                floder_b = side_b_floders[index]
-                if floder_a == floder_b:
-                    continue
-                elif floder_a.split(STAND_DISTS.get(BASE_SIDE)) == floder_b.split(STAND_DISTS.get(OSV_SIDE)):
-                    continue
-                elif flag_v and floder_a.replace(flag_v[0], '') == floder_b.replace(flag_v[1], ''):
-                    continue
-                elif re.search('\\d+\\.\\d+', floder_a) and re.search('\\d+\\.\\d+', floder_b):
-                    continue
-                else:
-                    compare_result = CMP_RESULT_DIFF
-                    break
-            return compare_result
-        else:
-            return CMP_RESULT_DIFF
 
     @staticmethod
     def format_dump_file(data_a, data_b):
@@ -285,17 +267,6 @@ class CompareExecutor(ABC):
         return set(all_pvds)
 
     @staticmethod
-    def mapping_files(files, flag):
-        map_result = {}
-        for file in files:
-            pat_other = re.compile(r"(\d+\.\d+\.\d+)|(\d+\.\d+)|(v\d{8}-\d{4})|(-[a-z0-9]{32})")
-            simple_file = file.replace(flag, '')
-            remove_version_file = re.sub(pat_other, '', simple_file)
-            map_result.setdefault(remove_version_file, file)
-
-        return map_result
-
-    @staticmethod
     def get_soname(library_file):
         cmd = f'objdump -p {library_file}'
         ret, out, err = shell_cmd(cmd.split())
@@ -307,6 +278,44 @@ class CompareExecutor(ABC):
 
         return library_file
 
+    def get_version_change_files(self, base_file, other_file, flag_v=None):
+        base_floders = base_file.split('/')
+        other_floders = other_file.split('/')
+        compare_result = CMP_RESULT_CHANGE
+        if len(base_floders) == len(other_floders):
+            for index in range(1, len(base_floders) - 1):
+                floder_base, floder_other = base_floders[index], other_floders[index]
+                simp_floder_base = re.sub(self.re_version, '', floder_base)
+                simp_floder_other = re.sub(self.re_version, '', floder_other)
+                if floder_base == floder_other:
+                    continue
+                elif floder_base.replace(self.base_dist, '') == floder_other.replace(self.osv_dist, ''):
+                    continue
+                elif flag_v and floder_base.replace(flag_v[0], '') == floder_other.replace(flag_v[1], ''):
+                    continue
+                elif simp_floder_base == simp_floder_other:
+                    continue
+                elif floder_base in UPSTREAM_DIST and floder_other in UPSTREAM_DIST:
+                    continue
+                else:
+                    compare_result = CMP_RESULT_DIFF
+                    break
+            return compare_result
+        else:
+            return CMP_RESULT_DIFF
+
+    def mapping_files(self, files, flag_vrd, dist):
+        map_result = {}
+        for file in sorted(files):
+            # 文件目录中含软件包version-release.dist.arch标识
+            truncate_vrd_dist = file.replace(flag_vrd, '').replace(dist, '')
+            truncate_dir_version = re.sub(PAT_DIR_VERSION, '', os.path.dirname(truncate_vrd_dist))
+            truncate_newfile = os.path.join(truncate_dir_version, os.path.basename(truncate_vrd_dist))
+            truncate_filename = str(truncate_newfile).split(self.link)[0].rstrip('.md')
+            map_result.setdefault(truncate_filename, file)
+
+        return map_result
+
     def get_library_pairs(self, base_file, other_file):
         base_soname = self.get_soname(base_file)
         other_soname = self.get_soname(other_file)
@@ -315,82 +324,111 @@ class CompareExecutor(ABC):
 
         return False
 
-    def format_dump(self, data_a, data_b, flag_v_r_d):
+    def format_dump(self, base_datas, other_datas, flag_vrd):
         """
         抓取相对路径相同或版本变化的文件对
-        @param data_a: dump_a获取的文件全路径
-        @param data_b: dump_b获取的文件全路径
-        @param flag_v_r_d: version+release+dist标识
+        @param base_datas: dump_base获取的文件全路径
+        @param other_datas: dump_other获取的文件全路径
+        @param flag_vrd: version+release+dist标识
         @return: 返回相对路径
         """
-        set_files_a = set([f.split(self.split_flag)[-1] for f in data_a])
-        set_files_b = set([f.split(self.split_flag)[-1] for f in data_b])
-        common_dump, change_dump, only_a, only_b = self.format_changed_files(set_files_a, set_files_b, flag_v_r_d)
+        base_files = set([data.split(self.split_flag)[-1] for data in base_datas])
+        other_files = set([data.split(self.split_flag)[-1] for data in other_datas])
+        common_dump = base_files & other_files
+        change_dump, only_base_dump, only_other_dump = self.format_changed_files(base_files, other_files, flag_vrd)
         all_dump = [
             [[x, x, CMP_RESULT_SAME] for x in common_dump],
-            [[x[0], x[1], CMP_RESULT_CHANGE] for x in change_dump],
-            [[x, '', CMP_RESULT_LESS] for x in only_a],
-            [['', x, CMP_RESULT_MORE] for x in only_b]
+            [self.judge_changed_type(x, flag_vrd) for x in change_dump],
+            [[x, '', CMP_RESULT_LESS] for x in only_base_dump],
+            [['', x, CMP_RESULT_MORE] for x in only_other_dump]
         ]
 
         return all_dump
 
-    def format_fullpath_files(self, data_a, data_b, flag_v_r_d):
+    def format_fullpath_files(self, base_datas, other_datas, flag_vrd):
         """
         抓取相对路径相同或版本变化的文件对
-        @param data_a: 相对路径与文件绝对能路径映射
-        @param data_b: 同上
-        @param flag_v_r_d:
+        @param base_datas: 基准rpm包特定类型文件
+        @param other_datas: 需要对比的rpm包特定类型文件
+        @param flag_vrd: version+release+dist标识
         @return: 返回绝对路径
         """
-        set_files_a, set_files_b = set(data_a.keys()), set(data_b.keys())
-        common_dump, change_dump, only_a, only_b = self.format_changed_files(set_files_a, set_files_b, flag_v_r_d)
-        common_pairs = [[data_a.get(y), data_b.get(y)] for y in common_dump]
-        common_pairs.extend([[data_a.get(y[0]), data_b.get(y[1])] for y in change_dump])
+        map_base_files = self.split_files_mapping(base_datas)
+        map_other_files = self.split_files_mapping(other_datas)
+        base_files, other_files = set(map_base_files.keys()), set(map_other_files.keys())
+        common_dump = base_files & other_files
+        change_dump, only_base_dump, only_other_dump = self.format_changed_files(base_files, other_files, flag_vrd)
+        common_pairs = [[map_base_files.get(y), map_other_files.get(y)] for y in common_dump]
+        common_pairs.extend([[map_base_files.get(y[0]), map_other_files.get(y[1])] for y in change_dump])
 
-        return common_pairs, only_a, only_b
+        return common_pairs, only_base_dump, only_other_dump
 
-    def format_changed_files(self, dump_set_a, dump_set_b, flag_v_r_d):
+    def format_changed_files(self, base_dumps, other_dumps, flag_vrd):
         """
         识别文件路径、文件名中存在以rpm包（version+release+dist/dist标识/x.x.x版本号）命名的相同文件对
-        @param dump_set_a: 缺失文件
-        @param dump_set_b: 新增文件
-        @param flag_v_r_d: version+release+dist标识
+        @param base_dumps: 缺失文件
+        @param other_dumps: 新增文件
+        @param flag_vrd: version+release+dist标识
         """
-        common_dump = dump_set_a & dump_set_b
-        only_dump_a = dump_set_a - dump_set_b
-        only_dump_b = dump_set_b - dump_set_a
+        only_dump_base = base_dumps - other_dumps
+        only_dump_other = other_dumps - base_dumps
         change_dump = []
+        datas_base = self.mapping_files(only_dump_base, flag_vrd[0], self.base_dist)
+        datas_other = self.mapping_files(only_dump_other, flag_vrd[1], self.osv_dist)
+        for simple_file in datas_other.keys():
+            if datas_base.get(simple_file):
+                base_file = datas_base.get(simple_file)
+                other_file = datas_other.get(simple_file)
+                change_dump.append([base_file, other_file])
+                only_dump_base.discard(base_file)
+                only_dump_other.discard(other_file)
 
-        datas_a = self.mapping_files(only_dump_a, flag_v_r_d[0])
-        datas_b = self.mapping_files(only_dump_b, flag_v_r_d[1])
-        """
-        eg: /usr/src/kernels/6.1.6-1.0.0.3.oe1.aarch64
-            /usr/src/kernels/6.1.8-1.0.0.5.oe1.aarch64
-        """
-        for simple_a in datas_a.keys():
-            if datas_b.get(simple_a):
-                file_a = datas_a.get(simple_a)
-                file_b = datas_b.get(simple_a)
-                change_dump.append([file_a, file_b])
-                only_dump_a.discard(file_a)
-                only_dump_b.discard(file_b)
-
-        for side_a_file in list(only_dump_a):
-            for side_b_file in list(only_dump_b):
-                get_result = CMP_RESULT_DIFF
-                file_a, file_b = os.path.basename(side_a_file), os.path.basename(side_b_file)
-                if file_a == file_b or file_a.split(STAND_DISTS.get(BASE_SIDE)) == file_b.split(
-                        STAND_DISTS.get(OSV_SIDE)):
-                    get_result = self.get_version_change_files(side_a_file, side_b_file)
-
-                if get_result == CMP_RESULT_CHANGE:
-                    change_dump.append([side_a_file, side_b_file])
-                    only_dump_a.discard(side_a_file)
-                    only_dump_b.discard(side_b_file)
+        sort_other_files, sort_base_files = sorted(only_dump_other), sorted(only_dump_base)
+        for other_file in sort_other_files:
+            for base_file in sort_base_files:
+                if base_file not in only_dump_base:
+                    continue
+                base_filename, other_filename = os.path.basename(base_file), os.path.basename(other_file)
+                simp_base_name = re.sub(self.re_version, '', base_filename)
+                simp_other_name = re.sub(self.re_version, '', other_filename)
+                if simp_base_name.lower() == simp_other_name.lower() or base_filename.replace(self.base_dist, '') == \
+                        other_filename.replace(self.osv_dist, ''):
+                    get_result = self.get_version_change_files(base_file, other_file, flag_vrd)
+                    if get_result == CMP_RESULT_DIFF:
+                        continue
+                    change_dump.append([base_file, other_file])
+                    only_dump_base.discard(base_file)
+                    only_dump_other.discard(other_file)
                     break
 
-        return common_dump, change_dump, only_dump_a, only_dump_b
+        return change_dump, only_dump_base, only_dump_other
+
+    def judge_changed_type(self, pair, flag_vrd):
+        base_file, other_file = pair[0], pair[1]
+        link_result = list(filter(lambda x: self.link in x, [base_file, other_file]))
+        if not link_result:
+            base_name, other_name = os.path.basename(base_file), os.path.basename(other_file)
+            if base_name == other_name:
+                changed_result = [base_file, other_file, CHANGE_DIRECTORY_VERSION]
+            elif base_name.replace(self.base_dist, '') == other_name.replace(self.osv_dist, ''):
+                changed_result = [base_file, other_file, CHANGE_DIST_IN_FILENAME]
+            else:
+                changed_result = [base_file, other_file, CHANGE_FILE_VERSION]
+        elif len(link_result) == 1:
+            changed_result = [base_file, other_file, CHANGE_FILE_TYPE]
+        else:
+            base_linkfile, base_target_file = base_file.split(self.link)
+            other_linkfile, other_target_file = other_file.split(self.link)
+            link_target_a = re.sub(self.re_version, '', base_target_file.replace(flag_vrd[0], ''))
+            link_target_b = re.sub(self.re_version, '', other_target_file.replace(flag_vrd[1], ''))
+            if base_target_file == other_target_file:
+                changed_result = [base_file, other_file, CHANGE_LINKFILE_VERSION]
+            elif link_target_a == link_target_b:
+                changed_result = [base_file, other_file, CHANGE_LINK_TARGET_VERSION]
+            else:
+                changed_result = [base_file, other_file, CHANGE_LINK_TARGET_FILE]
+
+        return changed_result
 
     def split_files_mapping(self, dump_files, model=''):
         map_files = {}
@@ -401,25 +439,6 @@ class CompareExecutor(ABC):
             map_files.setdefault(focus_file.split(self.split_flag)[-1], focus_file)
 
         return map_files
-
-    def split_common_files(self, files_a, files_b):
-        common_file_pairs, common_file_a, common_file_b = [], [], []
-        for file_a in files_a:
-            for file_b in files_b:
-                path_a, path_b = file_a.split('__rpm__')[-1], file_b.split('__rpm__')[-1]
-                if path_a == path_b:
-                    common_file_pairs.append([file_a, file_b])
-                    common_file_a.append(file_a)
-                    common_file_b.append(file_b)
-                elif os.path.basename(path_a) == os.path.basename(path_b):
-                    cmp_result = self.get_version_change_files(path_a, path_b)
-                    if cmp_result in CMP_SAME_RESULT:
-                        common_file_pairs.append([file_a, file_b])
-                        common_file_a.append(file_a)
-                        common_file_b.append(file_b)
-        only_file_a = list(set(files_a) - set(common_file_a))
-        only_file_b = list(set(files_b) - set(common_file_b))
-        return common_file_pairs, only_file_a, only_file_b
 
     def match_library_pairs(self, base_datas, other_datas, flag_vrd, model):
         map_files_base = self.split_files_mapping(base_datas, model)
@@ -460,7 +479,7 @@ class CompareExecutor(ABC):
 
         return [
             [[x, x, CMP_RESULT_SAME] for x in common_dump],
-            [[x[0], x[1], CMP_RESULT_CHANGE] for x in dump_os_changed],
+            [self.judge_changed_type(x, flag_vrd) for x in dump_os_changed],
             [[x, '', CMP_RESULT_LESS] for x in less_dump],
             [['', x, CMP_RESULT_MORE] for x in more_dump]
         ]

@@ -19,17 +19,6 @@
       }
     },
     {
-      "name": "filelist",
-      "dumper": "FileListDumper",
-      "executor": "list.ListCompareExecutor",
-      "config": {
-        "compare_type": "CMP_TYPE_RPM_FILES",
-        "strict": true,
-        "short_circut": false,
-        "show_same": true
-      }
-    },
-    {
       "name": "requires",
       "dumper": "RequiresDumper",
       "executor": "nvs.NVSCompareExecutor",
@@ -45,12 +34,23 @@
         "compare_type": "CMP_TYPE_RPM_PROVIDES"
       }
     },
-      {
+    {
       "name": "extract",
       "dumper": "RPMExtractDumper",
       "executor": "null.NullExecutor",
       "config": {
         "compare_type": "CMP_TYPE_NULL"
+      }
+    },
+    {
+      "name": "filelist",
+      "dumper": "FileListDumper",
+      "executor": "list.ListCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_RPM_FILES",
+        "strict": true,
+        "short_circut": false,
+        "show_same": true
       }
     },
     {

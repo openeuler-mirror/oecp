@@ -15,13 +15,18 @@
 # Description: repository
 # **********************************************************************************
 """
+import logging
+import os
 import re
 from collections import UserDict
 import tempfile
 
+from oecp.proxy.rpm_proxy import RPMProxy
+from oecp.result.compare_result import CompareResultComposite
+from oecp.result.constants import CMP_TYPE_REPOSITORY, CMP_RESULT_TO_BE_DETERMINED
 from oecp.utils.misc import path_is_remote, basename_of_path
 from oecp.proxy.requests_proxy import do_download
-from oecp.result.compare_result import *
+
 from oecp.utils.shell import shell_cmd
 
 logger = logging.getLogger("oecp")

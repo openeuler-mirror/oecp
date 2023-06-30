@@ -15,9 +15,14 @@
 # Description: similarity
 # **********************************************************************************
 """
+import os
+import logging
 
-from oecp.result.test_result import *
-from oecp.result.json_result import *
+from oecp.proxy.rpm_proxy import RPMProxy
+from oecp.result.test_result import get_perf_reg, load_json_result, small_better
+from oecp.result.constants import CMP_TYPE_RPM, SIMILARITY_TYPES, KERNEL_TYPES, CMP_TYPE_RPMS_TEST, CMP_TYPE_AT, \
+    CMP_TYPE_CI_CONFIG, CMP_TYPE_PERFORMANCE, CMP_TYPE_RPM_ABI, PKG_SIMILARITY_SON_TYPES, CMP_TYPE_RPM_FILES, \
+    CMP_SAME_RESULT, RESULT_SAME, CMP_RESULT_DIFF, CMP_RESULT_LESS, CMP_TYPE_RPM_LEVEL
 
 logger = logging.getLogger("oecp")
 
@@ -31,12 +36,8 @@ PKG_NAME = {
 }
 
 
-def get_similarity(rows, side_a, side_b):
-    similarity = {}
+def count_all_cmp_type_result(rows):
     count = {}
-    count_rpm_level, _ = rpm_count(rows, side_a, side_b)
-    count_rpm_test = rpm_test_count(rows.get(CMP_TYPE_RPM))
-
     for keys, results in rows.items():
         if not isinstance(results, list):
             for rpm_type, rpm_results in results.items():
@@ -45,46 +46,62 @@ def get_similarity(rows, side_a, side_b):
                         count_single_result(count, result, rpm_type)
                 elif rpm_type in KERNEL_TYPES:
                     count_kernel_result(count, rpm_results, rpm_type, keys)
+    return count
 
+
+def get_pkg_similarity(similarity, count_rpm_level):
     level1_name_rate = count_rate(count_rpm_level.get(1).get("same"),
                                   count_rpm_level.get(1).get("same") + count_rpm_level.get(1).get("diff"))
     level2_same = count_rpm_level.get(1).get("same") + count_rpm_level.get(2).get("same")
     level2_diff = count_rpm_level.get(1).get("diff") + count_rpm_level.get(2).get("diff")
     leve2_name_rate = count_rate(level2_same, (level2_same + level2_diff))
-    core_pkg_rate = count_rate(count_rpm_level.get("core_pkg").get("same"),
-                               count_rpm_level.get("core_pkg").get("same") + count_rpm_level.get("core_pkg").get(
-                                   "diff"))
+    core_pkg_rate = count_rate(count_rpm_level.get("core_pkg").get("same"), count_rpm_level.get("core_pkg").get("same")
+                               + count_rpm_level.get("core_pkg").get("diff"))
     similarity["core_pkg"] = core_pkg_rate
     similarity["level1 pkg"] = level1_name_rate
     similarity["level2 pkg"] = leve2_name_rate
     similarity["all_pkg"] = get_all_pkg_simlarity(count_rpm_level)
 
-    rmp_test_score = count_rate(count_rpm_test.get("same"),
-                                (count_rpm_test.get("same") + count_rpm_test.get("diff")))
+
+def get_platform_similarity(similarity, count_rpm_test, rows, side_other):
+    rmp_test_score = count_rate(count_rpm_test.get("same"), (count_rpm_test.get("same") + count_rpm_test.get("diff")))
     similarity[CMP_TYPE_RPMS_TEST] = rmp_test_score
 
     count_ciconfig = ci_test_count(rows.get(CMP_TYPE_CI_CONFIG), "same")
     similarity[CMP_TYPE_CI_CONFIG] = count_rate(count_ciconfig.get("same"),
                                                 (count_ciconfig.get("same") + count_ciconfig.get("diff")))
-
     count_at = ci_test_count(rows.get(CMP_TYPE_AT), "pass")
     similarity[CMP_TYPE_AT] = count_rate(count_at.get("same"), count_at.get("same") + count_at.get("diff"))
 
-    similarity[CMP_TYPE_PERFORMANCE] = performance_rate(rows.get(CMP_TYPE_PERFORMANCE), side_b)
+    similarity[CMP_TYPE_PERFORMANCE] = performance_rate(rows.get(CMP_TYPE_PERFORMANCE), side_other)
 
-    for count_type, result in count.items():
+
+def get_abi_similarity(similarity, count, count_type):
+    count_abi = count.get(count_type)
+    l0_rate = count_rate(count_abi.get(0).get("same"),
+                         count_abi.get(0).get("same") + count_abi.get(0).get("diff"))
+    l1_rate = count_rate(count_abi.get(1).get("same"),
+                         count_abi.get(1).get("same") + count_abi.get(1).get("diff"))
+    l2_same = count_abi.get(1).get("same") + count_abi.get(2).get("same")
+    l2_diff = count_abi.get(1).get("diff") + count_abi.get(2).get("diff")
+    l2_rate = count_rate(l2_same, l2_same + l2_diff)
+    similarity["level0 " + count_type] = l0_rate
+    similarity["level1 " + count_type] = l1_rate
+    similarity["level2 " + count_type] = l2_rate
+
+
+def get_similarity(rows, side_base, side_other):
+    similarity = {}
+    count_rpm_level, _ = rpm_count(rows, side_base, side_other)
+    count_rpm_test = rpm_test_count(rows.get(CMP_TYPE_RPM))
+    count = count_all_cmp_type_result(rows)
+
+    get_pkg_similarity(similarity, count_rpm_level)
+    get_platform_similarity(similarity, count_rpm_test, rows, side_other)
+
+    for count_type in count:
         if count_type == CMP_TYPE_RPM_ABI:
-            count_abi = count.get(count_type)
-            l0_rate = count_rate(count_abi.get(0).get("same"),
-                                 count_abi.get(0).get("same") + count_abi.get(0).get("diff"))
-            l1_rate = count_rate(count_abi.get(1).get("same"),
-                                 count_abi.get(1).get("same") + count_abi.get(1).get("diff"))
-            l2_same = count_abi.get(1).get("same") + count_abi.get(2).get("same")
-            l2_diff = count_abi.get(1).get("diff") + count_abi.get(2).get("diff")
-            l2_rate = count_rate(l2_same, l2_same + l2_diff)
-            similarity["level0 " + count_type] = l0_rate
-            similarity["level1 " + count_type] = l1_rate
-            similarity["level2 " + count_type] = l2_rate
+            get_abi_similarity(similarity, count, count_type)
         elif count_type in KERNEL_TYPES:
             rate = 0
             for single_kernel in count.get(count_type).values():
@@ -98,6 +115,7 @@ def get_similarity(rows, side_a, side_b):
         rate = count_rate(count.get(count_type).get("all").get("same"),
                           count.get(count_type).get("all").get("same") + count.get(count_type).get("all").get("diff"))
         similarity[count_type] = rate
+
     return similarity
 
 
@@ -209,7 +227,7 @@ def is_same_rpm(rpm_cmp_result):
             continue
         for row in result:
             if row.get("compare type") == CMP_TYPE_RPM_FILES:
-                if row.get("compare result") == CMP_RESULT_MORE or row.get("compare result") == CMP_RESULT_CHANGE:
+                if row.get("compare result") in CMP_SAME_RESULT:
                     continue
             if row.get("compare result") not in RESULT_SAME:
                 return False

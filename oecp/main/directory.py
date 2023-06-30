@@ -15,6 +15,8 @@
 # Description: directory
 # **********************************************************************************
 """
+import logging
+import os
 from multiprocessing import Pool, cpu_count
 from collections import UserDict
 import re
@@ -22,12 +24,14 @@ import tempfile
 from bs4 import BeautifulSoup as bs
 from defusedxml.ElementTree import parse
 
-from oecp.result.compare_result import *
 from oecp.proxy.rpm_proxy import RPMProxy
 from oecp.proxy.requests_proxy import do_download
+from oecp.result.compare_result import CompareResultComposite
 from oecp.utils.shell import shell_cmd
 from oecp.main.mapping import SQLiteMapping
 from oecp.main.repository import Repository
+from oecp.result.constants import OTHER_KERNEL_NAMES, KERNEL, CMP_TYPE_DIRECTORY, STAND_DISTS, CMP_TYPE_ISO, \
+    BASE_SIDE, OSV_SIDE, CMP_RESULT_TO_BE_DETERMINED, CMP_TYPE_REQUIRES, CMP_TYPE_DIST_REPOSITORY
 
 logger = logging.getLogger("oecp")
 

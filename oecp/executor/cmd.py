@@ -17,7 +17,7 @@ import logging
 
 from oecp.executor.base import CompareExecutor
 from oecp.result.compare_result import CompareResultComposite, CompareResultComponent
-from oecp.result.constants import *
+from oecp.result.constants import CMP_RESULT_SAME, CMP_TYPE_RPM, CMP_SAME_RESULT, CMP_RESULT_DIFF
 
 logger = logging.getLogger('oecp')
 
