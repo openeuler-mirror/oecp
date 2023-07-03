@@ -220,20 +220,20 @@ CTG_LEVEL = "category level"
 
 # COMPARE FILE CHANGED VERSION RE PATTERNS
 PAT_VER_CHANGED = [
-    "[-_.][a-z0-9]{16}\.",
-    "[-_.][a-z0-9]{32}(\.)?",
-    "[-_.][a-z0-9]{64}\.",
-    "[-.]\d(.\d){2}_[0-9a-z]{9}",
-    "python3-",
-    "py(thon)?[2,3]\.\w+",
-    "java-(\d+\.){0,2}\d+-openjdk-",
-    "([-_]?\d+)(\.\d+){0,3}"
+    r"[-_.][a-z0-9]{16}\.",
+    r"[-_.][a-z0-9]{32}(\.)?",
+    r"[-_.][a-z0-9]{64}\.",
+    r"[-.]\d(.\d){2}_[0-9a-z]{9}",
+    r"python3-",
+    r"py(thon)?[2,3]\.\w+",
+    r"java-(\d+\.){0,2}\d+-openjdk-",
+    r"([-_]?\d+)(\.\d+){0,3}"
 ]
 PAT_DIR_VERSION = [
-    "[-/](\d+\.){0,3}\d+",
-    "java-(\d+\.){0,2}\d+-openjdk-",
-    "_(\d+\.){3}v\d{8}-\d{4}",
-    "py(thon)?[2,3]\.\d+"
+    r"[-/](\d+\.){0,3}\d+",
+    r"java-(\d+\.){0,2}\d+-openjdk-",
+    r"_(\d+\.){3}v\d{8}-\d{4}",
+    r"py(thon)?[2,3]\.\d+"
 ]
 PAT_SO = r"(-?\d*([-_.]\d+){0,3}(\.cpython-(.*)-linux-gnu)?\.(so|a)([-_.][\dA-Za-z]+){0,4})|-[a-z0-9]{16}.(so|rlib)"
 

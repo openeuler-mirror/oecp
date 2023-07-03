@@ -68,5 +68,14 @@ class CompareExecutorTestFilelist(CompareExecutor):
         self.dump_b = dump_b
         self.config = config
 
+    def compare(self):
+        result = {}
+        if hasattr(self.dump_a, 'run') and hasattr(self.dump_a, 'run'):
+            self.dump_a.run()
+            self.dump_b.run()
+
+        return result
+
     def run(self):
-        return []
+        result = self.compare()
+        return result
