@@ -32,6 +32,7 @@ CHANGE_FILE_TYPE = "File type changed"
 CHANGE_LINK_TARGET_FILE = "Link target file changed"
 CHANGE_LINK_TARGET_VERSION = "Link target version changed"
 CHANGE_DIST_IN_FILENAME = "Dist in filename changed"
+CHANGE_FILE_FORMAT = "File format changed"
 
 # COMPARE_TYPE
 CMP_TYPE_PLAIN = "plain"
@@ -120,7 +121,8 @@ CMP_DIFF_RESULT = [
     CHANGE_FILE_VERSION,
     CHANGE_LINKFILE_VERSION,
     CHANGE_LINK_TARGET_FILE,
-    CHANGE_LINK_TARGET_VERSION
+    CHANGE_LINK_TARGET_VERSION,
+    CHANGE_FILE_FORMAT
 ]
 
 CMP_SAME_RESULT = [
@@ -130,7 +132,8 @@ CMP_SAME_RESULT = [
     CHANGE_DIST_IN_FILENAME,
     CHANGE_FILE_VERSION,
     CHANGE_LINKFILE_VERSION,
-    CHANGE_LINK_TARGET_VERSION
+    CHANGE_LINK_TARGET_VERSION,
+    CHANGE_FILE_FORMAT
 ]
 
 CMP_SERVICE_SAME = [
@@ -215,11 +218,27 @@ CMP_TYPE = "compare type"
 CMP_RESULT = "compare result"
 CTG_LEVEL = "category level"
 
-# RE PATTERNS
-PAT_VER_CHANGED = r"[-_.][a-z0-9]{16}\.|[-_.]\w{32}\.|[-_.]\w{64}\.|[-.]\d(.\d){2}_[0-9a-z]{9}|python3-|" \
-                  r"py(thon)?[2,3]\.\w+|java-(\d+\.){0,2}\d+-openjdk-|([-_]?\d+)(\.\d+){0,3}"
+# COMPARE FILE CHANGED VERSION RE PATTERNS
+PAT_VER_CHANGED = [
+    r"[-_.][a-z0-9]{16}\.",
+    r"[-_.][a-z0-9]{32}(\.)?",
+    r"[-_.][a-z0-9]{64}\.",
+    r"[-.]\d(.\d){2}_[0-9a-z]{9}",
+    r"python3-",
+    r"py(thon)?[2,3]\.\w+",
+    r"java-(\d+\.){0,2}\d+-openjdk-",
+    r"([-_]?\d+)(\.\d+){0,3}"
+]
+PAT_DIR_VERSION = [
+    r"[-/](\d+\.){0,3}\d+",
+    r"java-(\d+\.){0,2}\d+-openjdk-",
+    r"_(\d+\.){3}v\d{8}-\d{4}",
+    r"py(thon)?[2,3]\.\d+"
+]
 PAT_SO = r"(-?\d*([-_.]\d+){0,3}(\.cpython-(.*)-linux-gnu)?\.(so|a)([-_.][\dA-Za-z]+){0,4})|-[a-z0-9]{16}.(so|rlib)"
-PAT_DIR_VERSION = r"[-/](\d+\.){0,3}\d+|java-(\d+\.){0,2}\d+-openjdk-|_(\d+\.){3}v\d{8}-\d{4}|py(thon)?[2,3]\.\d+"
+
+# COMPRESS FORMAT
+CHANGE_FORMATS = [".md", ".xz"]
 
 # SOME UPSTREAM DIST COUPING WITH FILES DIRECTORY.
 OPENEULER = "openeuler"

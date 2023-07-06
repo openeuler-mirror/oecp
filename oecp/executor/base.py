@@ -24,7 +24,8 @@ from oecp.utils.shell import shell_cmd
 from oecp.result.constants import CMP_DIFF_RESULT, CMP_TYPE_KCONFIG, BASE_SIDE, OSV_SIDE, PAT_SO, CMP_SAME_FILES, \
     CMP_TYPE_RPM_ABI, CMP_RESULT_MORE, CMP_RESULT_LESS, CMP_RESULT_SAME, CMP_RESULT_DIFF, CMP_RESULT_CHANGE, \
     PAT_DIR_VERSION, PAT_VER_CHANGED, UPSTREAM_DIST, CHANGE_DIRECTORY_VERSION, CHANGE_DIST_IN_FILENAME, STAND_DISTS, \
-    CHANGE_FILE_VERSION, CHANGE_FILE_TYPE, CHANGE_LINKFILE_VERSION, CHANGE_LINK_TARGET_VERSION, CHANGE_LINK_TARGET_FILE
+    CHANGE_FILE_VERSION, CHANGE_FILE_TYPE, CHANGE_LINKFILE_VERSION, CHANGE_LINK_TARGET_VERSION, CHANGE_FORMATS, \
+    CHANGE_FILE_FORMAT, CHANGE_LINK_TARGET_FILE
 
 # 两者category指定的级别不同或者未指定
 
@@ -41,7 +42,7 @@ class CompareExecutor(ABC):
         self.config = config
         self.base_dist = STAND_DISTS.get(BASE_SIDE)
         self.osv_dist = STAND_DISTS.get(OSV_SIDE)
-        self.re_version = re.compile(PAT_VER_CHANGED)
+        self.re_version = re.compile("|".join(PAT_VER_CHANGED))
         self.split_flag = '__rpm__'
         self.link = '_[link]_'
 
@@ -278,6 +279,19 @@ class CompareExecutor(ABC):
 
         return library_file
 
+    @staticmethod
+    def clear_file_change_ext(file_path):
+        """
+        去掉压缩文件后缀，能够识别文件与它的压缩文件名
+        @param file_path:
+        @return:
+        """
+        _, file_ext = os.path.splitext(file_path)
+        if file_ext in CHANGE_FORMATS:
+            return file_path.rstrip(file_ext)
+
+        return file_path
+
     def get_version_change_files(self, base_file, other_file, flag_v=None):
         base_floders = base_file.split('/')
         other_floders = other_file.split('/')
@@ -308,11 +322,13 @@ class CompareExecutor(ABC):
         map_result = {}
         for file in sorted(files):
             # 文件目录中含软件包version-release.dist.arch标识
+            dir_pattern = re.compile("|".join(PAT_DIR_VERSION))
             truncate_vrd_dist = file.replace(flag_vrd, '').replace(dist, '')
-            truncate_dir_version = re.sub(PAT_DIR_VERSION, '', os.path.dirname(truncate_vrd_dist))
+            truncate_dir_version = re.sub(dir_pattern, '', os.path.dirname(truncate_vrd_dist))
             truncate_newfile = os.path.join(truncate_dir_version, os.path.basename(truncate_vrd_dist))
-            truncate_filename = str(truncate_newfile).split(self.link)[0].rstrip('.md')
-            map_result.setdefault(truncate_filename, file)
+            truncate_filename = str(truncate_newfile).split(self.link)[0]
+            clear_format_filename = self.clear_file_change_ext(truncate_filename)
+            map_result.setdefault(clear_format_filename, file)
 
         return map_result
 
@@ -323,6 +339,22 @@ class CompareExecutor(ABC):
             return True
 
         return False
+
+    def get_same_filename_pair(self, base_file, other_file):
+        """
+        判断是否为相同文件
+        @param base_file:
+        @param other_file:
+        @return:
+        """
+        base_clear_format = self.clear_file_change_ext(base_file)
+        other_clear_format = self.clear_file_change_ext(other_file)
+        if base_clear_format.lower() == other_clear_format.lower():
+            return True
+        elif base_clear_format.replace(self.base_dist, '') == other_clear_format.replace(self.osv_dist, ''):
+            return True
+        else:
+            return False
 
     def format_dump(self, base_datas, other_datas, flag_vrd):
         """
@@ -391,8 +423,7 @@ class CompareExecutor(ABC):
                 base_filename, other_filename = os.path.basename(base_file), os.path.basename(other_file)
                 simp_base_name = re.sub(self.re_version, '', base_filename)
                 simp_other_name = re.sub(self.re_version, '', other_filename)
-                if simp_base_name.lower() == simp_other_name.lower() or base_filename.replace(self.base_dist, '') == \
-                        other_filename.replace(self.osv_dist, ''):
+                if self.get_same_filename_pair(simp_base_name, simp_other_name):
                     get_result = self.get_version_change_files(base_file, other_file, flag_vrd)
                     if get_result == CMP_RESULT_DIFF:
                         continue
@@ -413,7 +444,12 @@ class CompareExecutor(ABC):
             elif base_name.replace(self.base_dist, '') == other_name.replace(self.osv_dist, ''):
                 changed_result = [base_file, other_file, CHANGE_DIST_IN_FILENAME]
             else:
-                changed_result = [base_file, other_file, CHANGE_FILE_VERSION]
+                basefile_clear_ext = self.clear_file_change_ext(base_name)
+                otherfile_clear_ext = self.clear_file_change_ext(other_name)
+                if basefile_clear_ext == otherfile_clear_ext:
+                    changed_result = [base_file, other_file, CHANGE_FILE_FORMAT]
+                else:
+                    changed_result = [base_file, other_file, CHANGE_FILE_VERSION]
         elif len(link_result) == 1:
             changed_result = [base_file, other_file, CHANGE_FILE_TYPE]
         else:
