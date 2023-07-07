@@ -34,5 +34,3 @@ class TestRPMProxy(TestCase):
         self.assertEqual(rpm_proxy.rpm_name("netsniff-ng-0.6.8-1.oe2203.rpm"), "netsniff-ng")
         self.assertEqual(rpm_proxy.rpm_name("openapi-spec-validator-help-0.3.1-1.oe2203.noarch.rpm"),
                          "openapi-spec-validator-help")
-
-

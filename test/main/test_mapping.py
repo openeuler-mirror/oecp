@@ -30,10 +30,10 @@ class TestMapping(TestCase):
         cls.logger = logging.getLogger("test")
 
     def test_construct(self):
-       sqlite_file = os.path.join(os.path.dirname(__file__), "data/primary.sqlite")
-       sqlite = SQLiteMapping(sqlite_file)
+        sqlite_file = os.path.join(os.path.dirname(__file__), "data/primary.sqlite")
+        sqlite = SQLiteMapping(sqlite_file)
 
-       self.assertNotEqual(getattr(sqlite, "_sqlite_conn"), None)
+        self.assertNotEqual(getattr(sqlite, "_sqlite_conn"), None)
 
     def test_bz2_sqlite_file(self):
         sqlite_file = "https://repo.openeuler.org/openEuler-20.03-LTS/OS/x86_64/repodata/365dc0e1dafa37b1ea4713a519a12ad1c91adee7bf38c236398e68b1bfada497-primary.sqlite.bz2"
