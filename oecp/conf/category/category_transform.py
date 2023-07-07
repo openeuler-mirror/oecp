@@ -29,15 +29,15 @@ from oecp.proxy.requests_proxy import do_download
 def transform(in_file, out_file):
     flags = os.O_RDWR | os.O_CREAT
     modes = stat.S_IROTH | stat.S_IRWXU
-    with os.fdopen(os.open(in_file, flags, modes), 'w', encoding='utf-8') as f_in:
-        for line in f_in:
-            if "|---|---|---|---|" in line:
-                break
-
-        categories = []
+    categories = []
+    with os.fdopen(os.open(in_file, flags, modes), 'r', encoding='utf-8') as f_in:
         for line in f_in:
             m = re.match(r"\|(.*)\|(.*)\|(.*)\|(.*)\|", line)
+            if not m:
+                continue
             src_rpm, bin_rpm, level, status = m.groups()
+            if not src_rpm.strip().endswith('.src'):
+                continue
             categories.append({"src": src_rpm.strip(), "bin": bin_rpm.strip(),
                                "level": level.strip(), "status": status.strip()})
 

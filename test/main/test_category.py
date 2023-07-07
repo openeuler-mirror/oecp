@@ -12,7 +12,7 @@
 # See the Mulan PSL v2 for more details.
 # Author:
 # Create: 2021-09-07
-# Description: test compare plan
+# Description: test rpm compatibility category
 # **********************************************************************************
 """
 import os
@@ -53,3 +53,4 @@ class TestCategory(TestCase):
         self.assertEqual(category.category_of_src_package("coreutils"), CategoryLevel.CATEGORY_LEVEL_TWO)
         self.assertEqual(category.category_of_src_package("man-db"), CategoryLevel.CATEGORY_LEVEL_THREE)
         self.assertEqual(category.category_of_bin_package("cairo"), CategoryLevel.CATEGORY_LEVEL_NOT_SPECIFIED)
+        self.assertEqual(category.category_of_src_package(""), CategoryLevel.CATEGORY_LEVEL_NOT_SPECIFIED)

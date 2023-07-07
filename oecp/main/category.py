@@ -66,10 +66,10 @@ class Category(object):
                     level = CategoryLevel.level_name_2_enum(category["level"])
                     try:
                         if category["src"]:
-                            name = RPMProxy.rpm_n_v_r_d_a(category["src"], dist="category")[0]
+                            name = RPMProxy.rpm_name(category["src"])
                             self._src_categories[name] = level
                         if category["bin"]:
-                            name = RPMProxy.rpm_n_v_r_d_a(category["bin"], dist="category")[0]
+                            name = RPMProxy.rpm_name(category["bin"])
                             self._bin_categories[name] = level
                     except AttributeError as e:
                         logger.exception(f"\"{category['oecp']}\" or \"{category['bin']}\" is illegal rpm name")

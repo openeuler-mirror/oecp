@@ -19,6 +19,7 @@ import os
 import json
 import logging
 
+from oecp.main.category import Category
 from oecp.result.constants import CMP_RESULT_SAME, CMP_TYPE_CI_FILE_CONFIG, CMP_TYPE_CI_CONFIG, CMP_RESULT_MORE, \
     CMP_RESULT_LESS, CMP_RESULT_DIFF, CMP_TYPE_RPMS_TEST
 
@@ -81,13 +82,13 @@ def cmp_performance_metric(metric, value, avg_b):
     """
     small_better_reg = get_perf_reg()['small_better']
     if small_better(metric, small_better_reg):
-        baseline_avg = value['average'] + (value['average'] * 0.05)
+        baseline_avg = value['average'] * 1.05
         if avg_b:
             cmp_result = 'pass' if avg_b - baseline_avg < 0 else 'fail'
         else:
             cmp_result = ''
     else:
-        baseline_avg = value['average'] - (value['average'] * 0.05)
+        baseline_avg = value['average'] * 0.95
         if avg_b:
             cmp_result = 'fail' if avg_b - baseline_avg < 0 else 'pass'
         else:
@@ -206,8 +207,7 @@ def test_result_parser(side_a, side_b, root_path):
     dump_b = get_test_result(side_b, root_path)
 
     if dump_b and dump_a:
-        category_map = create_category_map()
-        return assain_rpm_test_result(side_a, side_b, dump_a, dump_b, category_map)
+        return assain_rpm_test_result(side_a, side_b, dump_a, dump_b)
     else:
         return [], {}
 
@@ -224,7 +224,7 @@ def assgin_rpm_summay(rpm_test_details, side_a, side_b):
         }
         level = ''
         for v in values:
-            level = v.get("category level") if v.get("category level") else "6"
+            level = v.get("category level")
             summary.setdefault(level, {
                 "category level": level,
                 "[success] " + side_a: 0,
@@ -240,6 +240,7 @@ def assgin_rpm_summay(rpm_test_details, side_a, side_b):
                 summary.get(level)["[fail] " + s] += 1
             else:
                 summary.get(level)["[success] " + s] += 1
+
     return sorted(summary.values(), key=lambda i: i["category level"]) + fail_rows
 
 
@@ -261,19 +262,16 @@ def assgin_fail_test_row(results, fail_rows, side_a, side_b):
         fail_rows.append(row)
 
 
-def assain_rpm_test_result(side_a, side_b, dump_a, dump_b, category_map):
+def assain_rpm_test_result(side_a, side_b, dump_a, dump_b):
     rpm_test_rows = []
     rpm_test_details = {}
     a_keys = dump_a.keys()
     b_keys = dump_b.keys()
     keys = list(set(a_keys).union(set(b_keys)))
+    category_file = os.path.join(os.path.dirname(__file__), "../conf/category/category.json")
     for key in keys:
         va = dump_a.get(key, {})
         vb = dump_b.get(key, {})
-
-        src_side = va.get('rpm_src_name') if va else vb.get('rpm_src_name')
-        category_level = category_map.get(src_side, 'level6')[-1]
-
         defatule_side_a = key if va else ''
         rpm_side_a = va.get('rpm_full_name', defatule_side_a)
         rpm_side_b = vb.get('rpm_full_name', defatule_side_a)
@@ -284,6 +282,7 @@ def assain_rpm_test_result(side_a, side_b, dump_a, dump_b, category_map):
 
         remove_useless_result(va, vb)
         rpm_pkg = key
+        category_level = Category(category_file).category_of_bin_package(rpm_pkg)
         rpm_cmp_result = compare(va, vb)
         rpm_test_details.setdefault(rpm_pkg, {})
         rpm_test_details.get(rpm_pkg)[CMP_TYPE_RPMS_TEST] = assain_rpm_test_details(rpm_pkg, side_a, side_b, va, vb,
@@ -297,7 +296,7 @@ def assain_rpm_test_result(side_a, side_b, dump_a, dump_b, category_map):
             "compare result": rpm_cmp_result,
             "compare detail": ' ' + CMP_TYPE_RPMS_TEST.replace(' ', '-') + '/' + key + '.csv ',
             "compare type": CMP_TYPE_RPMS_TEST,
-            "category level": category_level
+            "category level": category_level.value
         }
         rpm_test_rows.append(row)
 
@@ -322,7 +321,7 @@ def assain_rpm_test_details(rpm_pkg, side_a, side_b, dump_a, dump_b, level):
             side_b: vb,
             "compare result": compare(va, vb),
             "compare type": CMP_TYPE_RPMS_TEST,
-            "category level": level
+            "category level": level.value
         }
         rows.append(row)
     return rows
@@ -393,16 +392,6 @@ def load_json_result(result_path):
     except FileNotFoundError:
         logger.warning(f"{os.path.realpath(result_path)} not exist")
         return None
-
-
-def create_category_map():
-    category_map = {}
-    category_file = os.path.join(os.path.dirname(__file__), "../conf/category/category.json")
-    categorys = load_json_result(category_file)
-    for category in categorys:
-        category_map[category['src']] = category['level']
-
-    return category_map
 
 
 # ------------------------------------------------------------------------

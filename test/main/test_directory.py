@@ -12,14 +12,14 @@
 # See the Mulan PSL v2 for more details.
 # Author:
 # Create: 2021-09-07
-# Description: test repository
+# Description: test directory
 # **********************************************************************************
 """
 import os
 import logging
 from unittest import TestCase, mock
 
-from oecp.main.category import Category, CategoryLevel
+from oecp.main.category import Category
 from oecp.main.directory import Directory
 from oecp.main.mapping import RepositoryPackageMapping
 from oecp.utils.logger import init_logger
