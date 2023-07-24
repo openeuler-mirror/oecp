@@ -108,9 +108,8 @@ def get_similarity(rows, side_base, side_other):
                 single_rate = count_rate(single_kernel.get('same'),
                                          single_kernel.get('same') + single_kernel.get('diff'))
                 rate = single_rate if single_rate > rate else rate
-            if rate:
-                similarity[count_type] = rate
-                continue
+            similarity[count_type] = rate
+            continue
 
         rate = count_rate(count.get(count_type).get("all").get("same"),
                           count.get(count_type).get("all").get("same") + count.get(count_type).get("all").get("diff"))
