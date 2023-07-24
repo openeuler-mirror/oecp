@@ -11,33 +11,26 @@
 # PURPOSE.
 # See the Mulan PSL v2 for more details.
 # Author:
-# Create: 2021-09-07
-# Description: test mapping
+# Create: 2022-3-05
+# Description: test rpm name prase
 # **********************************************************************************
 """
-import os
 import logging
 from unittest import TestCase
 
-from oecp.main.mapping import SQLiteMapping
+from oecp.proxy.rpm_proxy import RPMProxy
 from oecp.utils.logger import init_logger
 
 
-class TestMapping(TestCase):
+class TestRPMProxy(TestCase):
     @classmethod
     def setUpClass(cls):
         init_logger()
         cls.logger = logging.getLogger("test")
 
-    def test_construct(self):
-        sqlite_file = os.path.join(os.path.dirname(__file__), "data/primary.sqlite")
-        sqlite = SQLiteMapping(sqlite_file)
-
-        self.assertNotEqual(getattr(sqlite, "_sqlite_conn"), None)
-
-    def test_bz2_sqlite_file(self):
-        sqlite_file = "https://repo.openeuler.org/openEuler-20.03-LTS/OS/x86_64/repodata/365dc0e1dafa37b1ea4713a519a12ad1c91adee7bf38c236398e68b1bfada497-primary.sqlite.bz2"
-        sqlite = SQLiteMapping(sqlite_file)
-
-        self.assertEqual(sqlite.repository_of_package("gcc-7.3.0-20190804"), "gcc-7.3.0-20190804.h31.oe1.oecp.rpm")
-        self.assertEqual(sqlite.repository_of_package("notexist-9.3.1-20210204"), "notexist-9.3.1-20210204")
+    def test_rpm_name_proxy(self):
+        rpm_proxy = RPMProxy()
+        self.assertEqual(rpm_proxy.rpm_name("partclone-0.3.12-4.oe2203.rpm"), "partclone")
+        self.assertEqual(rpm_proxy.rpm_name("netsniff-ng-0.6.8-1.oe2203.rpm"), "netsniff-ng")
+        self.assertEqual(rpm_proxy.rpm_name("openapi-spec-validator-help-0.3.1-1.oe2203.noarch.rpm"),
+                         "openapi-spec-validator-help")

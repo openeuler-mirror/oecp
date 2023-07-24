@@ -12,7 +12,7 @@
 # See the Mulan PSL v2 for more details.
 # Author:
 # Create: 2023-02-25
-# Description: test compare plan
+# Description: test rpm filelist compare
 # **********************************************************************************
 """
 import logging

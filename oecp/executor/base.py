@@ -245,10 +245,9 @@ class CompareExecutor(ABC):
             pvd_name = pvd['name']
             pvd_symbol = pvd['symbol']
             new_component = ' '.join([pvd_name, pvd_symbol, pvd['version'].split('-')[0]])
-            # so动态库
-            so_version = re.search("(([-.]\\d+){0,3}\\.so([-.]\\d+){0,3})\\((.*?)\\)", pvd_name)
-            if so_version:
-                component_so_name = pvd_name.split(so_version.group(1))[0] + so_version.group(4)
+            pat_so = re.compile(PAT_SO)
+            if re.search(pat_so, pvd_name):
+                component_so_name = re.sub(pat_so, '', pvd_name)
                 pretty_result.setdefault(component_so_name, []).append(new_component)
             # provides版本不固定
             elif pvd_symbol in [">=", "<="]:
