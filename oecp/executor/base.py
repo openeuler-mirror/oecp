@@ -206,13 +206,6 @@ class CompareExecutor(ABC):
         return flag
 
     @staticmethod
-    def _cmp_rpm_arch(arch_a, arch_b):
-        # Check the arch of RPM packages is consistent or not.
-        if arch_a == arch_b:
-            return True
-        return False
-
-    @staticmethod
     def format_dump_file(data_a, data_b):
         dump_set_a, dump_set_b = set(data_a), set(data_b)
         common_dump = dump_set_a & dump_set_b
@@ -323,10 +316,10 @@ class CompareExecutor(ABC):
             # 文件目录中含软件包version-release.dist.arch标识
             dir_pattern = re.compile("|".join(PAT_DIR_VERSION))
             truncate_vrd_dist = file.replace(flag_vrd, '').replace(dist, '')
-            truncate_dir_version = re.sub(dir_pattern, '', os.path.dirname(truncate_vrd_dist))
-            truncate_newfile = os.path.join(truncate_dir_version, os.path.basename(truncate_vrd_dist))
-            truncate_filename = str(truncate_newfile).split(self.link)[0]
-            clear_format_filename = self.clear_file_change_ext(truncate_filename)
+            target_file_path = truncate_vrd_dist.split(self.link)[0]
+            truncate_dir_version = re.sub(dir_pattern, '', os.path.dirname(target_file_path))
+            truncate_newfile = os.path.join(truncate_dir_version, os.path.basename(target_file_path))
+            clear_format_filename = self.clear_file_change_ext(truncate_newfile)
             map_result.setdefault(clear_format_filename, file)
 
         return map_result
@@ -419,11 +412,12 @@ class CompareExecutor(ABC):
             for base_file in sort_base_files:
                 if base_file not in only_dump_base:
                     continue
-                base_filename, other_filename = os.path.basename(base_file), os.path.basename(other_file)
-                simp_base_name = re.sub(self.re_version, '', base_filename)
-                simp_other_name = re.sub(self.re_version, '', other_filename)
+                tru_base_file = base_file.split(self.link)[0]
+                tru_other_file = other_file.split(self.link)[0]
+                simp_base_name = re.sub(self.re_version, '', os.path.basename(tru_base_file))
+                simp_other_name = re.sub(self.re_version, '', os.path.basename(tru_other_file))
                 if self.get_same_filename_pair(simp_base_name, simp_other_name):
-                    get_result = self.get_version_change_files(base_file, other_file, flag_vrd)
+                    get_result = self.get_version_change_files(tru_base_file, tru_other_file, flag_vrd)
                     if get_result == CMP_RESULT_DIFF:
                         continue
                     change_dump.append([base_file, other_file])
@@ -592,22 +586,26 @@ class CompareExecutor(ABC):
         """
         _, v_a, r_a, d_a, a_a = RPMProxy.rpm_n_v_r_d_a(side_a)
         _, v_b, r_b, d_b, a_b = RPMProxy.rpm_n_v_r_d_a(side_b)
-        arch_result = self._cmp_rpm_arch(a_a, a_b)
         v_diff = self.cmp_version(v_a, v_b)
         r_diff = self.cmp_version(r_a, r_b)
         d_similar = self.get_equal_rate(d_a, d_b)
-        return arch_result, int(v_diff + r_diff) + d_similar
 
-    def get_similar_rpm_pairs(self, sides_a, sides_b):
+        return a_a == a_b, int(v_diff + r_diff) + d_similar
+
+    def get_similar_rpm_pairs(self, base_sides, other_sides):
         """
         Find the RPM pair in sides_a with the closest version based on sides_b.
-        :param sides_a, sides_b:Contains multiple RPM package names (list) or dumper (dict).
+        :param sides_a, other_sides:Contains multiple RPM package names (list) or dumper (dict).
         """
+        cmp_result = filter(lambda dumper: len(dumper) > 1, [base_sides, other_sides])
+        if not list(cmp_result):
+            return zip(base_sides, other_sides)
+
         cmp_results = []
-        for dump_b in sides_b:
+        for dump_b in other_sides:
             single_result = []
             similarity_rate = 0
-            for dump_a in sides_a:
+            for dump_a in base_sides:
                 rpm_a = dump_a if isinstance(dump_a, str) else dump_a.get('rpm')
                 rpm_b = dump_b if isinstance(dump_b, str) else dump_b.get('rpm')
                 arch_result, rpm_name_similar = self.calculate_rpm_similarity(rpm_a, rpm_b)

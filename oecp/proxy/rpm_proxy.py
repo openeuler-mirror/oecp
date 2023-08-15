@@ -109,9 +109,9 @@ class RPMProxy(object):
 
             return (None,) * 5
         except AttributeError as attr_error:
-            logger.exception("Package attribute matching error, %s" % attr_error)
+            logger.exception("Package %s attribute matching error %s" % rpm, attr_error)
         except Exception as general_error:
-            logger.exception(general_error)
+            logger.exception(f"error rpm: {rpm}, {general_error}")
 
     @classmethod
     def is_rpm_file(cls, rpm):
