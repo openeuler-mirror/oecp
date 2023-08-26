@@ -387,6 +387,22 @@ class CompareExecutor(ABC):
 
         return common_pairs, only_base_dump, only_other_dump
 
+    def map_base_files(self, base_files):
+        map_result = {}
+        for file in sorted(base_files):
+            truncate_name = self.truncate_files(file, self.base_dist)
+            map_result.setdefault(truncate_name, []).append(file)
+
+        return map_result
+
+    def truncate_files(self, file_path, dist):
+        tru_base_file = file_path.split(self.link)[0]
+        simple_name = re.sub(self.re_version, '', os.path.basename(tru_base_file))
+        clear_file_format = self.clear_file_change_ext(simple_name)
+        final_name = clear_file_format.replace(dist, '')
+
+        return final_name.lower()
+
     def format_changed_files(self, base_dumps, other_dumps, flag_vrd):
         """
         识别文件路径、文件名中存在以rpm包（version+release+dist/dist标识/x.x.x版本号）命名的相同文件对
@@ -407,23 +423,21 @@ class CompareExecutor(ABC):
                 only_dump_base.discard(base_file)
                 only_dump_other.discard(other_file)
 
-        sort_other_files, sort_base_files = sorted(only_dump_other), sorted(only_dump_base)
-        for other_file in sort_other_files:
-            for base_file in sort_base_files:
+        for other_file in sorted(only_dump_other):
+            simp_filename = self.truncate_files(other_file, self.osv_dist)
+            map_base_files = self.map_base_files(only_dump_base)
+            for base_file in map_base_files.get(simp_filename, []):
                 if base_file not in only_dump_base:
                     continue
                 tru_base_file = base_file.split(self.link)[0]
                 tru_other_file = other_file.split(self.link)[0]
-                simp_base_name = re.sub(self.re_version, '', os.path.basename(tru_base_file))
-                simp_other_name = re.sub(self.re_version, '', os.path.basename(tru_other_file))
-                if self.get_same_filename_pair(simp_base_name, simp_other_name):
-                    get_result = self.get_version_change_files(tru_base_file, tru_other_file, flag_vrd)
-                    if get_result == CMP_RESULT_DIFF:
-                        continue
-                    change_dump.append([base_file, other_file])
-                    only_dump_base.discard(base_file)
-                    only_dump_other.discard(other_file)
-                    break
+                get_result = self.get_version_change_files(tru_base_file, tru_other_file, flag_vrd)
+                if get_result == CMP_RESULT_DIFF:
+                    continue
+                change_dump.append([base_file, other_file])
+                only_dump_base.discard(base_file)
+                only_dump_other.discard(other_file)
+                break
 
         return change_dump, only_dump_base, only_dump_other
 
