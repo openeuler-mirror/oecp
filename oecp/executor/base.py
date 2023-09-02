@@ -389,11 +389,16 @@ class CompareExecutor(ABC):
 
     def map_base_files(self, base_files):
         map_result = {}
-        for file in sorted(base_files):
+        sort_base_files = sorted(base_files)
+        for file in sort_base_files:
             truncate_name = self.truncate_files(file, self.base_dist)
             map_result.setdefault(truncate_name, []).append(file)
 
         return map_result
+
+    def remove_map_basefiles(self, map_basefiles, key_name, file_name):
+        base_files = map_basefiles[key_name]
+        base_files.remove(file_name)
 
     def truncate_files(self, file_path, dist):
         tru_base_file = file_path.split(self.link)[0]
@@ -422,11 +427,12 @@ class CompareExecutor(ABC):
                 change_dump.append([base_file, other_file])
                 only_dump_base.discard(base_file)
                 only_dump_other.discard(other_file)
-
-        for other_file in sorted(only_dump_other):
+        sort_only_dump_other = sorted(only_dump_other)
+        map_base_files = self.map_base_files(only_dump_base)
+        for other_file in sort_only_dump_other:
             simp_filename = self.truncate_files(other_file, self.osv_dist)
-            map_base_files = self.map_base_files(only_dump_base)
-            for base_file in map_base_files.get(simp_filename, []):
+            base_files = map_base_files.get(simp_filename, [])
+            for base_file in base_files:
                 if base_file not in only_dump_base:
                     continue
                 tru_base_file = base_file.split(self.link)[0]
@@ -437,6 +443,7 @@ class CompareExecutor(ABC):
                 change_dump.append([base_file, other_file])
                 only_dump_base.discard(base_file)
                 only_dump_other.discard(other_file)
+                base_files.remove(base_file)
                 break
 
         return change_dump, only_dump_base, only_dump_other
