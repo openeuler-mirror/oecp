@@ -387,6 +387,27 @@ class CompareExecutor(ABC):
 
         return common_pairs, only_base_dump, only_other_dump
 
+    def map_base_files(self, base_files):
+        map_result = {}
+        sort_base_files = sorted(base_files)
+        for file in sort_base_files:
+            truncate_name = self.truncate_files(file, self.base_dist)
+            map_result.setdefault(truncate_name, []).append(file)
+
+        return map_result
+
+    def remove_map_basefiles(self, map_basefiles, key_name, file_name):
+        base_files = map_basefiles[key_name]
+        base_files.remove(file_name)
+
+    def truncate_files(self, file_path, dist):
+        tru_base_file = file_path.split(self.link)[0]
+        simple_name = re.sub(self.re_version, '', os.path.basename(tru_base_file))
+        clear_file_format = self.clear_file_change_ext(simple_name)
+        final_name = clear_file_format.replace(dist, '')
+
+        return final_name.lower()
+
     def format_changed_files(self, base_dumps, other_dumps, flag_vrd):
         """
         识别文件路径、文件名中存在以rpm包（version+release+dist/dist标识/x.x.x版本号）命名的相同文件对
@@ -406,24 +427,24 @@ class CompareExecutor(ABC):
                 change_dump.append([base_file, other_file])
                 only_dump_base.discard(base_file)
                 only_dump_other.discard(other_file)
-
-        sort_other_files, sort_base_files = sorted(only_dump_other), sorted(only_dump_base)
-        for other_file in sort_other_files:
-            for base_file in sort_base_files:
+        sort_only_dump_other = sorted(only_dump_other)
+        map_base_files = self.map_base_files(only_dump_base)
+        for other_file in sort_only_dump_other:
+            simp_filename = self.truncate_files(other_file, self.osv_dist)
+            base_files = map_base_files.get(simp_filename, [])
+            for base_file in base_files:
                 if base_file not in only_dump_base:
                     continue
                 tru_base_file = base_file.split(self.link)[0]
                 tru_other_file = other_file.split(self.link)[0]
-                simp_base_name = re.sub(self.re_version, '', os.path.basename(tru_base_file))
-                simp_other_name = re.sub(self.re_version, '', os.path.basename(tru_other_file))
-                if self.get_same_filename_pair(simp_base_name, simp_other_name):
-                    get_result = self.get_version_change_files(tru_base_file, tru_other_file, flag_vrd)
-                    if get_result == CMP_RESULT_DIFF:
-                        continue
-                    change_dump.append([base_file, other_file])
-                    only_dump_base.discard(base_file)
-                    only_dump_other.discard(other_file)
-                    break
+                get_result = self.get_version_change_files(tru_base_file, tru_other_file, flag_vrd)
+                if get_result == CMP_RESULT_DIFF:
+                    continue
+                change_dump.append([base_file, other_file])
+                only_dump_base.discard(base_file)
+                only_dump_other.discard(other_file)
+                base_files.remove(base_file)
+                break
 
         return change_dump, only_dump_base, only_dump_other
 
