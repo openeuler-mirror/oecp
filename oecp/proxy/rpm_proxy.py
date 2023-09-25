@@ -59,7 +59,7 @@ class RPMProxy(object):
         m = re.match(r"^.+-.+-(.+)", rpm)
 
         if m:
-            d = re.match(r"\d+\.(\w+)\.\w+\.rpm", m.group(1))
+            d = re.match(r"\d+\.([a-zA-Z]\w+)\.\w+\.rpm", m.group(1))
             return d.group(1) if d else ''
         return ''
 
@@ -94,7 +94,7 @@ class RPMProxy(object):
                         if kb_num:
                             release = release + '.' + kb_num.group()
                         return name, version, release, dist_flag, arch
-                matchs = re.match(r"([\d._]+)\.(.+)", release_dist)
+                matchs = re.match(r"([\d._]+)\.([a-zA-Z]\w+)", release_dist)
                 if matchs:
                     return name, version, matchs.group(1), matchs.group(2), arch
                 else:
