@@ -18,6 +18,7 @@
 import logging
 import os
 import re
+import traceback
 from collections import UserDict
 import tempfile
 
@@ -182,6 +183,9 @@ class Repository(UserDict):
                 cache_name.setdefault("work_dir", self._work_dir)
 
                 result.add_component(*executor_ins.run())
+        except Exception as err:
+            exstr = traceback.format_exc()
+            logger.error(f"repository compare process {executor} error {err}: \n{exstr}")
 
         # clean cache for tempfile
         finally:
