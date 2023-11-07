@@ -234,22 +234,22 @@ class CompareExecutor(ABC):
     def pretty_provide_datas(datas, v_r_d):
         # provides 版本固定时，不比较版本号
         pretty_result = {}
+        pat_so = re.compile(r"(-?\d*([-_.]\d+){0,3}(\.cpython-(.*)-linux-gnu)?\.so([-_.][\dA-Za-z]+){0,4})"
+                            r"|-[a-z0-9]{16}.so|python\d(\.\d+)?|([-_.]\d+){0,3}")
         for pvd in datas:
             pvd_name = pvd['name']
             pvd_symbol = pvd['symbol']
             new_component = ' '.join([pvd_name, pvd_symbol, pvd['version'].split('-')[0]])
-            pat_so = re.compile(PAT_SO)
+            if v_r_d in pvd_name:
+                # "application(java-1.8.0-openjdk-1.8.0.272.b10-7.oe1.aarch64-policytool.desktop)"
+                pvd_name = pvd_name.replace(v_r_d, '')
+
             if re.search(pat_so, pvd_name):
-                component_so_name = re.sub(pat_so, '', pvd_name)
-                pretty_result.setdefault(component_so_name, []).append(new_component)
+                pvd_name = re.sub(pat_so, '', pvd_name)
             # provides版本不固定
             elif pvd_symbol in [">=", "<="]:
-                simple_name = ''.join(new_component.split(v_r_d))
-                pretty_result.setdefault(simple_name, []).append(new_component)
-            else:
-                # "application(java-1.8.0-openjdk-1.8.0.272.b10-7.oe1.aarch64-policytool.desktop)"
-                simple_name = ''.join(pvd_name.split(v_r_d))
-                pretty_result.setdefault(simple_name, []).append(new_component)
+                pvd_name = ''.join(new_component.split(v_r_d))
+            pretty_result.setdefault(pvd_name, []).append(new_component)
 
         return pretty_result
 
