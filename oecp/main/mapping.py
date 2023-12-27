@@ -199,7 +199,7 @@ class SQLiteMapping(RepositoryPackageMapping):
                 package_name.append(rpm_name)
                 return package_name
 
-        cursor.execute(f"select pkgKey from provides where name='{name}'")
+        cursor.execute(f"select pkgKey,epoch,version,release from provides where name='{name}'")
         result = cursor.fetchall()
         if not result and name.startswith('/'):
             cursor.execute(f"select pkgKey from files where name='{name}'")
@@ -210,11 +210,11 @@ class SQLiteMapping(RepositoryPackageMapping):
             rpm_name = rpm_result[0][0].split('/')[-1]
             package_name.append(rpm_name)
         else:
-            for pkgkey in result:
-                cursor.execute(f"select location_href,epoch,version,release from packages where pkgKey={pkgkey[0]}")
+            for pkginfo in result:
+                cursor.execute(f"select location_href from packages where pkgKey={pkginfo[0]}")
                 rpm_record = cursor.fetchall()[0]
-                if version:
-                    whole_version = self.acquire_whole_version(rpm_record)
+                if version and len(pkginfo) == 4:
+                    whole_version = self.acquire_whole_version(pkginfo)
                     target_version = self._parse_version(whole_version)
                     require_version = self._parse_version(version)
                     is_pass = self._compare_version(require_version, symbol, target_version)
