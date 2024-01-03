@@ -50,6 +50,7 @@ def calculate_similarity(all_rpm_report):
     all_src_name_key = list(common_rpm_list[first_colomn_name])
     soft_package_table = df[(df['compare result'] != '4') | (df['compare result'] != '5')]
 
+    #  1/1.1/2/3   [包数量，same项数量/比较项数量， require(0 or 1), provides(0 or 1), 有无依赖和provides（0 or 1）]
     temp_simple_reslut = [
         [0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0],

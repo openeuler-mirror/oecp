@@ -270,6 +270,12 @@
         "status": ""
     },
     {
+        "src": "openssl-1.1.1d-9.oe1.src",
+        "bin": "openssl-1.1.1d-9.oe1.aarch64",
+        "level": "level1",
+        "status": ""
+    },
+    {
         "src": "libX11-1.6.9-2.oe1.src",
         "bin": "libX11-1.6.9-2.oe1.aarch64",
         "level": "level1",
@@ -315,6 +321,12 @@
         "src": "cairo-1.15.14-3.oe1.src",
         "bin": "cairo-devel-1.15.14-3.oe1.aarch64",
         "level": "level3",
+        "status": ""
+    },
+    {
+        "src": "util-linux-2.34-8.oe1.src",
+        "bin": "util-linux-2.34-8.oe1.aarch64",
+        "level": "level2",
         "status": ""
     },
     {
@@ -408,6 +420,12 @@
         "status": ""
     },
     {
+        "src": "dbus-1.12.16-13.oe1.src",
+        "bin": "dbus-1.12.16-13.oe1.aarch64",
+        "level": "level1",
+        "status": ""
+    },
+    {
         "src": "dbus-broker-29-2.oe2203.src",
         "bin": "dbus-broker-29-2.oe2203.aarch64",
         "level": "level1",
@@ -488,6 +506,12 @@
     {
         "src": "libvirt-5.5.0-6.oe1.src",
         "bin": "libvirt-wireshark-5.5.0-6.oe1.aarch64",
+        "level": "level2",
+        "status": ""
+    },
+    {
+        "src": "libvirt-5.5.0-6.oe1.src",
+        "bin": "libvirt-5.5.0-6.oe1.aarch64",
         "level": "level2",
         "status": ""
     },
@@ -608,6 +632,12 @@
     {
         "src": "xz-5.2.4-10.oe1.src",
         "bin": "xz-libs-5.2.4-10.oe1.aarch64",
+        "level": "level1",
+        "status": ""
+    },
+    {
+        "src": "xz-5.2.4-10.oe1.src",
+        "bin": "xz-5.2.4-10.oe1.aarch64",
         "level": "level1",
         "status": ""
     },
@@ -883,6 +913,12 @@
     },
     {
         "src": "acl-2.2.53-7.oe1.src",
+        "bin": "acl-2.2.53-7.oe1.aarch64",
+        "level": "level1",
+        "status": ""
+    },
+    {
+        "src": "acl-2.2.53-7.oe1.src",
         "bin": "libacl-2.2.53-7.oe1.aarch64",
         "level": "level1",
         "status": ""
@@ -950,6 +986,12 @@
     {
         "src": "audit-3.0-5.oe1.src",
         "bin": "audit-libs-3.0-5.oe1.aarch64",
+        "level": "level2",
+        "status": ""
+    },
+    {
+        "src": "audit-3.0-5.oe1.src",
+        "bin": "audit-3.0-5.oe1.aarch64",
         "level": "level2",
         "status": ""
     },
@@ -1514,6 +1556,12 @@
     {
         "src": "kmod-25-6.oe1.src",
         "bin": "kmod-libs-25-6.oe1.aarch64",
+        "level": "level2",
+        "status": ""
+    },
+    {
+        "src": "kmod-25-6.oe1.src",
+        "bin": "kmod-25-6.oe1.aarch64",
         "level": "level2",
         "status": ""
     },

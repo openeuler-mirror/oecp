@@ -53,6 +53,7 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | python2-2.7.16-15.oe1.src | python2-2.7.16-15.oe1.aarch64  | level2 |  |
 | python2-2.7.16-15.oe1.src | python2-debug-2.7.16-15.oe1.aarch64 | level3 |  |
 | openssl-1.1.1d-9.oe1.src | openssl-libs-1.1.1d-9.oe1.aarch64 | level1 |  |
+| openssl-1.1.1d-9.oe1.src | openssl-1.1.1d-9.oe1.aarch64 | level1 |  |
 | libX11-1.6.9-2.oe1.src | libX11-1.6.9-2.oe1.aarch64 | level1 |  |
 | libxml2-2.9.8-9.oe1.src | libxml2-2.9.8-9.oe1.aarch64  | level0.5 |  |
 | libxml2-2.9.8-9.oe1.src | python2-libxml2-2.9.8-9.oe1.aarch64  | level0.5 |  |
@@ -61,6 +62,7 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | perl-Carp-1.50-418.oe1.src | perl-Carp-1.50-418.oe1.noarch | level3 |  |
 | cairo-1.15.14-3.oe1.src | cairo-1.15.14-3.oe1.aarch64  | level2 |  |
 | cairo-1.15.14-3.oe1.src | cairo-devel-1.15.14-3.oe1.aarch64 | level3 |  |
+| util-linux-2.34-8.oe1.src | util-linux-2.34-8.oe1.aarch64 | level2 |  |
 | util-linux-2.34-8.oe1.src | libblkid-2.34-8.oe1.aarch64  | level2 |  |
 | util-linux-2.34-8.oe1.src | libfdisk-2.34-8.oe1.aarch64  | level2 |  |
 | util-linux-2.34-8.oe1.src | libmount-2.34-8.oe1.aarch64  | level2 |  |
@@ -76,6 +78,7 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | gtk3-3.24.1-3.oe1.src | gtk3-3.24.1-3.oe1.aarch64  | level2 |  |
 | gtk3-3.24.1-3.oe1.src | gtk3-devel-3.24.1-3.oe1.aarch64 | level3 |  |
 | dbus-1.12.16-13.oe1.src | dbus-libs-1.12.16-13.oe1.aarch64 | level1 |  |
+| dbus-1.12.16-13.oe1.src | dbus-1.12.16-13.oe1.aarch64 | level1 |  |
 | dbus-broker-29-2.oe2203.src | dbus-broker-29-2.oe2203.aarch64 | level1 |  |
 | atk-2.30.0-3.oe1.src | atk-2.30.0-3.oe1.aarch64 | level2 |  |
 | libXext-1.3.4-2.oe1.src | libXext-1.3.4-2.oe1.aarch64 | level2 |  |
@@ -89,6 +92,7 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | fontconfig-2.13.1-3.oe1.src | fontconfig-2.13.1-3.oe1.aarch64 | level3 |  |
 | python-setuptools-40.4.3-4.oe1.src | python-setuptools-40.4.3-4.oe1.noarch | level3 |  |
 | libglvnd-1.2.0-3.oe1.src | libglvnd-1.2.0-3.oe1.aarch64 |  | Subject to modification |
+| libvirt-5.5.0-6.oe1.src | libvirt-5.5.0-6.oe1.aarch64 | level2 |  |
 | libvirt-5.5.0-6.oe1.src | libvirt-wireshark-5.5.0-6.oe1.aarch64 | level2 |  |
 | e2fsprogs-1.45.3-4.oe1.src | e2fsprogs-1.45.3-4.oe1.aarch64 | level0.5 |  |
 | krb5-1.17-9.oe1.src | krb5-1.17-9.oe1.aarch64  | level1 |  |
@@ -109,6 +113,7 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | samba-4.11.6-5.oe1.src | samba-test-4.11.6-5.oe1.aarch64  | level2 |  |
 | samba-4.11.6-5.oe1.src | samba-winbind-4.11.6-5.oe1.aarch64  | level2 |  |
 | samba-4.11.6-5.oe1.src | samba-winbind-modules-4.11.6-5.oe1.aarch64 | level2 |  |
+| xz-5.2.4-10.oe1.src | xz-5.2.4-10.oe1.aarch64 | level1 |  |
 | xz-5.2.4-10.oe1.src | xz-libs-5.2.4-10.oe1.aarch64 | level1 |  |
 | ceph-12.2.8-6.oe1.src | ceph-base-12.2.8-6.oe1.aarch64  | level2 | Subject to modification |
 | ceph-12.2.8-6.oe1.src | libcephfs2-12.2.8-6.oe1.aarch64  | level2 |  |
@@ -155,6 +160,7 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | libpng-1.6.36-4.oe1.src | libpng-1.6.36-4.oe1.aarch64 | level2 |  |
 | expat-2.2.6-5.oe1.src | expat-2.2.6-5.oe1.aarch64 | level2 |  |
 | google-noto-cjk-fonts-20170602-9.oe1.src | google-noto-cjk-fonts-20170602-9.oe1.noarch | level3 |  |
+| acl-2.2.53-7.oe1.src | acl-2.2.53-7.oe1.aarch64 | level1 |  |
 | acl-2.2.53-7.oe1.src | libacl-2.2.53-7.oe1.aarch64 | level1 |  |
 | sqlite-3.24.0-9.oe1.src | sqlite-3.24.0-9.oe1.aarch64 | level2 |  |
 | lvm2-2.02.181-8.oe1.src | device-mapper-1.02.150-8.oe1.aarch64  | level2 |  |
@@ -166,6 +172,7 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | abrt-2.13.0-4.oe1.src | abrt-gui-2.13.0-4.oe1.aarch64  | level3 |  |
 | abrt-2.13.0-4.oe1.src | abrt-libs-2.13.0-4.oe1.aarch64 | level3 |  |
 | bzip2-1.0.8-3.oe1.src | bzip2-1.0.8-3.oe1.aarch64 | level1 |  |
+| audit-3.0-5.oe1.src | audit-3.0-5.oe1.aarch64 | level2 |  |
 | audit-3.0-5.oe1.src | audit-libs-3.0-5.oe1.aarch64 | level2 |  |
 | cyrus-sasl-2.1.27-10.oe1.src | cyrus-sasl-2.1.27-10.oe1.aarch64  | level2 |  |
 | cyrus-sasl-2.1.27-10.oe1.src | cyrus-sasl-lib-2.1.27-10.oe1.aarch64  | level2 |  |
@@ -260,6 +267,7 @@ openEuler 对软件包的兼容性进行分级管理，其中：
 | bind-9.11.4-13.oe1.src | bind-libs-9.11.4-13.oe1.aarch64  | level2 |  |
 | bind-9.11.4-13.oe1.src | bind-libs-lite-9.11.4-13.oe1.aarch64  | level2 |  |
 | bind-9.11.4-13.oe1.src | bind-pkcs11-9.11.4-13.oe1.aarch64 | level2 |  |
+| kmod-25-6.oe1.src | kmod-25-6.oe1.aarch64 | level2 |  |
 | kmod-25-6.oe1.src | kmod-libs-25-6.oe1.aarch64 | level2 |  |
 | libnsl2-1.2.0-4.oe1.src | libnsl2-1.2.0-4.oe1.aarch64 | level2 |  |
 | jansson-2.11-4.oe1.src | jansson-2.11-4.oe1.aarch64 | level2 |  |
