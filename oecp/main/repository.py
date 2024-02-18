@@ -18,13 +18,14 @@
 import logging
 import os
 import re
+import sys
 import traceback
 from collections import UserDict
 import tempfile
 
 from oecp.proxy.rpm_proxy import RPMProxy
 from oecp.result.compare_result import CompareResultComposite
-from oecp.result.constants import CMP_TYPE_REPOSITORY, CMP_RESULT_TO_BE_DETERMINED
+from oecp.result.constants import CMP_TYPE_REPOSITORY, CMP_RESULT_TO_BE_DETERMINED, CMP_MODEL_FILE
 from oecp.utils.misc import path_is_remote, basename_of_path
 from oecp.proxy.requests_proxy import do_download
 
@@ -43,6 +44,7 @@ class Repository(UserDict):
 
         :param work_dir: 工作目录
         :param name: repository名称
+        :param rpm_path: 软件包路径
         :param category: 类别
         """
         super(Repository, self).__init__()
@@ -51,7 +53,7 @@ class Repository(UserDict):
         self._download_dir = None  # 如果包在远端，本地的下载路径，当不需要时删除此属性释放磁盘空间
 
         self._name = RPMProxy.rpm_name(name)
-        self.verbose_path = name
+        self.verbose_path = os.path.basename(rpm_path)
         self.src_package = self.acquire_source_package(rpm_path)
 
         self._category = category
@@ -86,6 +88,23 @@ class Repository(UserDict):
         }
 
         self[package_name] = rpm
+
+    def upsert_a_file(self, path, rpm_name):
+        """
+        增加一个文件
+        @param path: 文件的完整路径
+        @param rpm_name: 文件所属rpm名
+        """
+        file_name = os.path.basename(path)
+        category_level = self._category.category_of_bin_package(rpm_name)
+        file = {
+            "rpm_name": rpm_name,
+            "path": path,
+            "category": category_level,
+            "model": CMP_MODEL_FILE
+        }
+
+        self[file_name] = file
 
     @property
     def download_dir(self):
@@ -151,6 +170,9 @@ class Repository(UserDict):
         # 比较项存在依赖关系，将config、dumper、executor缓存下来传递，缓存通过比较项名称索引
         # {"plan_name": {"config": config, "dumper": {"this": this_dumper, "that": that_dumper}, "executor": executor}}
         compare_cache = {}
+        if not self.src_package.endswith('.rpm') and plan._plan_name != CMP_MODEL_FILE:
+            logger.error("Please enter the correct args --plan to compare files, the value of plan name is file.")
+            sys.exit(1)
 
         try:
             for name in plan:
@@ -198,6 +220,9 @@ class Repository(UserDict):
         return result
 
     def acquire_source_package(self, rpm_path):
+        if not rpm_path.endswith('.rpm'):
+            logger.debug(f"{rpm_path} is not a rpm.")
+            return os.path.basename(rpm_path)
         cmd = ['rpm', '-qpi', '--nosignature', rpm_path]
         code, out, err = shell_cmd(cmd)
         if err:

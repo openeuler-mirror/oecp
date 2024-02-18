@@ -16,6 +16,7 @@
 # **********************************************************************************
 """
 import os
+import sys
 import tempfile
 import logging
 
@@ -93,11 +94,21 @@ class Factory(object):
             # dist repo
             logger.info(f"treat {file_path} as openEuler dist repository")
             return OEDistRepo(file_path, work_dir, category, side)
-        else:
+        elif os.path.isdir(file_path):
             # directory
             logger.info(f"treat {file_path} as local directory")
 
             return Directory(file_path, work_dir, category, side, False)
+        elif os.path.isfile(file_path):
+            # file
+            logger.info(f"treat {file_path} as single comparison file")
+            if not args.rpm_name:
+                logger.error("Please input args --rpm-name: it's the rpm name of compare files.")
+                sys.exit(1)
+            repository = Repository(work_dir, args.rpm_name, file_path, category)
+            repository.upsert_a_file(file_path, args.rpm_name)
+
+            return repository
 
     @staticmethod
     def guess_obs_repo(remote_path):

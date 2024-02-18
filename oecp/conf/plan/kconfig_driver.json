@@ -7,17 +7,17 @@
       "executor": "null.NullExecutor",
       "config": {
         "compare_type": "CMP_TYPE_NULL",
-	    "package": "kernel"
+        "package": "kernel"
       }
     },
     {
-      "name": "kconfig",
-      "dumper": "KconfigDumper",
+      "name": "kconfig_drive",
+      "dumper": "KconfigDriveDumper",
       "executor": "nvs.NVSCompareExecutor",
       "config": {
-        "compare_type": "CMP_TYPE_KCONFIG",
-		"package": "kernel",
-		"show_same": true
+        "compare_type": "CMP_TYPE_KCONFIG_DRIVE",
+        "package": "kernel",
+        "show_same": true
       }
     }
   ]

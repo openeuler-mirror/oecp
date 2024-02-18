@@ -45,6 +45,8 @@ class RPMProxy(object):
 
     @classmethod
     def rpm_name_version(cls, rpm):
+        if not rpm.endswith('.rpm'):
+            return rpm, ''
         name = cls.rpm_name(rpm)
         m = re.match(r"-(.+)-.+", rpm.replace(name, "", 1))
         return name, m.group(1)

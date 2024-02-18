@@ -1,6 +1,6 @@
 ## 0. 主要功能
 
-1.检测2个ISO（基于RPM）的软件包，软件包内文件，库文件接口（C/C++）,内核KABI的变化差异
+1.检测2个ISO（基于RPM）的软件包，软件包内文件，库文件接口（C/C++），内核KABI的变化差异
 
 2.检测同一个软件（rpm包）在不同版本下的变化以及差异
 ## 1. 运行环境
@@ -64,6 +64,9 @@ pip3 install -r requirement
 
   * **`-o, --output`**
     指定`输出结果路径`，默认为/tmp/oecp
+  
+  * **`-r, --rpm-name`**
+    指定`输出软件包名称`，比较模式为内核配置文件、服务文件时，需指定文件所属软件包名称及-p比较计划根据文件类型配置'file'类型json配置文件
 
   * **`--platform`**
     指定`进行平台验证有关json报告地址`，默认为/tmp/oecp；性能测试默认基线文件为oecp/conf/performance/openEuler-20.03-LTS-aarch64-dvd.iso.performance.json
@@ -75,7 +78,7 @@ pip3 install -r requirement
 * **比较计划说明**
   * **`all.json`**
     涵盖下面所有配置项的比较
-  * **`config_file.json`**
+  * **`config.json`**
     比较rpm包中配置文件内容的差异，需依赖RPMExtractDumper（提取解压rpm的dumper类）
   * **`file_list.json`**
     比较rpm包文件列表差异，可通过rpm -pql ${rpm_path}命令获取rpm文件列表
@@ -85,6 +88,9 @@ pip3 install -r requirement
     比较两个rpm包名称、版本、发行版本的差异
   * **`provides_requires.json`**
     比较rpm的provides和requires差异，可通过rpm -pq --provides/requires ${rpm_path}查询
-
-
-
+  * **`kabi_file.json`**
+    比较内核kabi列表变化差异，输入比较目标为内核kabi列表文件（symvers*）时，指定比较计划-p为该json配置文件
+  * **`kconfig_file.json`**
+    比较内核配置变化差异，输入比较目标为内核配置文件（config-*）时，指定比较计划-p为该json配置文件
+  * **`service_file.json`**
+    比较服务文件配置变化差异，输入比较目标为服务文件（.service）时，指定比较计划-p为该json配置文件
