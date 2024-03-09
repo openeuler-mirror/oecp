@@ -2,7 +2,7 @@
 
 ## 1 需求描述
 
-​       搭建一个前端展示系统，通过上传OECP报告，对报告内容进行解析展示，提供 报告内容间的跳转链接，支持调用后端OECP工具能力，上传2个ISO，直接对比结果，无论何种方式得到的结果都保存下来，可用作后续查询。
+​       在已经搭建好的前端展示系统中，通过上传OECP报告或上传2个ISO，后端服务支持调用OECP工具能力，对上传或对比生成的OECP报告内容进行解析及统计分析展示，提供报告内容间的跳转链接，无论何种方式得到的报告都保存在服务端，可用作后续查询。
 
 ### 1.1 依赖组件
 
@@ -41,11 +41,11 @@ Mulan V2
 
 ### 3.1.1 逻辑视图
 
-![image-20220728223730627](imgs\逻辑视图.png)
+![逻辑视图](https://gitee.com/yang-yulong-007/img_bed/raw/master/oecp_web_imgs/%E9%80%BB%E8%BE%91%E8%A7%86%E5%9B%BE.png)
 
 ### 3.1.2 ISO文件导入持久化
 
-![image-20220728210530617](imgs\ISO文件导入流程)
+![ISO文件导入流程](https://gitee.com/yang-yulong-007/img_bed/raw/master/oecp_web_imgs/ISO%E6%96%87%E4%BB%B6%E5%AF%BC%E5%85%A5%E6%B5%81%E7%A8%8B.png)
 
 > 1. ISO文件较大，采用分片上传技术，当所有分片上传成功后，调用分片合入（异步任务，后台进行分片合并）
 > 2. 分片合并结束后，前端通过获取任务状态（合并已完成），向后台发送差异化分析请求，生成差异化分析与持久化异步任务
@@ -53,26 +53,26 @@ Mulan V2
 
 ### 3.1.3 报告导入持久化
 
-![image-20220728210451192](imgs\报告持久化流程)
+![报告持久化流程](https://gitee.com/yang-yulong-007/img_bed/raw/master/oecp_web_imgs/%E6%8A%A5%E5%91%8A%E6%8C%81%E4%B9%85%E5%8C%96%E6%B5%81%E7%A8%8B.png)
 
 > 1. 通过上传差异化报告，临时存放至系统指定目录中，调用异步任务（报告持久化存储），返回任务ID
 > 2. 根据任务ID实时查看持久化进度，显示持久化结果
 
 ### 3.1.4 API开发视图
 
-![image-20221017190153783](imgs\api开发视图)
+![api开发视图](https://gitee.com/yang-yulong-007/img_bed/raw/master/oecp_web_imgs/api%E5%BC%80%E5%8F%91%E8%A7%86%E5%9B%BE.png)
 
 ### 3.1.5 部署视图
 
 #### 	3.1.5.1 文件部署视图
 
-![image-20220728235504886](imgs\文件部署视图)
+![文件部署视图](https://gitee.com/yang-yulong-007/img_bed/raw/master/oecp_web_imgs/%E6%96%87%E4%BB%B6%E9%83%A8%E7%BD%B2%E8%A7%86%E5%9B%BE.png)
 
 
 
 #### 	3.1.5.2服务部署视图
 
-![image-20220728210012176](imgs\服务部署视图)
+![服务部署视图](https://gitee.com/yang-yulong-007/img_bed/raw/master/oecp_web_imgs/%E6%9C%8D%E5%8A%A1%E9%83%A8%E7%BD%B2%E8%A7%86%E5%9B%BE.png)
 
 
 
@@ -103,7 +103,7 @@ Mulan V2
 
 1. **数据库**：
 
-    备份恢复：系统增加定时任务，在特定的时间段内，对系统中的数据做备份，保留最新或最近的数据，便于后期恢复 ；
+    备份恢复：系统增加定时任务，在特定的时间段内，对系统中的数据做备份，保留最新或最近的数据，便于后期恢复；
 
     主从复制：提升服务的稳定性，建议mysql数据库采用主从复制的部署方案，实现热切换；
 
@@ -185,7 +185,7 @@ Mulan V2
 | 11   | diff_service_detail     | 服务变化详情            |
 | 12   | rpm_requires_analyse    | rpm依赖分析             |
 
-![image-20221017201718639](imgs\数据库结构设计)
+![数据库结构设计](https://gitee.com/yang-yulong-007/img_bed/raw/master/oecp_web_imgs/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BB%93%E6%9E%84%E8%AE%BE%E8%AE%A1.png)
 
 #### 3.3.3 数据表字段解释
 
@@ -390,26 +390,26 @@ Mulan V2
 |    - |   - |    - |   - |
 | 1 | /upload/tar-gz | post | 上传tar.gz压缩格式的报告，读取报告内容存入数据库 |
 | 2 | /upload/ios | post | 上传两个IOS文件，生成对比报告，并将报告内容存入数据库 |
-| 3    | /upload/exists/upload-file                                   | get  | 判断上传的文件是否存在                                    |
-| 4    | /upload/async/state/<str:task_id>                            | get  | 获取后台任务状态                                          |
-| 5    | /upload/analysis/iso                                         | post | 通过oecp工具分析iso底层变化,生成报告                      |
-| 6    | /upload/storage/iso                                          | get  | ISO镜像文件获取或删除                                     |
-| 7    | /report/detail/all-rpm/page/<int:limit>/<int:page>           | get  | 分页查询所有rpm对比报告详细信息                           |
-| 8    | /report/page/<int:limit>/<int:page>                          | get  | 分页查询报告总览信息                                      |
-| 9    | /report/detail/osv/<int:report_base_id>                      | get  | 查询OSV技术测评报告                                       |
-| 10   | /report/detail/all-differences/page/<int:limit>/<int:page>   | get  | 分页查询所有比对出的差异文件                              |
-| 11   | /report/detail/all-compare/page/<int:limit>/<int:page>       | get  | 分页查询比对报告详情                                      |
-| 12   | /report/compare/iso-info/<int:report_base_id>                | get  | 获取比较的iso名称                                         |
-| 13 | /report/compare/all-compare-type/<int:report_base_id> | get | 获取所有比较类型 |
-| 14 | /report/compare/all-compare-result/<int:report_base_id> | get | 对比ISo的差异，主要用于获取比较的基本信息（ISO1 VS ISO2） |
-| 15 | /report/update-version/<int:report_base_id> | post | 修改报告标题/删除报告 |
-| 16 | /report/md-detail/<int:report_base_id> | get | md文档详情 |
-| 17   | /report/diff-service-csv-detail/page/<int:limit>/<int:page>  | get  | diff service报告详情列表                                  |
-| 18 | /statistical/detail/all-package/<int:report_base_id> | get | 查询软件包比对统计 |
+| 3 | /upload/exists/upload-file                                   | get  | 判断上传的文件是否存在                                    |
+| 4 | /upload/async/state/<str:task_id>                            | get  | 获取后台任务状态                                          |
+| 5 | /upload/analysis/iso                                         | post | 通过oecp工具分析iso底层变化,生成报告                      |
+| 6 | /upload/storage/iso                                          | get  | ISO镜像文件获取或删除                                     |
+| 7 | /report/detail/all-rpm/page/<int:limit>/<int:page>           | get  | 分页查询所有rpm对比报告详细信息                           |
+| 8 | /report/page/<int:limit>/<int:page>                          | get  | 分页查询报告总览信息                                      |
+| 9 | /report/detail/osv/<int:report_base_id>                      | get  | 查询OSV技术测评报告                                       |
+| 10 | /report/detail/all-differences/page/<int:limit>/<int:page>   | get  | 分页查询所有比对出的差异文件                              |
+| 11 | /report/detail/all-compare/page/<int:limit>/<int:page>       | get  | 分页查询比对报告详情                                      |
+| 12 | /report/compare/iso-info/<int:report_base_id>                | get  | 获取比较的iso名称                                         |
+| 13 | /report/compare/all-compare-type/<int:report_base_id>        | get | 获取所有比较类型 |
+| 14 | /report/compare/all-compare-result/<int:report_base_id>      | get | 对比ISo的差异，主要用于获取比较的基本信息（ISO1 VS ISO2） |
+| 15 | /report/update-version/<int:report_base_id>                  | post | 修改报告标题/删除报告 |
+| 16 | /report/md-detail/<int:report_base_id>                       | get | md文档详情 |
+| 17 | /report/diff-service-csv-detail/page/<int:limit>/<int:page>  | get  | diff service报告详情列表                                  |
+| 18 | /statistical/detail/all-package/<int:report_base_id>         | get | 查询软件包比对统计 |
 | 19 | /statistical/detail/rpm-service-cmd-conf/<int:report_base_id> | get | 查询rpm 的服务文件、命令、配置文件比对结果 |
-| 20 | /statistical/detail/api-change/<int:report_base_id> | get | 查询接口文件变化、接口参数变化、结构体变化统计 |
+| 20 | /statistical/detail/api-change/<int:report_base_id>          | get  | 查询接口文件变化、接口参数变化、结构体变化统计 |
 | 21 | /statistical/detail/kernel-analyse/<int:report_base_id>      | get  | kernel内核分析统计数据查询                                |
-| 22   | /statistical/detail/rpmfile-analyse/<int:report_base_id>     | get  | rpm文件分析统计                                           |
+| 22 | /statistical/detail/rpmfile-analyse/<int:report_base_id>     | get  | rpm文件分析统计                                           |
 
 >**备注：后续所有API请求都包含msg、code、data三个标准字段，视情况而定，data可以是字典也可能是数组，具体请参照API**
 >
