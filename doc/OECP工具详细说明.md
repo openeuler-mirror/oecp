@@ -184,9 +184,6 @@ pip3 install -r requirement
   
   * **`-d, --debuginfo`**
     指定`debuginfo iso/rpm路径`
-
-  * **`--platform`**
-    指定`进行平台验证有关json报告地址`，默认为/tmp/oecp；性能测试默认基线文件为oecp/conf/performance/openEuler-20.03-LTS-aarch64-dvd.iso.performance.json
     
   * **举例**
 
@@ -293,3 +290,64 @@ oecp工具会展示一份最终报告，用于展示最终的测试结果，测�
                 level 3   --  版本升级兼容性不做保证
 
                 level 4   --  未指定的软件包
+
+## 8.  平台验证说明
+
+平台验证需要使用lkp工具，对待测系统进行有关项目检测，oecp工具分析平台验证测试报告（json）报告说明及相似度计算公式如下所示：
+ 
+ 1）执行命令及参数示例：
+
+    python3 cli.py openEuler-20.03-LTS-aarch64-dvd.iso openEuler-22.03-LTS-aarch64-dvd.iso
+
+    `--platform`
+    指定`进行平台验证有关json报告地址`，默认为/tmp/oecp；基础性能测试默认基线文件为oecp/conf/performance/openEuler-20.03-LTS-aarch64-dvd.iso.performance.json
+
+ 2）平台验证各测试项功能及报告命名规范：
+
+  2.1 仓库验证
+
+    -进行仓库验证使用install-rpm job进行验证，运行前在install_rpm.yaml中配置EPOL repo/软件所仓库源进行下载，安装，服务启动、停止，卸载等仓库验证
+    -仓库验证基线报告命名规范示例：openEuler-20.03-LTS-aarch64-dvd.iso.tests.json
+    -仓库验证待检测报告命名规范示例：openEuler-22.03-LTS-aarch64-dvd.iso.tests.json
+    -输出报告：all-rpm-report.csv中rpm-test比较项，该比较项参与相似度计算，差异项compare result为diff，一致项为same，其中每个软件包的具体安装差异报告可在报告rpm-test目录下查看
+    -仓库相似度计算公式：
+        similar_rpm_test = EPOL、软件所仓库软件安装结果一致项/检测安装软件包总数 * 100%
+    
+  2.2 基本功能检测
+
+    -基本功能验证使用测试框架mugen（https://gitee.com/openeuler/mugen），也可执行lkp工具mugen job初始生成基本功能报告：smoke-basic-os.json
+    -基本功能基线报告命名规范示例：openEuler-20.03-LTS-aarch64-dvd.iso.at.json
+    -基本功能待检测报告命名规范示例：openEuler-22.03-LTS-aarch64-dvd.iso.at.json
+    -输出报告：all-AT-report.csv,其中测试用例失败项compare result结果为fail，成功项为pass
+    -at相似度计算公式：
+        similar_at = 待测系统AT用例测试通过总数/os基础测试用例总数 * 100%
+
+  2.3 运行时默认配置
+
+    -运行时默认配置可在待测系统中执行oecp/tools/get_etc_config.py脚本，生成运行时默认配置结果：Linux*.json(*与当前系统相关)
+    -运行时默认配置基线报告命名规范示例：openEuler-20.03-LTS-aarch64-dvd.iso.ciconfig.json
+    -运行时默认配置待检测报告命名规范示例：openEuler-22.03-LTS-aarch64-dvd.iso.ciconfig.json
+    -输出报告：all-ciconfig-report.csv,其中差异项包含配置不同项及配置缺失项（compare result结果为diff/more，一致项为same），all-ci-file-config-report.csv提供运行时配置文件比较结果，不参与最终相似度计算。
+    -ciconfig相似度计算公式：
+        similar_ciconfig = 待测系统配置一致项总数/基准系统配置项总数 * 100%
+
+  2.4 基础性能测试
+
+    -unixbench:执行unixbench job,单核结果在/lkp/result/1/*/unixbench.json，多核结果在/lkp/result/100%/*/unixbench.json（*与当前系统相关）
+    -lmbench3: 执行lmbench job, 结果在/lkp/result/*/lmbench3.json（*与当前系统相关）
+    -benchmark-sql:执行benchmark-sql job，结果在/lkp/result/*/benchmark-sql.json（*与当前系统相关）
+    -基础性能测试基线报告命名规范示例：openEuler-20.03-LTS-aarch64-dvd.iso.performance.json
+    -基础性能测试待比较报告命名规范示例：openEuler-22.03-LTS-aarch64-dvd.iso.performance.json
+    -输出报告：all-performance-report.csv，报告汇总unixbench、lmbench3、benchmark-sql性能有关测试结果，相似度计算关注测试项（conf/performance/perf-reg.json）区分延迟指标测试项与其它指标项
+    -performance相似度计算公式：
+        lmbench3权重：15%
+        unixbench权重： 50%
+        benchmark-sql权重：35%
+        延迟指标项单项得分：
+            score_pass = (baseline - side_b_avg) / baseline + 1
+            score_fail = 1 - (side_b_avg - baseline) / baseline
+        其它指标项单项得分：
+            score = side_b_avg / baseline
+
+        similar_performance = lmbench3平均单项得分 * 15% + unixbench平均单项得分 * 50% + benchmark-sql平均单项得分 * 35%
+  
