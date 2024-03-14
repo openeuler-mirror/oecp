@@ -77,10 +77,14 @@ class ServiceCompareExecutor(CompareExecutor):
     def compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
         category = base_dump['category']
-        flag_vrd = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, base_dump['rpm'], other_dump['rpm'], category)
         base_files, other_files = base_dump[self.data], other_dump[self.data]
-        common_file_pairs, less_dumps, more_dumps = self.format_fullpath_files(base_files, other_files, flag_vrd)
+        if base_dump.get('model'):
+            common_file_pairs = zip(base_files, other_files)
+            less_dumps, more_dumps = [], []
+        else:
+            flag_vrd = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
+            common_file_pairs, less_dumps, more_dumps = self.format_fullpath_files(base_files, other_files, flag_vrd)
         if not common_file_pairs and not less_dumps and not more_dumps:
             logger.debug(f"No service package found, ignored with {other_dump['rpm']} and {other_dump['rpm']}")
             return result

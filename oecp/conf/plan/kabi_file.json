@@ -1,0 +1,15 @@
+{
+  "name": "file",
+  "plan": [
+    {
+      "name": "kabi",
+      "dumper": "KabiDumper",
+      "executor": "nvs.NVSCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_KABI",
+        "show_same": true,
+        "white_list": "kabi_whitelist/aarch64"
+      }
+    }
+  ]
+}

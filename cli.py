@@ -53,6 +53,7 @@ def init_args():
                         help="platform test json result path")
     parser.add_argument("compare_files", metavar="file", type=str, nargs='*', help="compare files")
     parser.add_argument("--submit", help="submit job to compass-ci", type=str, dest="submit", default='at')
+    parser.add_argument("-r", "--rpm-name", type=str, dest="rpm_name", help="name of file belong to rpm")
     parser.set_defaults(func=do_compress)
     return parser.parse_args()
 

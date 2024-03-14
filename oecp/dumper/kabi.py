@@ -23,8 +23,6 @@ from oecp.utils.kernel import get_file_by_pattern
 class KabiDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
         super(KabiDumper, self).__init__(repository, cache, config)
-        cache_require_key = 'extract'
-        self.cache_dumper = self.get_cache_dumper(cache_require_key)
         self.white_list = []
         self.load_white_list()
         self._component_key = 'kabi'
@@ -39,7 +37,12 @@ class KabiDumper(AbstractDumper):
 
     def load_symvers(self, repository):
         rpm_name = repository.get('verbose_path')
-        symvers = get_file_by_pattern(r"^symvers", self.cache_dumper, rpm_name)
+        if self.cmp_model:
+            symvers = repository.get('path')
+            rpm_name = repository.get('rpm_name')
+        else:
+            cache_dumper = self.get_cache_dumper(self.cache_require_key)
+            symvers = get_file_by_pattern(r"^symvers", cache_dumper, rpm_name)
         if not symvers:
             return []
 
@@ -50,7 +53,7 @@ class KabiDumper(AbstractDumper):
         item = {}
         item.setdefault('rpm', rpm_name)
         item.setdefault('kind', self._component_key)
-        item.setdefault('category', repository.get('category', '').value)
+        item.setdefault('category', repository['category'].value)
         with open(symvers, "r") as f:
             for line in f.readlines():
                 line = line.strip().replace("\n", "")

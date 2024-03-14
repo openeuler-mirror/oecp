@@ -13,7 +13,7 @@
       "name": "cmd",
       "dumper": "CmdDumper",
       "executor": "cmd.CmdCompareExecutor",
-        "config": {
+      "config": {
           "compare_type": "CMP_TYPE_CMD",
           "show_same": true
         }
@@ -22,7 +22,7 @@
       "name": "lib",
       "dumper": "ABIDumper",
       "executor": "cmd.CmdCompareExecutor",
-        "config": {
+      "config": {
           "compare_type": "CMP_TYPE_RPM_LIB",
           "show_same": true
         }

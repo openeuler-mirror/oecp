@@ -106,13 +106,13 @@ class NVSCompareExecutor(CompareExecutor):
         """
         single_result = CMP_RESULT_SAME
         count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
-        rpm_version_release_dist = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
         category = base_dump['category'] if base_dump['category'] == other_dump['category'] else CPM_CATEGORY_DIFF
         if base_dump['kind'] == 'kabi' or base_dump['kind'] == 'kconfig':
             component_results = self.format_dump_kv(base_components, other_components, base_dump['kind'])
         elif base_dump['kind'] == CMP_TYPE_REQUIRES:
             component_results = self.format_rmp_name(base_components, other_components)
         else:
+            rpm_version_release_dist = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
             component_results = self.format_dump_provides(base_components, other_components, rpm_version_release_dist)
 
         result = CompareResultComposite(CMP_TYPE_RPM, single_result, base_dump['rpm'], other_dump['rpm'], category)

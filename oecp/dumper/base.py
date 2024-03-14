@@ -19,6 +19,7 @@ import logging
 
 from abc import ABC, abstractmethod
 from oecp.utils.shell import shell_cmd
+from oecp.result.constants import CMP_MODEL_FILE
 
 
 logger = logging.getLogger('oecp')
@@ -34,6 +35,8 @@ class AbstractDumper(ABC):
         self.repository = repository
         self.cache = cache if cache else {}
         self.config = config if config else {}
+        self.cache_require_key = 'extract'
+        self.cmp_model = next(iter(repository.values())).get('model') == CMP_MODEL_FILE
 
     def get_cache_dumper(self, cache_require_key):
         tar_dumper = None

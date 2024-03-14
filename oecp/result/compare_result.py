@@ -401,8 +401,8 @@ def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, 
     else:
         row = {
             "binary rpm package": parent_side,
-            base_side_a: result.cmp_side_a.strip(),
-            base_side_b: result.cmp_side_b.strip(),
+            "Base__" + base_side_a: result.cmp_side_a.strip(),
+            "Check__" + base_side_b: result.cmp_side_b.strip(),
             "compare result": result.cmp_result,
             "compare type": result.cmp_type,
         }
@@ -471,8 +471,8 @@ def get_differences_info(rows):
 def get_require_differencs_info(single_result):
     differencs_info = {'binary rpm package': single_result['binary rpm package']}
     result_keys = list(single_result.keys())
-    side_a = result_keys[1].split(" ")[0]
-    side_b = result_keys[4].split(" ")[0]
+    side_a = "Base__" + result_keys[1].split(" ")[0]
+    side_b = "Check__" + result_keys[4].split(" ")[0]
     symbol_a, package_a = single_result.get(result_keys[1]), single_result.get(result_keys[2])
     symbol_b, package_b = single_result.get(result_keys[4]), single_result.get(result_keys[5])
     differencs_info[side_a] = None if not symbol_a and not package_a else symbol_a.strip() + "  [" + package_a + "]"

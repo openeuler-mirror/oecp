@@ -27,8 +27,6 @@ logger = logging.getLogger('oecp')
 class KconfigDriveDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
         super(KconfigDriveDumper, self).__init__(repository, cache, config)
-        cache_require_key = 'extract'
-        self.cache_dumper = self.get_cache_dumper(cache_require_key)
         self._component_key = 'kconfig'
 
     @staticmethod
@@ -60,11 +58,14 @@ class KconfigDriveDumper(AbstractDumper):
 
     def load_kconfig_range(self, repository):
         rpm_name = repository.get('verbose_path')
-        kconfig = get_file_by_pattern(r"^config-", self.cache_dumper, rpm_name)
+        if self.cmp_model:
+            kconfig = repository.get('path')
+            rpm_name = repository.get('rpm_name')
+        else:
+            cache_dumper = self.get_cache_dumper(self.cache_require_key)
+            kconfig = get_file_by_pattern(r"^config(-)?", cache_dumper, rpm_name)
         if not kconfig:
-            kconfig = get_file_by_pattern(r"^config", self.cache_dumper, rpm_name)
-            if not kconfig:
-                return []
+            return []
 
         kconfig_range_data = self._load_kconfig_json()
         # A collection of non-annotated phases in the configuration file
