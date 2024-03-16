@@ -249,6 +249,10 @@ UPSTREAM_DIST = {
     "fedora"
 }
 
+# BOTH OF OPENEULER ARCH
+X86_64 = "x86_64"
+AARCH64 = "aarch64"
+
 
 def compare_result_name_to_attr(name):
     """

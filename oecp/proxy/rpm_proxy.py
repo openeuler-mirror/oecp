@@ -73,6 +73,9 @@ class RPMProxy(object):
         :param dist:
         :return:
         """
+        if not rpm.endswith('.rpm'):
+            logger.debug(f"RPMProxy rpm_n_v_r_d_a is not a rpm: {rpm}")
+            return rpm, '', '', '', ''
         try:
             if dist == "openEuler":
                 # 名称-版本号-发布号.发行商.体系.rpm

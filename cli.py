@@ -49,6 +49,9 @@ def init_args():
     parser.add_argument("-f", "--format", type=str, dest="output_format", default="csv", help="result export format")
     parser.add_argument("-o", "--output", type=str, dest="output_file", default=default_output_file,
                         help="result output path")
+    parser.add_argument("-b", "--branch", type=str, dest="branch", default="20.03-LTS-SP1",
+                        help="compare base branch name")
+    parser.add_argument("-a", "--arch", type=str, dest="arch", default="aarch64", help="compare arch")
     parser.add_argument("--platform", type=str, dest="platform_test", default=default_output_file,
                         help="platform test json result path")
     parser.add_argument("compare_files", metavar="file", type=str, nargs='*', help="compare files")
@@ -74,7 +77,7 @@ if __name__ == "__main__":
     logger.info(f"--format: {args.output_format}")
     logger.info(f"--output: {args.output_file}")
 
-    plan = Plan(args.plan_path)
+    plan = Plan(args.plan_path, args.compare_files[0], args.branch, args.arch)
     if args.parallel is not None:
         plan.parallel = args.parallel
     logger.info(f"--parallel: {plan.parallel}")
