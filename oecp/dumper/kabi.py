@@ -13,19 +13,17 @@
 # **********************************************************************************
 """
 
-import os
 import gzip
 
 from oecp.dumper.base import AbstractDumper
+from oecp.result.constants import CMP_TYPE_KABI
 from oecp.utils.kernel import get_file_by_pattern
 
 
 class KabiDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
         super(KabiDumper, self).__init__(repository, cache, config)
-        self.white_list = []
-        self.load_white_list()
-        self._component_key = 'kabi'
+        self._white_list = []
         self.data = "data"
 
     @staticmethod
@@ -52,8 +50,10 @@ class KabiDumper(AbstractDumper):
 
         item = {}
         item.setdefault('rpm', rpm_name)
-        item.setdefault('kind', self._component_key)
+        item.setdefault('kind', CMP_TYPE_KABI)
         item.setdefault('category', repository['category'].value)
+        item.setdefault(self.data, [])
+        self.load_white_list(rpm_name)
         with open(symvers, "r") as f:
             for line in f.readlines():
                 line = line.strip().replace("\n", "")
@@ -64,18 +64,11 @@ class KabiDumper(AbstractDumper):
                 if len(hsdp) < 4:
                     continue
 
-                if hsdp[1] in self.white_list:
-                    item.setdefault(self.data, []).append(
-                        {'name': hsdp[1], 'symbol': "=", 'version': "%s %s %s" % (hsdp[0], hsdp[2], hsdp[3])})
+                if self._white_list and hsdp[1] not in self._white_list:
+                    continue
+                item.get(self.data, []).append(
+                    {'name': hsdp[1], 'symbol': "=", 'version': "%s %s %s" % (hsdp[0], hsdp[2], hsdp[3])})
         return [item]
-
-    def load_white_list(self):
-        white_file = self.config.get('white_list')
-        if not white_file.startswith("/"):
-            white_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "conf", white_file)
-        with open(white_file, "r") as f:
-            for line in f.readlines()[1:]:
-                self.white_list.append(line.strip().replace("\n", ""))
 
     def run(self):
         result = []

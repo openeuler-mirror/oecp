@@ -16,11 +16,14 @@
 # **********************************************************************************
 """
 import json
+import os
 import re
 import logging
 import importlib
 from collections import UserDict
 from multiprocessing import cpu_count
+
+from oecp.result.constants import OPENEULER, CMP_TYPE_KABI, CMP_TYPE_DRIVE_KABI, X86_64
 
 logger = logging.getLogger("oecp")
 
@@ -30,7 +33,7 @@ class Plan(UserDict):
 
     """
 
-    def __init__(self, path):
+    def __init__(self, path, base_file, branch, arch):
         """
 
         :param path: 比较计划路径
@@ -41,7 +44,15 @@ class Plan(UserDict):
         self._base = []
         self._other = []
         self._plan = path
+        self._base_file = os.path.basename(base_file)
+        self._branch = self.cut_branch(branch)
+        self._arch = arch
         self._load(path)
+
+    @staticmethod
+    def cut_branch(branch):
+        os_branch = branch.lower().replace(OPENEULER, '').strip('-_.')
+        return os_branch.upper()
 
     def _load(self, path):
         """
@@ -65,6 +76,8 @@ class Plan(UserDict):
                     try:
                         name = item["name"]
                         config = item.get("config", dict())
+                        if name in [CMP_TYPE_KABI, CMP_TYPE_DRIVE_KABI]:
+                            self.get_cmp_branch_arch(config)
 
                         # update compare type
                         from oecp.result.constants import compare_result_name_to_attr
@@ -191,6 +204,25 @@ class Plan(UserDict):
         :return:
         """
         return self.config_of(name).get("sensitive_image", False)
+
+    def get_cmp_branch_arch(self, conf):
+        if self._base_file.endswith('.iso'):
+            all_split_info = self._base_file.split('-')
+            if all_split_info[0].lower() == OPENEULER:
+                try:
+                    if re.match(r"SP", all_split_info[3]):
+                        version = '-'.join(all_split_info[1:4])
+                        self._branch = version
+                    elif "LTS" in self._base_file:
+                        self._branch = '-'.join(all_split_info[1:3])
+                except IndexError:
+                    logger.warning(
+                        f"Please check the base iso name: {self._base_file}, not get the iso branch.")
+        if X86_64 in self._base_file:
+            self._arch = X86_64
+
+        conf.setdefault("branch", self._branch)
+        conf.setdefault("arch", self._arch)
 
 
 def load_module_class(package, module_name, class_name):
