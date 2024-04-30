@@ -37,19 +37,30 @@ class FileListDumper(AbstractDumper):
         self.white_rpm = "/conf/rpm_white/rpm_name_list.json"
 
     @staticmethod
-    def filter_attention_files(line):
+    def filter_not_focus_files(line):
+        if not line or NO_FILES in line:
+            return False
+        elif "metadata_list-compact" in line:
+            return False
+        elif ".so." in line and not line.endswith(".py"):
+            return False
         for filter_pattern in FILTER_PATTERN.values():
-            if re.match(filter_pattern, line) or "metadata_list-compact" in line:
-                return True
+            if re.match(filter_pattern, line):
+                return False
 
-        return False
+        return True
+
+    def load_white_list(self):
+        white_file_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + self.white_rpm
+        with open(white_file_path, 'r') as rpm_name_list:
+            white_list = json.load(rpm_name_list)
+
+        return white_list
 
     def dump(self, repository):
         rpm_path = repository['path']
-        white_file_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + self.white_rpm
+        white_list = self.load_white_list()
         rpm_extract_dir = self.extract_info.get(os.path.basename(rpm_path))
-        with open(white_file_path, 'r') as rpm_name_list:
-            white_list = json.load(rpm_name_list)
         dump_list = []
         code, out, err = shell_cmd(self._cmd + [rpm_path])
         if not code:
@@ -57,10 +68,9 @@ class FileListDumper(AbstractDumper):
                 logger.warning(err)
             if out:
                 for line in out.split("\n"):
-                    if not line or NO_FILES in line:
+                    if not self.filter_not_focus_files(line):
                         continue
-                    if self.filter_attention_files(line):
-                        continue
+
                     if repository['name'] in white_list['rpm_name_list']:
                         dump_list.append(os.path.basename(line))
                     else:

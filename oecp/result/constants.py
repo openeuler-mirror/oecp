@@ -175,7 +175,7 @@ FILTER_PATTERN = {
     "jabi": ".*\\.jar$",
     "abi": "^/(usr/)?lib(64)?/.+\\.so|.*\\.a$|.*\\.rlib$",
     "cmd": "^/usr/(local/)?(s)?bin/.*|^/bin/.*",
-    "build": "^/usr/lib/.build-id/.*",
+    "build_id": "^/usr/lib/.build-id/.*|^/lib/modules/.*/vdso/.build-id.*",
     "ima": "^/etc/ima/.*"
 }
 NO_FILES = "(没有包含文件)"
