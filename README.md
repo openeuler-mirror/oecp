@@ -85,6 +85,12 @@ pip3 install -r requirement
   * **`-f, --format`**
     指定`输出格式`，默认为csv
 
+  * **`-b, --branch`**
+    指定`kabi基线分支`，默认为20.03-LTS-SP1分支，可离线指定对比目标kabi白名单分支（比较对象为iso时工具可自行解析）
+
+  * **`-a, --arch`**
+    指定`架构`，指定比较架构，目前支持x86_64、aarch64（比较对象名内含架构时工具可自行解析）
+
   * **`-o, --output`**
     指定`输出结果路径`，默认为/tmp/oecp
   
@@ -107,10 +113,16 @@ pip3 install -r requirement
     比较rpm包文件列表差异，可通过rpm -pql ${rpm_path}命令获取rpm文件列表
   * **`kconfig.json`**
     比较内核配置文件，需依赖RPMExtractDumper（提取解压rpm的dumper类）
+  * **`kabi.json`**
+    比较内核kabi列表，需依赖RPMExtractDumper（提取解压rpm的dumper类）
   * **`package_list.json`**
     比较两个rpm包名称、版本、发行版本的差异
   * **`provides_requires.json`**
     比较rpm的provides和requires差异，可通过rpm -pq --provides/requires ${rpm_path}查询
+  * **`abi.json`**
+    比较rpm动态库文件的abi接口差异，使用abidiff工具（详细文档：https://sourceware.org/libabigail/manual/abidiff.html）
+  * **`service.json`**
+    比较rpm的默认服务配置，需依赖RPMExtractDumper（提取解压rpm的dumper类）
   * **`kabi_file.json`**
     比较内核kabi列表变化差异，输入比较目标为内核kabi列表文件（symvers*）时，指定比较计划-p为该json配置文件
   * **`kconfig_file.json`**
