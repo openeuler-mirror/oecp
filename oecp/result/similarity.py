@@ -282,7 +282,7 @@ def performance_rate(results, side_b):
             test_rate = sum(count) / len(count) * weight[test]
             rate += test_rate
 
-    return rate
+    return round(rate, 4)
 
 
 def perfomance_count(results, side_b):
@@ -293,9 +293,8 @@ def perfomance_count(results, side_b):
     }
     if not results:
         return count
-    small_better_reg = get_perf_reg()['small_better']
-    perf_reg_path = os.path.join(os.path.dirname(__file__), "../conf/performance/perf-reg.json")
-    perf_reg = load_json_result(perf_reg_path)
+    perf_reg = get_perf_reg()
+    small_better_reg = perf_reg.get('small_better')
     perf_filter = tuple(perf_reg['filter'])
 
     for result in results:
