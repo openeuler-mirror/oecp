@@ -117,31 +117,42 @@ oecp工具适用于比较两个ISO镜像之间的差别，具体比较项有：
 1）仓库rpm的packagelist（两个仓库包名、版本号、release号比较），对应报告比较类型如下：
 
 - rpm package name
-- rpm filelist
 
-2）config（rpm包内配置）、kconfig（内核配置文件），对应报告比较类型如下：
+2）config（rpm包内配置）、kconfig（内核配置文件）、内核kabi接口，对应报告比较类型如下：
 
 - rpm config
 - rpm kconfig
+- rpm kabi
 
-3）provides（rpm的provides）、requires（rpm的依赖）等, 对应报告比较类型如下：
+3）provides（rpm的provides）、requires（rpm的依赖）等、filelist(rpm内文件), 对应报告比较类型如下：
 
 - rpm provides
 - rpm requires
+- rpm files
 
 4）动态链接库(.so), 静态链接库（.a）abi比较，对应报告比较类型如下：
 
 - rpm abi
 - rpm lib
 
-5）unixbench, lmbench, mysql性能测试，对应报告比较类型如下：
+5）service默认服务配置，头文件、命令变更，对应报告比较类型如下：
+
+- rpm service
+- rpm header
+- rpm cmd
+
+6）unixbench, lmbench3, benchmark-sql性能测试，对应报告比较类型如下：
 
 - performacne
 
-6）服务命令起停测试，对应报告比较类型如下：
+7）服务命令起停测试，对应报告比较类型如下：
 
 - rpm test
 
+8）运行时默认配置，社区AT用例运行结果，对比报告类型如下：
+
+- ciconfig
+- at
 
 ## 4. oecp下载安装与部署
 
@@ -178,6 +189,12 @@ pip3 install -r requirement
   
   * **`-f, --format`**
     指定`输出格式`，默认为csv
+  
+  * **`-b, --branch`**
+    指定`kabi基线分支`，默认为20.03-LTS-SP1分支，可离线指定对比目标kabi白名单分支
+
+  * **`-a, --arch`**
+    指定`架构`，指定比较架构，目前支持x86_64、aarch64
 
   * **`-o, --output`**
     指定`输出结果路径`，默认为/tmp/oecp
