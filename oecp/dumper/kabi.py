@@ -23,7 +23,7 @@ from oecp.utils.kernel import get_file_by_pattern
 class KabiDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
         super(KabiDumper, self).__init__(repository, cache, config)
-        self._white_list = []
+        self.cmp_type = config.get("compare_type")
         self.data = "data"
 
     @staticmethod
@@ -54,6 +54,7 @@ class KabiDumper(AbstractDumper):
         item.setdefault('category', repository['category'].value)
         item.setdefault(self.data, [])
         self.load_white_list(rpm_name)
+        kabi_whitelist = self.kabi_white_list if self.cmp_type == CMP_TYPE_KABI else self.drive_kabi_white_list
         with open(symvers, "r") as f:
             for line in f.readlines():
                 line = line.strip().replace("\n", "")
@@ -64,7 +65,7 @@ class KabiDumper(AbstractDumper):
                 if len(hsdp) < 4:
                     continue
 
-                if self._white_list and hsdp[1] not in self._white_list:
+                if kabi_whitelist and hsdp[1] not in kabi_whitelist:
                     continue
                 item.get(self.data, []).append(
                     {'name': hsdp[1], 'symbol': "=", 'version': "%s %s %s" % (hsdp[0], hsdp[2], hsdp[3])})
