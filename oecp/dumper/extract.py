@@ -125,7 +125,8 @@ class RPMExtractDumper(AbstractDumper):
 
     def _collect_cmd_files(self, extract_dir_name):
         extract_path_obj = Path(extract_dir_name)
-        all_files = [extract_path_obj.glob('usr/bin/**/*'), extract_path_obj.glob('usr/sbin/**/*'),
+        all_files = [extract_path_obj.glob('bin/**/*'), extract_path_obj.glob('sbin/**/*'),
+                     extract_path_obj.glob('usr/bin/**/*'), extract_path_obj.glob('usr/sbin/**/*'),
                      extract_path_obj.glob('usr/local/bin/**/*'), extract_path_obj.glob('usr/local/sbin/**/*')]
         self._cmd_files.setdefault(extract_dir_name, [])
         for glob in all_files:
