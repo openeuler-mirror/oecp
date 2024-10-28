@@ -253,6 +253,9 @@ UPSTREAM_DIST = {
 X86_64 = "x86_64"
 AARCH64 = "aarch64"
 
+# BOOLEAN OPERATORS
+BOOLEAN_OPERATORS = ['and', 'if', 'or', 'with', 'without', 'unless', 'else']
+
 
 def compare_result_name_to_attr(name):
     """
