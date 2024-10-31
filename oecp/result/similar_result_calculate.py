@@ -16,6 +16,7 @@
 # **********************************************************************************
 """
 import os.path
+import warnings
 import pandas as pd
 
 
@@ -24,6 +25,7 @@ def calculate_similarity(all_rpm_report):
     first_colomn_name = df.columns.tolist()[0]
 
     df.drop(labels=0, inplace=True)
+    warnings.simplefilter(action='ignore', category=FutureWarning)
     df.fillna('', inplace=True)
 
     # 新增两列包名

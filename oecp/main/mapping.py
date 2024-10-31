@@ -21,6 +21,7 @@ import gzip
 from pathlib import Path
 from itertools import groupby
 from oecp.proxy.rpm_proxy import RPMProxy
+from oecp.result.constants import BOOLEAN_OPERATORS
 
 try:
     import lzma
@@ -141,6 +142,10 @@ class SQLiteMapping(RepositoryPackageMapping):
             return is_eq, False
         return is_eq, True
 
+    @staticmethod
+    def filter_pkg_name(pkg):
+        return pkg.strip("\(\)") not in BOOLEAN_OPERATORS
+
     def _compare_version(self, require_version, symbol, target_version):
         is_pass = False
         for version_type in ['epoch', 'version', 'release']:
@@ -177,26 +182,39 @@ class SQLiteMapping(RepositoryPackageMapping):
         return version
 
     def is_package_name(self, name):
-        regex = re.compile('[\w-]*')
-        sub_name = regex.sub('', name)
-        return False if sub_name else True
+        pkgs = []
+        matchs = re.match(r"^\(.*\)$", name)
+        if matchs:
+            match_result = matchs.group()
+            list_pkgs = [pkg.strip("\(\)") for pkg in match_result.split()]
+            pkgs = filter(self.filter_pkg_name, list_pkgs)
+        else:
+            regex = re.compile(r'[\w-]*')
+            sub_name = regex.sub('', name)
+            if not sub_name:
+                pkgs.append(name)
+
+        return pkgs
 
     def get_provides_rpm(self, name, symbol, version):
         package_name = []
         cursor = self._sqlite_conn.cursor()
-        if self.is_package_name(name):
-            try:
-                cursor.execute(f"select location_href from packages where location_href like '%/{name}%'")
-                rpm_result = cursor.fetchall()
-                if rpm_result:
-                    rpm_name = rpm_result[0][0].split('/')[-1]
-                else:
-                    rpm_name = None
-            except Exception as e:
-                rpm_name = None
-                logger.error(f'query location_href from packages error,packages name={name}, error={e}')
-            if rpm_name and rpm_name == RPMProxy.rpm_name(rpm_name):
-                package_name.append(rpm_name)
+        pkg_names = self.is_package_name(name)
+        if pkg_names:
+            for name in pkg_names:
+                query_rpms = []
+                try:
+                    cursor.execute(f"select location_href from packages where location_href like '%/{name}%'")
+                    rpm_result = cursor.fetchall()
+                    if rpm_result:
+                        for query_rpm in rpm_result:
+                            query_rpms.append(query_rpm[0].split('/')[-1])
+                except Exception as e:
+                    logger.error(f'query location_href from packages error,packages name={name}, error={e}')
+                for rpm_name in query_rpms:
+                    if rpm_name and name == RPMProxy.rpm_name(rpm_name):
+                        package_name.append(rpm_name)
+            if package_name:
                 return package_name
 
         cursor.execute(f"select pkgKey,epoch,version,release from provides where name='{name}'")

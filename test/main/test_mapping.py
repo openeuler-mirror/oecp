@@ -41,3 +41,12 @@ class TestMapping(TestCase):
 
         self.assertEqual(sqlite.repository_of_package("gcc-7.3.0-20190804"), "gcc-7.3.0-20190804.h31.oe1.oecp.rpm")
         self.assertEqual(sqlite.repository_of_package("notexist-9.3.1-20210204"), "notexist-9.3.1-20210204")
+
+    def test_get_pkg_fullname(self):
+        sqlite_file = os.path.join(os.path.dirname(__file__), "data/primary.sqlite")
+        sqlite = SQLiteMapping(sqlite_file)
+        self.assertEqual(sqlite.get_provides_rpm('(ntp or chrony)', '', ''),
+                         ['ntp-4.2.8p15-13.oe2203sp3.aarch64.rpm', 'chrony-4.1-6.oe2203sp3.aarch64.rpm'])
+        self.assertEqual(sqlite.get_provides_rpm('texlive-cntperchap', '', ''),
+                         ['texlive-cntperchap-svn37572.0.3-26.oe2203sp3.noarch.rpm'])
+        self.assertEqual(sqlite.get_provides_rpm('/bin/bash', '', ''), ['bash-5.1.8-12.oe2203sp3.aarch64.rpm'])
