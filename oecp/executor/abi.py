@@ -46,7 +46,15 @@ class ABICompareExecutor(CompareExecutor):
                         logger.info(f"{rpm} {base_linkfile[0]} link file is change!")
 
     @staticmethod
-    def extract_abi_change_detail(str_content):
+    def filter_abi_symbol(str_content):
+        qemu_abi = r"qemu_stamp_[a-z0-9]{40}"
+        stamp = re.finditer(qemu_abi, str_content)
+        if len(list(stamp)) == 2:
+            return True
+
+        return False
+
+    def extract_abi_change_detail(self, str_content):
         remove_abi, change_abi, add_abi = 0, 0, 0
         pattern_db = r"Functions changes summary: (\d+) Removed(.*?), (\d+) Changed(.*?), (\d+) Added(.*?)functions?"
         debug_match = re.finditer(pattern_db, str_content)
@@ -59,8 +67,14 @@ class ABICompareExecutor(CompareExecutor):
         no_debug_match = re.finditer(pattern_ndb, str_content)
         for n_match in no_debug_match:
             if n_match:
-                remove_abi += int(n_match.group(2))
-                add_abi += int(n_match.group(3))
+                remove_num = int(n_match.group(2))
+                add_num = int(n_match.group(3))
+                if self.filter_abi_symbol(str_content):
+                    remove_num -= 1
+                    add_num -= 1
+                remove_abi += remove_num
+                add_abi += add_num
+
         return remove_abi, change_abi, add_abi
 
     def compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
