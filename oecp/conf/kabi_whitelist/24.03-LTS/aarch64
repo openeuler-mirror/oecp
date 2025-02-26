@@ -23,8 +23,6 @@
 	anon_inode_getfile
 	__arch_clear_user
 	__arch_copy_from_user
-	__arch_copy_from_user
-	__arch_copy_to_user
 	__arch_copy_to_user
 	arch_touch_nmi_watchdog
 	argv_free
@@ -229,7 +227,6 @@
 	devl_assert_locked
 	devl_health_reporter_create
 	devl_health_reporter_destroy
-	devl_health_reporter_destroy
 	devlink_alloc_ns
 	devlink_flash_update_status_notify
 	devlink_flash_update_timeout_notify
@@ -319,7 +316,6 @@
 	devm_request_threaded_irq
 	_dev_notice
 	dev_open
-	_dev_printk
 	_dev_printk
 	dev_printk_emit
 	__dev_queue_xmit
@@ -720,7 +716,6 @@
 	ioport_resource
 	__ioread32_copy
 	ioremap_prot
-	ioremap_prot
 	iounmap
 	iov_iter_kvec
 	__iowrite32_copy
@@ -776,7 +771,6 @@
 	kmalloc_caches
 	kmalloc_large
 	__kmalloc_node
-	kmalloc_node_trace
 	kmalloc_node_trace
 	kmalloc_trace
 	kmem_cache_alloc
@@ -1009,7 +1003,6 @@
 	page_pool_alloc_pages
 	page_pool_create
 	page_pool_destroy
-	page_pool_put_defragged_page
 	page_pool_put_defragged_page
 	page_pool_update_nid
 	panic
@@ -1354,7 +1347,6 @@
 	set_user_nice
 	sg_alloc_append_table_from_pages
 	sg_alloc_table
-	sg_alloc_table_from_pages_segment
 	sg_alloc_table_from_pages_segment
 	sg_copy_from_buffer
 	sg_copy_to_buffer

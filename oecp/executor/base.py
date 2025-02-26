@@ -2,14 +2,14 @@
 """
 # **********************************************************************************
 # Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
-# [oecp] is licensed under the Mulan PSL v1.
-# You can use this software according to the terms and conditions of the Mulan PSL v1.
-# You may obtain a copy of Mulan PSL v1 at:
-#     http://license.coscl.org.cn/MulanPSL
+# [oecp] is licensed under the Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#     http://license.coscl.org.cn/MulanPSL2
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
 # PURPOSE.
-# See the Mulan PSL v1 for more details.
+# See the Mulan PSL v2 for more details.
 # **********************************************************************************
 """
 import os
@@ -108,6 +108,30 @@ class CompareExecutor(ABC):
             [[single_less, '', CMP_RESULT_LESS] for single_less in require_less],
             [['', single_more, CMP_RESULT_MORE] for single_more in require_more]
         ]
+        return all_dump
+
+    @staticmethod
+    def format_func_prototype(base_datas, other_datas):
+        same, diff = [], []
+        base_symbols, other_symbols = list(base_datas.keys()), list(other_datas.keys())
+        same_symbol = set(base_symbols) & set(other_symbols)
+        less_symbol = set(base_symbols) - set(other_symbols)
+        more_symbol = set(other_symbols) - set(base_symbols)
+        for symbol in same_symbol:
+            base_model = base_datas.get(symbol)
+            other_model = other_datas.get(symbol)
+            if base_model == other_model:
+                same.append([base_model, other_model, CMP_RESULT_SAME, symbol])
+            else:
+                diff.append([base_model, other_model, CMP_RESULT_DIFF, symbol])
+
+        all_dump = [
+            same,
+            diff,
+            [[base_datas.get(symbol), '', CMP_RESULT_LESS, symbol] for symbol in less_symbol],
+            [['', other_datas.get(symbol), CMP_RESULT_MORE, symbol] for symbol in more_symbol]
+        ]
+
         return all_dump
 
     @staticmethod

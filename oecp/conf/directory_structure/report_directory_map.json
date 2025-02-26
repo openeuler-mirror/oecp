@@ -4,7 +4,8 @@
             "drive kabi",
             "drive kconfig",
             "kabi",
-            "kconfig"
+            "kconfig",
+            "kapi"
           ],
   "rpmabi_analyse":
           [

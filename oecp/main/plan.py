@@ -23,7 +23,7 @@ import importlib
 from collections import UserDict
 from multiprocessing import cpu_count
 
-from oecp.result.constants import OPENEULER, CMP_TYPE_KABI, CMP_TYPE_DRIVE_KABI, X86_64
+from oecp.result.constants import OPENEULER, CMP_TYPE_KABI, CMP_TYPE_DRIVE_KABI, X86_64, CMP_TYPE_KAPI
 
 logger = logging.getLogger("oecp")
 
@@ -33,21 +33,21 @@ class Plan(UserDict):
 
     """
 
-    def __init__(self, path, base_file, branch, arch):
+    def __init__(self, args):
         """
-
-        :param path: 比较计划路径
+        :param args: 主程序入口参数
         """
         super(Plan, self).__init__()
 
         self._type = ''
         self._base = []
         self._other = []
-        self._plan = path
-        self._base_file = os.path.basename(base_file)
-        self._branch = self.cut_branch(branch)
-        self._arch = arch
-        self._load(path)
+        self._plan = args.plan_path
+        self._base_file = os.path.basename(args.compare_files[0])
+        self._branch = self.cut_branch(args.branch)
+        self._arch = args.arch
+        self._kpath = args.src_kpath
+        self._load(args.plan_path)
 
     @staticmethod
     def cut_branch(branch):
@@ -76,8 +76,10 @@ class Plan(UserDict):
                     try:
                         name = item["name"]
                         config = item.get("config", dict())
-                        if name in [CMP_TYPE_KABI, CMP_TYPE_DRIVE_KABI]:
+                        if name in [CMP_TYPE_KABI, CMP_TYPE_DRIVE_KABI, CMP_TYPE_KAPI]:
                             self.get_cmp_branch_arch(config)
+                            if name == CMP_TYPE_KAPI:
+                                config["src_kernel"] = self._kpath
 
                         # update compare type
                         from oecp.result.constants import compare_result_name_to_attr
@@ -96,7 +98,7 @@ class Plan(UserDict):
                             self[name] = {"name": name, "direct": True, "executor": executor, "config": config}
                         else:
                             # load dumper
-                            if name == 'drive kabi':
+                            if name in [CMP_TYPE_DRIVE_KABI, CMP_TYPE_KAPI]:
                                 module_name, class_name = 'kabi', item["dumper"]
                             elif name == 'lib':
                                 module_name, class_name = 'abi', item["dumper"]

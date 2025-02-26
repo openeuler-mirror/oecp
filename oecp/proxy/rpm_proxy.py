@@ -15,11 +15,14 @@
 # Description: rpm proxy
 # **********************************************************************************
 """
+import os
 import re
 import subprocess
 import logging
+import tarfile
+import tempfile
 
-from oecp.result.constants import STAND_DISTS
+from oecp.result.constants import STAND_DISTS, CMP_TYPE_RPM_KERNEL
 
 logger = logging.getLogger('oecp')
 
@@ -189,3 +192,22 @@ class RPMProxy(object):
                              stdout=subprocess.DEVNULL,
                              stderr=subprocess.STDOUT)
         p.communicate()
+
+    @classmethod
+    def _extract_tar_gz(cls, extract_dir_name, tar_file):
+        file_path = os.path.join(extract_dir_name, tar_file)
+        with tarfile.open(file_path, "r:gz") as tar:
+            tar.extractall(path=extract_dir_name)
+
+    @classmethod
+    def uncompress_source_rpm(cls, src_package, src_kernel=True):
+        dir_path = os.path.dirname(src_package)
+        extract_dir_obj = tempfile.TemporaryDirectory(suffix='__srpm__', dir=dir_path)
+        extract_dir_name = extract_dir_obj.name
+        os.chdir(extract_dir_name)
+        RPMProxy.perform_cpio(src_package)
+        if src_kernel:
+            tar_file = "%s.tar.gz" % CMP_TYPE_RPM_KERNEL
+            cls._extract_tar_gz(extract_dir_name, tar_file)
+
+        return extract_dir_obj

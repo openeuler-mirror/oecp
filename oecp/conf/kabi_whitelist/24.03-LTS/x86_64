@@ -249,7 +249,6 @@
 	devl_assert_locked
 	devl_health_reporter_create
 	devl_health_reporter_destroy
-	devl_health_reporter_destroy
 	devlink_alloc_ns
 	devlink_flash_update_status_notify
 	devlink_flash_update_timeout_notify
@@ -310,8 +309,6 @@
 	devlink_unregister
 	devl_lock
 	devl_param_driverinit_value_get
-	devl_param_driverinit_value_get
-	devl_param_driverinit_value_set
 	devl_param_driverinit_value_set
 	devl_params_register
 	devl_params_unregister
@@ -396,7 +393,6 @@
 	dma_pool_create
 	dma_pool_destroy
 	dma_pool_free
-	dma_resv_add_fence
 	dma_resv_add_fence
 	dma_resv_get_fences
 	dma_resv_reserve_fences
@@ -941,7 +937,6 @@
 	mutex_trylock
 	mutex_unlock
 	__napi_alloc_frag_align
-	__napi_alloc_frag_align
 	__napi_alloc_skb
 	napi_build_skb
 	napi_busy_loop
@@ -1046,7 +1041,6 @@
 	page_pool_alloc_pages
 	page_pool_create
 	page_pool_destroy
-	page_pool_put_defragged_page
 	page_pool_put_defragged_page
 	page_pool_update_nid
 	panic
@@ -1207,7 +1201,6 @@
 	ptp_parse_header
 	ptp_schedule_worker
 	put_device
-	__put_devmap_managed_page_refs
 	__put_devmap_managed_page_refs
 	__put_net
 	__put_task_struct

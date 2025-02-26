@@ -1,0 +1,23 @@
+"make_attrs":
+  - __\w+\(\d, \d\)
+  -  __\w+\(\d\)
+  -  __[a-z]+\(\w+\)
+  -  __cond_acquires\(\w+\)
+"after_attrs":
+  -  __noreturn
+  -  __cold
+  -  __malloc
+  -  __assume_[a-z]+_alignment
+  -  __read_mostly
+  -  __attribute(\w{6})?__(\({2}[a-z]+\(\d\){3})?
+"before_attrs":
+  - __visible
+  - __must_check
+  - __fix_address
+  - __attribute_const__
+  - XZ_EXTERN
+  - __malloc
+  - asmlinkage
+  - __pure
+  - __list_valid_slowpath
+  - noinline
