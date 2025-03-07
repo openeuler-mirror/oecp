@@ -53,6 +53,7 @@ CMP_TYPE_REPOSITORY = "repository"
 CMP_TYPE_ZIP_FILES = "zip file"
 CMP_TYPE_GZIP_FILES = "gzip file"
 CMP_TYPE_KABI = "kabi"
+CMP_TYPE_KAPI = "kapi"
 CMP_TYPE_DRIVE_KABI = "drive kabi"
 CMP_TYPE_KCONFIG = "kconfig"
 CMP_TYPE_KCONFIG_DRIVE = "drive kconfig"
@@ -83,6 +84,9 @@ CMP_TYPE_DIFFERENCES = "differences"
 CMP_TYPE_REQUIRES = "requires"
 CMP_TYPE_PROVIDES = "provides"
 CMP_MODEL_FILE = "file"
+MACRO_DEFINE = "DEFINE"
+MACRO_DECLARE = "DECLARE"
+EXTERN = "extern"
 
 # COMPOSITE_CMPS which without detail report
 COMPOSITE_CMPS = {CMP_TYPE_RPM, CMP_TYPE_REPOSITORY}

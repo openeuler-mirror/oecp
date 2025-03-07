@@ -62,10 +62,13 @@ def compress_report(osv_title, output_path):
 
     Returns:
     """
-    timestamp = time.strftime("%Y%m%d%H%M%S", time.localtime())
-    report_dir = os.path.join(output_path, osv_title)
-    if os.path.exists(report_dir):
-        with tarfile.open(f"{output_path}/report{timestamp}.tar.gz", "w:gz") as tar:
-            tar.add(report_dir, arcname=osv_title, filter=filter_general)
+    if osv_title:
+        timestamp = time.strftime("%Y%m%d%H%M%S", time.localtime())
+        report_dir = os.path.join(output_path, osv_title)
+        if os.path.exists(report_dir):
+            with tarfile.open(f"{output_path}/report{timestamp}.tar.gz", "w:gz") as tar:
+                tar.add(report_dir, arcname=osv_title, filter=filter_general)
+        else:
+            logger.warning(f"report {report_dir} lost.")
     else:
-        logger.warning(f"report {report_dir} lost.")
+        logger.warning(f"Not create oecp report.")

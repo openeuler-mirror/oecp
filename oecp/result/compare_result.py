@@ -35,7 +35,8 @@ from oecp.result.test_result import performance_result_parser, test_result_parse
 from oecp.result.constants import CMP_RESULT_DIFF, CMP_TYPE_DIFFERENCES, ALL_DETAILS_NAME, CMP_TYPE, COMPOSITE_CMPS, \
     CMP_TYPE_AT, CMP_TYPE_RPM, CMP_TYPE_CI_FILE_CONFIG, CMP_TYPE_CI_CONFIG, CMP_TYPE_PERFORMANCE, CMP_TYPE_RPMS_TEST, \
     CMP_TYPE_DRIVE_KABI, CMP_TYPE_SERVICE, CMP_TYPE_RPM_CONFIG, CMP_TYPE_RPM_ABI, CMP_TYPE_RPM_HEADER, \
-    COUNT_ABI_DETAILS, CMP_TYPE_RPM_LEVEL, CMP_TYPE_RPM_REQUIRES, CMP_TYPE_SERVICE_DETAIL, DETAIL_PATH, CMP_RESULT_SAME
+    COUNT_ABI_DETAILS, CMP_TYPE_RPM_LEVEL, CMP_TYPE_RPM_REQUIRES, CMP_TYPE_SERVICE_DETAIL, DETAIL_PATH, \
+    CMP_RESULT_SAME, CMP_TYPE_KAPI
 
 logger = logging.getLogger("oecp")
 
@@ -243,6 +244,8 @@ class CompareResultComposite(CompareResultComponent):
 
                 export.create_csv_report(headers, value, report_path)
             else:
+                if node is None:
+                    return ""
                 # eg: node just a single rpm-requires result
                 export_single_report(node, value, root_path, osv_title)
         all_rpm_report = os.path.join(export_floder, 'all-rpm-report.csv')
@@ -415,6 +418,8 @@ def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, 
             row["effect drivers"] = result.detail
         elif result.cmp_type == CMP_TYPE_SERVICE:
             row["details path"] = result.detail
+        elif result.cmp_type == CMP_TYPE_KAPI:
+            row["kabi symbol"] = result.detail
     # handle kabi result
 
     rows.setdefault(parent_side, {})
@@ -458,6 +463,8 @@ def get_differences_info(rows):
     if not rows:
         return []
     for key in rows.keys():
+        if key is None:
+            return []
         if key.endswith('.rpm') and not key.endswith('.src.rpm'):
             for cmp_type, results in rows[key].items():
                 for single_result in results:
