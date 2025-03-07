@@ -100,6 +100,9 @@ pip3 install -r requirement
   * **`--platform`**
     指定`进行平台验证有关json报告地址`，默认为/tmp/oecp；性能测试默认基线文件为oecp/conf/performance/openEuler-20.03-LTS-aarch64-dvd.iso.performance.json
   
+  * **`-s, --src_kernel`**
+    指定`输入内核源码包路径`，路径下存放内核源码包：kernel-*.src.rpm，比较模式为kapi，需要在对应版本的kernel源码中查找kapi函数原型
+  
 * **举例**
 
   * **` python3 cli.py  /root/openEuler-20.03-LTS-aarch64-dvd.iso /root/openEuler-20.03-LTS-SP1-aarch64-dvd.iso`**
@@ -115,6 +118,8 @@ pip3 install -r requirement
     比较内核配置文件，需依赖RPMExtractDumper（提取解压rpm的dumper类）
   * **`kabi.json`**
     比较内核kabi列表，需依赖RPMExtractDumper（提取解压rpm的dumper类）
+  * **`kapi.json`**
+    捕获kabi列表的kapi原型，比较内核kapi列表，需依赖RPMExtractDumper（提取解压rpm的dumper类）
   * **`package_list.json`**
     比较两个rpm包名称、版本、发行版本的差异
   * **`provides_requires.json`**

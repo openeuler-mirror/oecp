@@ -12,10 +12,11 @@
 # See the Mulan PSL v2 for more details.
 # **********************************************************************************
 """
-
+import concurrent
 import os
 import re
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Pool, cpu_count
 import yaml
 
@@ -274,15 +275,7 @@ class EXTRACTKAPI(object):
 
         return model
 
-    def order_get_prototype(self, kabi_symbols, src_obj):
-        component_results = {}
-        for symbol in kabi_symbols:
-            model = self.get_kapi_prototype(symbol, src_obj)
-            component_results.setdefault(symbol, model)
-
-        return dict(sorted(component_results.items()))
-
-    def multi_get_prototype(self, kabi_symbols, src_obj):
+    def multiprocess_get_prototype(self, kabi_symbols, src_obj):
         """
         异步查询kapi函数原型
         @param kabi_symbols: 需要查找的kabi符号列表
@@ -306,5 +299,21 @@ class EXTRACTKAPI(object):
 
         pool.close()
         pool.join()
+
+        return dict(sorted(component_results.items()))
+
+    def multithread_get_prototype(self, symbols, src_obj):
+        component_results = {}
+        with ThreadPoolExecutor() as executor:
+            futures = {
+                executor.submit(self.get_kapi_prototype, symbol, src_obj): symbol
+                for symbol in symbols
+            }
+            for future in concurrent.futures.as_completed(futures):
+                symbol = futures[future]
+                try:
+                    component_results[symbol] = future.result()
+                except Exception as e:
+                    logger.error("get %s kapi failed, error: %s", symbol, e)
 
         return dict(sorted(component_results.items()))
