@@ -16,7 +16,7 @@
 import os
 import logging
 import tempfile
-from datetime import datetime
+from datetime import datetime, timezone
 
 from oecp.utils.shell import shell_cmd
 from oecp.kabi.csv_result import CsvResult
@@ -32,7 +32,7 @@ class KabiGenerate:
         self.in_dir = in_dir
         self.kb_dir = kb_dir
         self.src_kpath = src_kpath
-        csv_name = f"result-{datetime.now()}.csv"
+        csv_name = f"result-{datetime.now(tz=timezone.utc)}.csv"
         self.result = CsvResult(f"/tmp/kabi/{csv_name}")
 
     def generate(self):
@@ -96,7 +96,8 @@ class KabiGenerate:
         sorted_kabi_dic = {k: v for k, v in sorted(kabi_dic.items(), key=lambda item: item[1])}
         return sorted_kabi_dic  
 
-    def kapi_generate(self, kabi_symbols, src_kpath):
+    @staticmethod
+    def kapi_generate(kabi_symbols, src_kpath):
         """
         :param kabi_symbols: list of kabi
         :param src_kpath: kernel source path
@@ -135,7 +136,8 @@ class KabiGenerate:
             logger.error(f"Error extracting .ko files from {rpm_file}: {e}")
         return extracted_kabi
 
-    def extract_kabi(self, ko_path):
+    @staticmethod
+    def extract_kabi(ko_path):
         """
         Extract KABI information from a .ko file using modprobe --dump-modversions.
         :return: Set of KABI symbols.
@@ -152,7 +154,8 @@ class KabiGenerate:
             logger.error(f"Error extracting KABI from {ko_path}: {e}")
             return set()
 
-    def is_kabi_whitelist(self, kabi_symbols, kb_dir):
+    @staticmethod
+    def is_kabi_whitelist(kabi_symbols, kb_dir):
         """
         Check if each KABI symbol in kabi_symbols is in the whitelist.
         :param kabi_symbols: List of KABI entries
