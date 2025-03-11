@@ -15,13 +15,14 @@
 
 import os
 import logging
-import rpm
 import tempfile
+from datetime import datetime
+
 from oecp.utils.shell import shell_cmd
 from oecp.kabi.csv_result import CsvResult
 from oecp.proxy.rpm_proxy import RPMProxy
 from oecp.main.extract_kapi import EXTRACTKAPI
-from datetime import datetime
+
 
 logger = logging.getLogger("oecp")
 

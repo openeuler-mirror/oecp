@@ -44,11 +44,6 @@ class CsvResult:
                 reader = csv.reader(file)
                 rows = list(reader)
 
-        # Check if the number of rows matches the length of data
-        #if len(rows) - 1 != len(data):  # Subtracting 1 to account for header row
-        #    logger.error(f"The number of data points ({len(data)}) does not match the number of rows in the CSV file ({len(rows) - 1}).")
-        #    return
-
         # Write headers if the file was empty
         if not rows:
             rows.append([column_name])

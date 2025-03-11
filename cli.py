@@ -27,6 +27,7 @@ from oecp.main.plan import Plan
 from oecp.dumper.base import AbstractDumper
 from oecp.kabi.kabi_generate import KabiGenerate
 
+
 def init_args():
     """
     init args
