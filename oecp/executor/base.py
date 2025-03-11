@@ -25,7 +25,7 @@ from oecp.result.constants import CMP_DIFF_RESULT, CMP_TYPE_KCONFIG, BASE_SIDE, 
     CMP_TYPE_RPM_ABI, CMP_RESULT_MORE, CMP_RESULT_LESS, CMP_RESULT_SAME, CMP_RESULT_DIFF, CMP_RESULT_CHANGE, \
     PAT_DIR_VERSION, PAT_VER_CHANGED, UPSTREAM_DIST, CHANGE_DIRECTORY_VERSION, CHANGE_DIST_IN_FILENAME, STAND_DISTS, \
     CHANGE_FILE_VERSION, CHANGE_FILE_TYPE, CHANGE_LINKFILE_VERSION, CHANGE_LINK_TARGET_VERSION, CHANGE_FORMATS, \
-    CHANGE_FILE_FORMAT, CHANGE_LINK_TARGET_FILE
+    CHANGE_FILE_FORMAT, CHANGE_LINK_TARGET_FILE, CMP_TYPE_KO
 
 # 两者category指定的级别不同或者未指定
 
@@ -253,6 +253,77 @@ class CompareExecutor(ABC):
         ]
 
         return all_dump
+
+    @staticmethod
+    def format_ko_info(base_ko_info, other_ko_info):
+        same_info = []
+        diff_info = []
+        less_info = []
+        if not base_ko_info:
+            more_info = []
+            for more, other_info in other_ko_info.items():
+                if re.match('^alias', more):
+                    other_info = '\n'.join(sorted(other_info))
+                more_info.append(['', ' '.join([more, other_info]), CMP_RESULT_MORE])
+            all_dump = [more_info]
+        elif not other_ko_info:
+            for less, base_info in base_ko_info.items():
+                if re.match('^alias', less):
+                    base_info = '\n'.join(sorted(base_info))
+                less_info.append([' '.join([less, base_info]), '', CMP_RESULT_LESS])
+            all_dump = [less_info]
+        else:
+            for item, base_info in base_ko_info.items():
+                other_info = other_ko_info.get(item, None)
+                if re.match('^alias', item):
+                    base_info = '\n'.join(sorted(base_info))
+                    other_info = '\n'.join(sorted(other_info))
+                if base_info == other_info:
+                    same_info.append([' '.join([item, base_info]), ' '.join([item, base_info]), CMP_RESULT_SAME])
+                elif re.match('^license', item) and re.sub(r"\sv\d", '', base_info) == re.sub(r"\sv\d", '', other_info):
+                    same_info.append([' '.join([item, base_info]), ' '.join([item, other_info]), CMP_RESULT_SAME])
+                elif re.match('^vermagic', item):
+                    match_base = re.match(r"(.+)-(\S+).*", base_info.split()[0])
+                    match_other = re.match(r"(.+)-(\S+).*", other_info.split()[0])
+                    if base_info.replace(match_base.group(2), '') == other_info.replace(match_other.group(2), ''):
+                        same_info.append([' '.join([item, base_info]), ' '.join([item, other_info]), CMP_RESULT_SAME])
+                    else:
+                        diff_info.append([' '.join([item, base_info]), ' '.join([item, other_info]), CMP_RESULT_DIFF])
+                else:
+                    if other_info is None:
+                        less_info.append([' '.join([item, base_info]), '', CMP_RESULT_LESS])
+                    else:
+                        diff_info.append([' '.join([item, base_info]), ' '.join([item, other_info]), CMP_RESULT_DIFF])
+            more_info = set(other_ko_info.keys()) - set(base_ko_info.keys())
+
+            all_dump = [
+                same_info,
+                diff_info,
+                less_info,
+                [['', ' '.join([more, other_ko_info.get(more)]), CMP_RESULT_MORE] for more in more_info]
+            ]
+
+        return all_dump
+
+    @staticmethod
+    def format_ko_files(base_datas, other_datas):
+        common_ko_names = []
+        format_results = {
+            CMP_RESULT_SAME: [],
+            CMP_RESULT_MORE: []
+        }
+        for other_ko_name in other_datas:
+            if base_datas.get(other_ko_name):
+                format_results[CMP_RESULT_SAME].append([base_datas.get(other_ko_name), other_datas.get(other_ko_name)])
+                common_ko_names.append(other_ko_name)
+            else:
+                format_results[CMP_RESULT_MORE].append(['', other_datas.get(other_ko_name)])
+
+        only_base_ko = set(base_datas.keys()) - set(common_ko_names)
+        only_base = [[base_datas.get(ko_name), ''] for ko_name in only_base_ko]
+        format_results.setdefault(CMP_RESULT_LESS, only_base)
+
+        return format_results
 
     @staticmethod
     def pretty_provide_datas(datas, v_r_d):
@@ -510,7 +581,10 @@ class CompareExecutor(ABC):
             # 剔除rlib库
             if model == CMP_TYPE_RPM_ABI and focus_file.endswith('.rlib'):
                 continue
-            map_files.setdefault(focus_file.split(self.split_flag)[-1], focus_file)
+            if model == CMP_TYPE_KO:
+                map_files.setdefault(os.path.basename(focus_file).split('.')[0], focus_file)
+            else:
+                map_files.setdefault(focus_file.split(self.split_flag)[-1], focus_file)
 
         return map_files
 

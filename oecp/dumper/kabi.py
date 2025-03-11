@@ -24,7 +24,6 @@ class KabiDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
         super(KabiDumper, self).__init__(repository, cache, config)
         self.cmp_type = config.get("compare_type")
-        self.data = "data"
         self._white_list = self.kabi_white_list
 
     @staticmethod

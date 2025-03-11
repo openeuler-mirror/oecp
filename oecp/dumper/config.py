@@ -26,8 +26,7 @@ class ConfigDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
         super(ConfigDumper, self).__init__(repository, cache, config)
         # 依赖rpm解压对象，暂时先写死，todo: 后面通过config字典中加入{'require': 'extract'}获取此dumper对应的依赖
-        cache_require_key = 'extract'
-        self.cache_dumper = self.get_cache_dumper(cache_require_key)
+        self.cache_dumper = self.get_cache_dumper(self.cache_require_key)
         self.extract_info = self.cache_dumper.get_extract_info()
 
     def _get_text_files(self, rpm_extract_dir):
@@ -45,7 +44,7 @@ class ConfigDumper(AbstractDumper):
             logger.exception('RPM decompression path not found')
             raise
         text_files = self._get_text_files(rpm_extract_name)
-        item = {'rpm': verbose_path, 'category': category, 'kind': 'config', 'data': text_files}
+        item = {'rpm': verbose_path, 'category': category, 'kind': 'config', self.data: text_files}
         return item
 
     def run(self):

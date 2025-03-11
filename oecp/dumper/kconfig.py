@@ -14,14 +14,13 @@
 """
 
 from oecp.dumper.base import AbstractDumper
+from oecp.result.constants import CMP_TYPE_KCONFIG
 from oecp.utils.kernel import get_file_by_pattern
 
 
 class KconfigDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
         super(KconfigDumper, self).__init__(repository, cache, config)
-        self._component_key = 'kconfig'
-        self.data = "data"
 
     def load_kconfig(self, repository):
         rpm_name = repository.get('verbose_path')
@@ -37,7 +36,7 @@ class KconfigDumper(AbstractDumper):
 
         item = {}
         item.setdefault('rpm', rpm_name)
-        item.setdefault('kind', self._component_key)
+        item.setdefault('kind', CMP_TYPE_KCONFIG)
         item.setdefault('category', repository['category'].value)
         with open(kconfig, "r") as f:
             for line in f.readlines():

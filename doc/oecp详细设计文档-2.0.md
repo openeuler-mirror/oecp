@@ -117,6 +117,7 @@ Mulan V2
 |             |                        | list.py                 | 比较文件列表、包列表             |
 |             |                        | null.py                 | 空比较，当比较计划项只需要dumper时使用 |
 |             |                        | nvs.py                  | 符号、版本、名称比较器            |
+|             |                        | ko.py                   | 内核模块比较器                |
 |             |                        | plain.py                | 配置文件比较器                |
 |             |                        | service.py              | 服务文件比较器                |
 |             | dumper                 |                         | dumper模块               |
@@ -129,6 +130,7 @@ Mulan V2
 |             |                        | header.py               | 头文件                    |
 |             |                        | jabi.py                 | jar包abi                |
 |             |                        | kabi.py                 | 内核abi                  |
+|             |                        | ko.py                   | 内核模块                   |
 |             |                        | kconfig.py              | 内核配置                   |
 |             |                        | kconfig_drive.py        | 内核驱动abi、配置             |
 |             |                        | null.py                 | 当比较计划项只需要执行比较时使用       |
@@ -229,6 +231,9 @@ _真实环境如何部署，网络和存储如何划分，业务程序如何部�
   * **`-d, --debuginfo`**
     指定`debuginfo iso/rpm路径`
   
+  * **`-s, --src_kernel`**
+    指定`输入内核源码包路径`，路径下存放内核源码包：kernel-*.src.rpm，比较模式为kapi，需要在对应版本的kernel源码中查找kapi函数原型
+  
 * **举例**
 
   * ` python3 cli.py /root/openEuler-20.03-LTS-aarch64-dvd.iso /root/openEuler-20.03-LTS-SP1-aarch64-dvd.iso -p src/conf/plan/test.json`
@@ -263,6 +268,7 @@ _真实环境如何部署，网络和存储如何划分，业务程序如何部�
 | `HeaderDumper`                                   | 依赖RPMExtractDumper，从rpm解压dumper中提取头文件                        | repository,cache,config                                      | 头文件的字典封装                                                                                        |                                                              |
 | `JABIDumper`                                     | 依赖RPMExtractDumper，从rpm解压dumper中提取jar包                       | repository,cache,config                                      | jar包文件字典的封装                                                                                     |                                                              |
 | `ServiceDumper`                                  | 依赖RPMExtractDumper，从rpm解压dumper中提取服务文件                       | repository,cache,config                                      | 服务文件字典的封装                                                                                       |                                                              |
+| `KoDumper`                                       | 依赖RPMExtractDumper，从rpm解压dumper中提取ko文件                        | repository,cache,config                                      | 内核模块info信息及kabi列表封装成KoCompareExecutor可处理的对象                                                     |                                                              |
 | `FileListDumper`                                 | 获取rpm包内文件列表                                                  | repository,cache,config                                      | rpm包内文件列表的字典封装                                                                                  |                                                              |
 | `PackageListDumper`                              | 获取仓库目录rpm包列表                                                 | directory,config                                             | 仓库目录所有rpm列表的字典封装                                                                                |                                                              |
 | `ProvidesDumper`                                 | 获取rpm的provides                                               | repository,cache,config                                      | rpm的provides列表的字典封装                                                                             |                                                              |
@@ -275,6 +281,7 @@ _真实环境如何部署，网络和存储如何划分，业务程序如何部�
 | `LibCompareExecutor`                             | 比较两个动态(.so)/静态库(.a)的dumper                                   | dump_a,dump_b,config                                         | lib的比较结果对象树和差异保存到文件                                                                             |                                                              |
 | `ServiceCompareExecutor`                         | 比较两个服务文件的配置及服务文件增加删除                                         | dump_a,dump_b,config                                         | 服务文件的比较结果对象树和差异保存到文件                                                                            |
 | `ListCompareExecutor`                            | 支持FileListDumper和PackageListDumper对象的dumper比较                | dump_a,dump_b,config                                         | 比较结果对象树                                                                                         |                                                              |
+| `KoCompareExecutor`                              | 比较两个内核模块的info信息及abi接口增加删除                               | dump_a,dump_b,config                                         | 比较结果对象树                                                                                         |                                                              |
 | `NVSCompareExecutor`                             | 比较组件name/version/symbol的dumper                               | dump_a,dump_b,config                                         | 比较结果对象树                                                                                         |                                                              |
 | `PlainCompareExecutor`                           | 比较config配置文件内容                                               | dump_a,dump_b,config                                         | 比较结果对象树和diff的文件内容                                                                               |                                                              |
 | `CompareResultComposite.export`                  | 输出工具检测报告文件                                                   | 输出地址、输出格式、比较对象地址、平台测试文件地址                                        | 报告目录名                                                                                           |                                                              |

@@ -23,7 +23,8 @@ import importlib
 from collections import UserDict
 from multiprocessing import cpu_count
 
-from oecp.result.constants import OPENEULER, CMP_TYPE_KABI, CMP_TYPE_DRIVE_KABI, X86_64, CMP_TYPE_KAPI
+from oecp.result.constants import OPENEULER, CMP_TYPE_KABI, CMP_TYPE_DRIVE_KABI, X86_64, CMP_TYPE_KAPI, CMP_TYPE_KO, \
+    AARCH64
 
 logger = logging.getLogger("oecp")
 
@@ -76,7 +77,7 @@ class Plan(UserDict):
                     try:
                         name = item["name"]
                         config = item.get("config", dict())
-                        if name in [CMP_TYPE_KABI, CMP_TYPE_DRIVE_KABI, CMP_TYPE_KAPI]:
+                        if name in [CMP_TYPE_KABI, CMP_TYPE_DRIVE_KABI, CMP_TYPE_KAPI, CMP_TYPE_KO]:
                             self.get_cmp_branch_arch(config)
                             if name == CMP_TYPE_KAPI:
                                 config["src_kernel"] = self._kpath
@@ -220,8 +221,15 @@ class Plan(UserDict):
                 except IndexError:
                     logger.warning(
                         f"Please check the base iso name: {self._base_file}, not get the iso branch.")
-        if X86_64 in self._base_file:
-            self._arch = X86_64
+        if self._arch:
+            if self._arch not in [X86_64, AARCH64]:
+                self._arch = ""
+                logger.warning("only support two arch: x86_64 and aarch64")
+        else:
+            if re.search(r"x86[_|-]64", self._base_file):
+                self._arch = X86_64
+            elif re.search(r"%s" % AARCH64, self._base_file):
+                self._arch = AARCH64
 
         conf.setdefault("branch", self._branch)
         conf.setdefault("arch", self._arch)

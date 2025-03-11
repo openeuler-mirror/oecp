@@ -82,6 +82,7 @@ class Repository(UserDict):
             "category": category_level,
             "path": path,
             "verbose_path": verbose_path,
+            "src": self.src_package,
             "raw_path": path,
             "debuginfo_path": debuginfo_path,
             "raw_debuginfo_path": debuginfo_path
@@ -100,6 +101,7 @@ class Repository(UserDict):
         file = {
             "rpm_name": rpm_name,
             "path": path,
+            "src": rpm_name,
             "category": category_level,
             "model": CMP_MODEL_FILE
         }

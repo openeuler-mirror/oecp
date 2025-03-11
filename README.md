@@ -120,6 +120,8 @@ pip3 install -r requirement
     比较内核kabi列表，需依赖RPMExtractDumper（提取解压rpm的dumper类）
   * **`kapi.json`**
     捕获kabi列表的kapi原型，比较内核kapi列表，需依赖RPMExtractDumper（提取解压rpm的dumper类）
+  * **`ko.json`**
+    比较内核模块的modinfo信息及接口变化，需依赖RPMExtractDumper（提取解压rpm的dumper类）
   * **`package_list.json`**
     比较两个rpm包名称、版本、发行版本的差异
   * **`provides_requires.json`**
@@ -134,3 +136,5 @@ pip3 install -r requirement
     比较内核配置变化差异，输入比较目标为内核配置文件（config-*）时，指定比较计划-p为该json配置文件
   * **`service_file.json`**
     比较服务文件配置变化差异，输入比较目标为服务文件（.service）时，指定比较计划-p为该json配置文件
+  * **`ko_file.json`**
+    比较内核模块文件配置变化差异，输入比较目标为服务文件（.ko）时，指定比较计划-p为该配置文件

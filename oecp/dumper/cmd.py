@@ -24,8 +24,7 @@ logger = logging.getLogger('oecp')
 class CmdDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
         super(CmdDumper, self).__init__(repository, cache, config)
-        cache_require_key = 'extract'
-        self.cache_dumper = self.get_cache_dumper(cache_require_key)
+        self.cache_dumper = self.get_cache_dumper(self.cache_require_key)
         self.extract_info = self.cache_dumper.get_extract_info()
         self._component_key = 'cmd'
 
@@ -38,7 +37,7 @@ class CmdDumper(AbstractDumper):
         if not rpm_extract_name:
             logger.exception(f"RPM {verbose_path} decompression path not found.")
         cmd_files = self.cache_dumper.get_cmd_files(rpm_extract_name)
-        item = {'rpm': verbose_path, 'category': category, 'kind': self._component_key, 'data': cmd_files}
+        item = {'rpm': verbose_path, 'category': category, 'kind': self._component_key, self.data: cmd_files}
         return item
 
     def run(self):

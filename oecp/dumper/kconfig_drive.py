@@ -19,6 +19,7 @@ from json.decoder import JSONDecodeError
 from pathlib import Path
 
 from oecp.dumper.base import AbstractDumper
+from oecp.result.constants import CMP_TYPE_KCONFIG
 from oecp.utils.kernel import get_file_by_pattern
 
 logger = logging.getLogger('oecp')
@@ -27,7 +28,6 @@ logger = logging.getLogger('oecp')
 class KconfigDriveDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
         super(KconfigDriveDumper, self).__init__(repository, cache, config)
-        self._component_key = 'kconfig'
 
     @staticmethod
     def get_config_data(kconfig_range_data):
@@ -72,9 +72,9 @@ class KconfigDriveDumper(AbstractDumper):
         not_annotated_config = self.get_config_data(kconfig_range_data)
         item = {
             "rpm": rpm_name,
-            "kind": self._component_key,
+            "kind": CMP_TYPE_KCONFIG,
             "category": repository.get('category').value,
-            "data": []
+            self.data: []
         }
         with open(kconfig, "r") as f:
             for line in f.readlines():
@@ -84,11 +84,11 @@ class KconfigDriveDumper(AbstractDumper):
                 if line.startswith("#"):
                     for annotation in kconfig_range_data.get("annotation"):
                         if annotation in line:
-                            item.get("data").append({'name': line, 'symbol': "=", 'version': ""})
+                            item.get(self.data).append({'name': line, 'symbol': "=", 'version': ""})
                     continue
                 name, version = line.split("=", 1)
                 if name in not_annotated_config:
-                    item.get("data").append({'name': name, 'symbol': "=", 'version': version})
+                    item.get(self.data).append({'name': name, 'symbol': "=", 'version': version})
         return [item]
 
     def run(self):
