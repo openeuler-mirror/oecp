@@ -41,7 +41,7 @@ class KAPICompareExecutor(CompareExecutor):
             logger.error("Please input the storage path of the kernel source rpms with -s (--src_kernel).")
             return None
         path = Path(kpath)
-        src_kernel_rpms = [str(file) for file in path.rglob('*.src.rpm') if file.is_file()]
+        src_kernel_rpms = [str(file) for file in path.rglob('kernel*.src.rpm') if file.is_file()]
         for srpm in src_kernel_rpms:
             rpm_version = "-".join([k_v, k_r])
             srpm_name = os.path.basename(srpm)
@@ -66,8 +66,8 @@ class KAPICompareExecutor(CompareExecutor):
             logger.error(f"not get source code path {base_srpm_obj}, {other_srpm_obj}")
             return result
         extract_kapi = EXTRACTKAPI()
-        base_kapi = extract_kapi.order_get_prototype(base_kabi, base_srpm_obj)
-        other_kapi = extract_kapi.order_get_prototype(other_kabi, other_srpm_obj)
+        base_kapi = extract_kapi.multithread_get_prototype(base_kabi, base_srpm_obj)
+        other_kapi = extract_kapi.multithread_get_prototype(other_kabi, other_srpm_obj)
         component_results = self.format_func_prototype(base_kapi, other_kapi)
         for component_result in component_results:
             for sub_component_result in component_result:
