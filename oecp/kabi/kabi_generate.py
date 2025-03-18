@@ -14,6 +14,7 @@
 """
 
 import os
+import re
 import logging
 import tempfile
 from datetime import datetime, timezone
@@ -123,8 +124,10 @@ class KabiGenerate:
                 logger.info(f"Current working directory: {os.getcwd()}")
                 logger.info(f"Extracting {rpm_file}")
                 RPMProxy.perform_cpio(rpm_file)
+                rpm_name = os.path.basename(rpm_file)
+                root_dir = "./usr/local/Ascend/driver/host_rpm/" if re.match("ascend-hdk", rpm_name.lower()) else "."
                 # Extract RPM contents
-                for root, _, files in os.walk('.'):
+                for root, _, files in os.walk(root_dir):
                     for file_info in files:
                         if file_info.endswith(('.ko', '.ko.new', '.ko.xz')):
                             extracted_ko_path = os.path.join(root, file_info)
@@ -145,7 +148,6 @@ class KabiGenerate:
         try:
             ret, out, err = shell_cmd(['modprobe', '--dump-modversions', ko_path])
             if ret == 0:
-                logger.info(f"Extracted KABI info from {ko_path}")
                 return set(out.splitlines())
             else:
                 logger.error(f"Failed to extract KABI from {ko_path}: {err}")
