@@ -54,6 +54,8 @@ CMP_TYPE_ZIP_FILES = "zip file"
 CMP_TYPE_GZIP_FILES = "gzip file"
 CMP_TYPE_KABI = "kabi"
 CMP_TYPE_KAPI = "kapi"
+CMP_TYPE_KO = "ko"
+CMP_TYPE_KO_INFO = "ko info"
 CMP_TYPE_DRIVE_KABI = "drive kabi"
 CMP_TYPE_KCONFIG = "kconfig"
 CMP_TYPE_KCONFIG_DRIVE = "drive kconfig"
@@ -105,7 +107,8 @@ KERNEL_TYPES = {
     CMP_TYPE_KABI,
     CMP_TYPE_DRIVE_KABI,
     CMP_TYPE_KCONFIG,
-    CMP_TYPE_KCONFIG_DRIVE
+    CMP_TYPE_KCONFIG_DRIVE,
+    CMP_TYPE_KO
 }
 
 PKG_SIMILARITY_SON_TYPES = {
@@ -179,6 +182,7 @@ FILTER_PATTERN = {
     "jabi": ".*\\.jar$",
     "abi": "^/(usr/)?lib(64)?/.+\\.so|.*\\.a$|.*\\.rlib$",
     "cmd": "^/usr/(local/)?(s)?bin/.*|^/bin/.*",
+    "ko": ".*\\.ko(.xz)?$",
     "build_id": "^/usr/lib/.build-id/.*|^/lib/modules/.*/vdso/.build-id.*",
     "ima": "^/etc/ima/.*"
 }

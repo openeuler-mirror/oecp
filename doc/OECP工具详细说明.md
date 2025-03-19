@@ -74,6 +74,7 @@
 |             |                        | header.py               | 比较头文件              |
 |             |                        | service.py              | 比较服务文件             |
 |             |                        | kapi.py                 | 匹配kapi原型，比较kapi列表  |
+|             |                        | ko.py                   | 比较内核模块info信息及abi接口变化  |
 |             | dumper                 |                         | dumper模块           |
 |             |                        | base.py                 | dumper基类           |
 |             |                        | config.py               | rpm包的配置文件          |
@@ -81,6 +82,7 @@
 |             |                        | filelist.py             | 文件列表               |
 |             |                        | kconfig.py              | 内核配置               |
 |             |                        | kabi.py                 | 内核abi              |
+|             |                        | ko.py                   | 内核模块              |
 |             |                        | kconfig_drive.py        | 内核驱动配置             |
 |             |                        | null.py                 | 当比较计划项只需要执行比较时使用   |
 |             |                        | packagelist.py          | ISO中包列表            |
@@ -119,12 +121,13 @@ oecp工具适用于比较两个ISO镜像之间的差别，具体比较项有：
 
 - rpm package name
 
-2）config（rpm包内配置）、kconfig（内核配置文件）、内核kabi接口、kapi原型，对应报告比较类型如下：
+2）config（rpm包内配置）、kconfig（内核配置文件）、内核kabi接口、内核模块、kapi原型，对应报告比较类型如下：
 
 - rpm config
 - rpm kconfig
 - rpm kabi
 - rpm kapi
+- rpm ko
 
 3）provides（rpm的provides）、requires（rpm的依赖）等、filelist(rpm内文件), 对应报告比较类型如下：
 
@@ -220,6 +223,8 @@ pip3 install -r requirement
       比较rpm包文件列表差异，可通过rpm -pql ${rpm_path}命令获取rpm文件列表
     * **`kconfig.json`**
       比较内核配置文件，需依赖RPMExtractDumper（提取解压rpm的dumper类）
+    * **`ko.json`**
+      比较内核模块的modinfo信息及接口变化，需依赖RPMExtractDumper（提取解压rpm的dumper类）
     * **`package_list.json`**
       比较两个rpm集合包名称、版本、发行版本的差异
     * **`provides_requires.json`**
@@ -244,6 +249,7 @@ oecp工具会展示一份最终报告，用于展示最终的测试结果，测�
 |                   |                               | kabi           | 内核abi比较结果目录      |
 |                   |                               | kconfig        | 内核配置比较结果目录       |
 |                   |                               | kapi           | 内核kapi原型比较结果目录   |
+|                   |                               | ko             | 内核模块比较结果目录   |
 |                   | rpm_analyse                   |                | rpm比较结果目录        |
 |                   |                               | rpm-provides   | rpm包提供符号比较结果目录   |
 |                   |                               | rpm-requires   | rpm包依赖符号比较结果目录   |
@@ -262,6 +268,7 @@ oecp工具会展示一份最终报告，用于展示最终的测试结果，测�
 |                   |                               | config         | 配置文件内容变化详情       |
 |                   |                               | header         | 头文件内容变化详情        |
 |                   |                               | service-detail | 服务文件配置变化详情       |
+|                   |                               | ko-info        | 内核模块信息及abi变化详情       |
 |                   | all-AT-report.csv             |                | 社区AT用例运行测试结果     |
 |                   | all-ciconfig-report.csv       |                | OSV版本运行时默认配置一致性结果 |
 |                   | all-ci-file-config-report.csv |                | 运行时默认配置文件一致性结果   |

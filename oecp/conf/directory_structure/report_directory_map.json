@@ -5,7 +5,8 @@
             "drive kconfig",
             "kabi",
             "kconfig",
-            "kapi"
+            "kapi",
+            "ko"
           ],
   "rpmabi_analyse":
           [
@@ -27,6 +28,7 @@
           ],
     "details_analyse":
           [
-            "service detail"
+            "service detail",
+            "ko info"
           ]
 }

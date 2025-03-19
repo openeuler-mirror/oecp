@@ -22,7 +22,7 @@ from oecp.proxy.rpm_proxy import RPMProxy
 from oecp.result.test_result import get_perf_reg, load_json_result, small_better
 from oecp.result.constants import CMP_TYPE_RPM, SIMILARITY_TYPES, KERNEL_TYPES, CMP_TYPE_RPMS_TEST, CMP_TYPE_AT, \
     CMP_TYPE_CI_CONFIG, CMP_TYPE_PERFORMANCE, CMP_TYPE_RPM_ABI, PKG_SIMILARITY_SON_TYPES, CMP_TYPE_RPM_FILES, \
-    CMP_SAME_RESULT, RESULT_SAME, CMP_RESULT_DIFF, CMP_RESULT_LESS, CMP_TYPE_RPM_LEVEL
+    CMP_SAME_RESULT, RESULT_SAME, CMP_RESULT_DIFF, CMP_RESULT_LESS, CMP_TYPE_RPM_LEVEL, CMP_TYPE_KO, RESULT_MORE
 
 logger = logging.getLogger("oecp")
 
@@ -159,6 +159,8 @@ def count_kernel_result(count, rpm_results, cmp_type, rpm):
         "diff": 0
     })
     for result in rpm_results:
+        if cmp_type == CMP_TYPE_KO and result["compare result"] in RESULT_MORE:
+            continue
         if result["compare result"] in RESULT_SAME:
             count.get(cmp_type).get(rpm_n_v)["same"] += 1
         else:

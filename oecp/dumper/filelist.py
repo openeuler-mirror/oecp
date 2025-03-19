@@ -29,8 +29,7 @@ class FileListDumper(AbstractDumper):
 
     def __init__(self, repository, cache=None, config=None):
         super(FileListDumper, self).__init__(repository, cache, config)
-        cache_require_key = "extract"
-        self.cache_dumper = self.get_cache_dumper(cache_require_key)
+        self.cache_dumper = self.get_cache_dumper(self.cache_require_key)
         self.extract_info = self.cache_dumper.get_extract_info()
         self._cmd = ['rpm', '-pql', '--nosignature']
         self.link_flag = "_[link]_"
@@ -80,7 +79,7 @@ class FileListDumper(AbstractDumper):
                             dump_list.append(''.join(link_tar))
                         else:
                             dump_list.append(line)
-        item = {'rpm': os.path.basename(rpm_path), 'kind': 'filelist', 'data': dump_list}
+        item = {'rpm': os.path.basename(rpm_path), 'kind': 'filelist', self.data: dump_list}
         item.setdefault('category', repository['category'].value)
         return item
 

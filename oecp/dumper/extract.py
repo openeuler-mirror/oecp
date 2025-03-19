@@ -34,10 +34,11 @@ class RPMExtractDumper(AbstractDumper):
         self._extract_info = {}
 
         # 文件类型
-        self._text_mime = ["text/plain"]
+        self._text_mime = ["text/plain", "application/x-wine-extension-ini"]
         self._library_mime = ["application/x-sharedlib", "application/x-pie-executable"]
         self._archive_mime = ["application/x-archive"]
         self._head_mime = ["text/x-c", "text/x-c++"]
+        self._ko_mime = ["application/x-object", "application/x-xz"]
 
         # 保存解压目录到对应类型文件列表的映射
         self._config_files = {}
@@ -45,23 +46,28 @@ class RPMExtractDumper(AbstractDumper):
         self._service_files = {}
         self._header_files = {}
         self._cmd_files = {}
+        self._ko_files = {}
 
     def do_rpm_cpio(self, rpm_path):
-        full_path = os.path.realpath(rpm_path)
-        pwd_path = os.getcwd()
-        verbose_path = os.path.basename(rpm_path)
-        extract_dir_obj = tempfile.TemporaryDirectory(suffix='__rpm__', prefix=f'_{verbose_path}_',
-                                                      dir=self._work_dir)
-        extract_dir_name = extract_dir_obj.name
-        os.chdir(extract_dir_name)
-        RPMProxy.perform_cpio(full_path)
-        os.chdir(pwd_path)
-        self._extract_info.setdefault(verbose_path, extract_dir_obj)
-        self._collect_config_file(extract_dir_name)
-        self._collect_library_files(extract_dir_name)
-        self._collect_service_files(extract_dir_name)
-        self._collect_header_files(extract_dir_name)
-        self._collect_cmd_files(extract_dir_name)
+        try:
+            full_path = os.path.realpath(rpm_path)
+            pwd_path = os.getcwd()
+            verbose_path = os.path.basename(rpm_path)
+            extract_dir_obj = tempfile.TemporaryDirectory(suffix='__rpm__', prefix=f'_{verbose_path}_',
+                                                          dir=self._work_dir)
+            extract_dir_name = extract_dir_obj.name
+            os.chdir(extract_dir_name)
+            RPMProxy.perform_cpio(full_path)
+            os.chdir(pwd_path)
+            self._extract_info.setdefault(verbose_path, extract_dir_obj)
+            self._collect_config_file(extract_dir_name)
+            self._collect_library_files(extract_dir_name)
+            self._collect_service_files(extract_dir_name)
+            self._collect_header_files(extract_dir_name)
+            self._collect_cmd_files(extract_dir_name)
+            self._collect_ko_files(extract_dir_name, verbose_path)
+        except Exception as err:
+            logger.exception(f"Collect files error: {err}")
 
     def clean(self):
         # clean tempfile
@@ -134,6 +140,22 @@ class RPMExtractDumper(AbstractDumper):
                 if file.is_file():
                     self._cmd_files.setdefault(extract_dir_name, []).append(file.as_posix())
 
+    def _collect_ko_files(self, extract_dir_name, rpm_name):
+        extract_path_obj = Path(extract_dir_name)
+        if "dkms" in rpm_name:
+            cmd = f"cd {extract_path_obj} && find . -name *.tar.gz | xargs -r tar -xf"
+            os.system(cmd)
+        all_files = extract_path_obj.glob('**/*.ko*')
+        self._ko_files.setdefault(extract_dir_name, [])
+        for file in all_files:
+            if not file.is_file():
+                continue
+            file_path = file.as_posix()
+            file_type = magic.from_file(file_path, mime=True)
+            if file_type not in self._ko_mime:
+                continue
+            self._ko_files.setdefault(extract_dir_name, []).append(file_path)
+
     def get_extract_info(self):
         return self._extract_info
 
@@ -151,6 +173,9 @@ class RPMExtractDumper(AbstractDumper):
 
     def get_cmd_files(self, extract_dir_name):
         return self._cmd_files[extract_dir_name]
+
+    def get_ko_files(self, extract_dir_name):
+        return self._ko_files[extract_dir_name]
 
     def get_package_extract_path(self, kernel_name_version):
         for k, v in self._extract_info.items():

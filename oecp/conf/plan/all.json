@@ -83,6 +83,16 @@
       }
     },
     {
+      "name": "ko",
+      "dumper": "KoDumper",
+      "executor": "ko.KoCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_KO",
+        "package": "kernel",
+        "show_same": true
+      }
+    },
+    {
       "name": "drive kabi",
       "dumper": "KabiDumper",
       "executor": "nvs.NVSCompareExecutor",

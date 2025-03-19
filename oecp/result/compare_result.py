@@ -36,7 +36,7 @@ from oecp.result.constants import CMP_RESULT_DIFF, CMP_TYPE_DIFFERENCES, ALL_DET
     CMP_TYPE_AT, CMP_TYPE_RPM, CMP_TYPE_CI_FILE_CONFIG, CMP_TYPE_CI_CONFIG, CMP_TYPE_PERFORMANCE, CMP_TYPE_RPMS_TEST, \
     CMP_TYPE_DRIVE_KABI, CMP_TYPE_SERVICE, CMP_TYPE_RPM_CONFIG, CMP_TYPE_RPM_ABI, CMP_TYPE_RPM_HEADER, \
     COUNT_ABI_DETAILS, CMP_TYPE_RPM_LEVEL, CMP_TYPE_RPM_REQUIRES, CMP_TYPE_SERVICE_DETAIL, DETAIL_PATH, \
-    CMP_RESULT_SAME, CMP_TYPE_KAPI
+    CMP_RESULT_SAME, CMP_TYPE_KAPI, CMP_TYPE_KO, CMP_TYPE_KO_INFO
 
 logger = logging.getLogger("oecp")
 
@@ -308,7 +308,7 @@ def export_single_report(node, single_result, root_path, osv_title):
         if cmp_type == CMP_TYPE_DRIVE_KABI and "effect drivers" not in headers:
             headers.append("effect drivers")
         if "details path" not in headers:
-            if cmp_type in [CMP_TYPE_SERVICE, CMP_TYPE_RPM_CONFIG, CMP_TYPE_RPM_ABI, CMP_TYPE_RPM_HEADER]:
+            if cmp_type in [CMP_TYPE_SERVICE, CMP_TYPE_RPM_CONFIG, CMP_TYPE_RPM_ABI, CMP_TYPE_RPM_HEADER, CMP_TYPE_KO]:
                 headers.append("details path")
         export.create_csv_report(headers, results, report_path)
 
@@ -399,7 +399,17 @@ def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, 
             base_side_b + " package name": result.cmp_side_b.get('packages', '') if result.cmp_side_b else '',
             base_side_b + " dependence type": result.cmp_side_b.get('dependence', None) if result.cmp_side_b else None,
             "compare result": result.cmp_result,
+            "compare type": result.cmp_type
+        }
+    elif result.cmp_type == CMP_TYPE_KO_INFO:
+        parent_side_bd, uid = parent_side_b.split('_ko_')
+        parent_side = f"{os.path.basename(parent_side_a)}_vs_{os.path.basename(parent_side_b)}"
+        row = {
+            "Base__" + parent_side_a: result.cmp_side_a.strip(),
+            "Check__" + parent_side_bd: result.cmp_side_b.strip(),
+            "compare result": result.cmp_result,
             "compare type": result.cmp_type,
+            "kabi white list": result.detail
         }
     else:
         row = {
@@ -407,16 +417,17 @@ def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, 
             "Base__" + base_side_a: result.cmp_side_a.strip(),
             "Check__" + base_side_b: result.cmp_side_b.strip(),
             "compare result": result.cmp_result,
-            "compare type": result.cmp_type,
+            "compare type": result.cmp_type
         }
     if result.cmp_type == CMP_TYPE_SERVICE_DETAIL:
         if detail:
             row["file_name"] = detail.get("file_name")
     else:
-        row["category level"] = detail
+        if result.cmp_type != CMP_TYPE_KO_INFO:
+            row["category level"] = detail
         if result.cmp_type == CMP_TYPE_DRIVE_KABI:
             row["effect drivers"] = result.detail
-        elif result.cmp_type == CMP_TYPE_SERVICE:
+        elif result.cmp_type in [CMP_TYPE_SERVICE, CMP_TYPE_KO]:
             row["details path"] = result.detail
         elif result.cmp_type == CMP_TYPE_KAPI:
             row["kabi symbol"] = result.detail

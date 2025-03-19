@@ -26,8 +26,7 @@ class ABIDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
         super(ABIDumper, self).__init__(repository, cache, config)
         # 依赖rpm解压对象，暂时先写死，todo: 后面通过config字典中加入{'require': 'extract'}获取此dumper对应的依赖
-        cache_require_key = 'extract'
-        self.cache_dumper = self.get_cache_dumper(cache_require_key)
+        self.cache_dumper = self.get_cache_dumper(self.cache_require_key)
         self.extract_info = self.cache_dumper.get_extract_info()
 
     def dump(self, repository):
@@ -48,7 +47,7 @@ class ABIDumper(AbstractDumper):
                 'debuginfo_extract_path': debuginfo_extract_name,
                 'category': repository['category'].value,
                 'kind': 'abi',
-                'data': library_files,
+                self.data: library_files,
                 'link_file': link_files}
         return item
 

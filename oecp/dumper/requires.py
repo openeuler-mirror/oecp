@@ -68,7 +68,7 @@ class RequiresDumper(ComponentsDumper):
         requires_data = self.get_rpm_requires('strict', self._requires_cmd + [rpm_path])
         recommends_data = self.get_rpm_requires('weak', self._recommends_cmd + [rpm_path])
         requires_data.extend(recommends_data)
-        result.setdefault(self._data, []).extend(requires_data)
+        result.setdefault(self.data, []).extend(requires_data)
         if result:
             result.setdefault('rpm', os.path.basename(rpm_path))
             result.setdefault('kind', self._component_key)

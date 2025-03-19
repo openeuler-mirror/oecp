@@ -1,0 +1,14 @@
+{
+  "name": "file",
+  "plan": [
+    {
+      "name": "ko",
+      "dumper": "KoDumper",
+      "executor": "ko.KoCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_KO",
+        "show_same": true
+      }
+    }
+  ]
+}

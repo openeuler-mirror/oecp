@@ -35,6 +35,7 @@ class AbstractDumper(ABC):
         self.cache = cache if cache else {}
         self.config = config if config else {}
         self.cache_require_key = 'extract'
+        self.data = 'data'
         self.kabi_white_list = []
         self.drive_kabi_white_list = []
         self.cmp_model = next(iter(repository.values())).get('model') == CMP_MODEL_FILE
@@ -78,7 +79,8 @@ class AbstractDumper(ABC):
                                           "conf/kabi_whitelist")
         _, _, _, _, parse_arch = RPMProxy.rpm_n_v_r_d_a(rpm_name)
         white_branch = self.config.get('branch')
-        arch = parse_arch if parse_arch else self.config.get('arch')
+        param_arch = self.config.get('arch')
+        arch = param_arch if param_arch else parse_arch
         logger.debug(f"kabi whitelist get branch: {white_branch}, arch: {arch}")
         if arch not in [X86_64, AARCH64]:
             logger.error(f"kabi whitelist arch error: {arch}")
@@ -104,7 +106,6 @@ class ComponentsDumper(AbstractDumper):
         super(ComponentsDumper, self).__init__(repository, cache, config)
         self._cmd = None
         self._component_key = None
-        self._data = 'data'
 
     def dump(self, repository):
         rpm_path = repository['path']
@@ -128,11 +129,11 @@ class ComponentsDumper(AbstractDumper):
                     try:
                         if r:
                             name, symbol, version = r.groups()
-                            item.setdefault(self._data, []).append(
+                            item.setdefault(self.data, []).append(
                                 {'name': name, 'symbol': symbol, 'version': version})
                         else:
                             name = line
-                            item.setdefault(self._data, []).append(
+                            item.setdefault(self.data, []).append(
                                 {'name': name, 'symbol': '', 'version': ''})
                     except Exception:
                         logger.warning("{}".format(line))

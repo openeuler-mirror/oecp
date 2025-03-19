@@ -58,7 +58,7 @@ class SensitiveStrDumper(ComponentsDumper):
                             continue
                         line = line.strip(tmp_path)
                         dump_list.append(line)
-        item = {'rpm': os.path.basename(rpm_path), 'kind': self._component_key, 'data': dump_list}
+        item = {'rpm': os.path.basename(rpm_path), 'kind': self._component_key, self.data: dump_list}
         item.setdefault('category', repository['category'].value)
         return item
 
