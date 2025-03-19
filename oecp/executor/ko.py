@@ -41,7 +41,7 @@ class KoCompareExecutor(CompareExecutor):
         self.ko_flag = '_ko_'
 
     @staticmethod
-    def prase_ko_abi_info(ko_path, ko_info):
+    def parse_ko_abi_info(ko_path, ko_info):
         cmd = ["modprobe", "--dump-modversions", ko_path]
         ret, out, err = shell_cmd(cmd)
         if not ret:
@@ -56,10 +56,14 @@ class KoCompareExecutor(CompareExecutor):
 
     @staticmethod
     def get_whitelist_rpms():
+        whitelist = []
         whitelist_rpms_path = os.path.realpath(
             os.path.join(os.path.dirname(__file__), '../conf/ko_whitelist_rpms.yaml'))
-        with open(whitelist_rpms_path, "r") as f:
-            whitelist = yaml.safe_load(f)
+        try:
+            with open(whitelist_rpms_path, "r") as f:
+                whitelist = yaml.safe_load(f)
+        except FileNotFoundError as err:
+            logger.error("Not found path of ko whitelist rpms, %s", err)
 
         return whitelist
 
@@ -111,7 +115,7 @@ class KoCompareExecutor(CompareExecutor):
                     ko_info[item] = item_info.strip()
                 alias_match = re.findall(r"alias:\s+(\S+)\n", out)
                 ko_info.setdefault("alias:", alias_match)
-        self.prase_ko_abi_info(ko_path, ko_info)
+        self.parse_ko_abi_info(ko_path, ko_info)
 
         return ko_info
 

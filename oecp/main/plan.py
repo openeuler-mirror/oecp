@@ -43,17 +43,28 @@ class Plan(UserDict):
         self._type = ''
         self._base = []
         self._other = []
-        self._plan = args.plan_path
+        self._plan = self.load_plan(args.plan_name)
         self._base_file = os.path.basename(args.compare_files[0])
         self._branch = self.cut_branch(args.branch)
         self._arch = args.arch
         self._kpath = args.src_kpath
-        self._load(args.plan_path)
+        self._load(self._plan)
 
     @staticmethod
     def cut_branch(branch):
         os_branch = branch.lower().replace(OPENEULER, '').strip('-_.')
         return os_branch.upper()
+
+    @staticmethod
+    def load_plan(plan_name):
+        dir_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "conf/plan")
+        plan_path = os.path.join(dir_path, "%s.json" % plan_name)
+        if not os.path.exists(plan_path):
+            logger.error(
+                "Incorrect plan name and check in: %s, please input 'abi' specified plan as 'abi.json'" % dir_path)
+            raise SystemExit(-1)
+
+        return plan_path
 
     def _load(self, path):
         """

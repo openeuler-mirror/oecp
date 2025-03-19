@@ -187,7 +187,7 @@ pip3 install -r requirement
     指定`工作路径`，默认路径为/tmp/oecp
   
   * **`-p, --plan`**
-    指定`比较计划`，默认为oecp/conf/plan/all.json
+    指定`比较计划`，默认为'all', 指定为oecp/conf/plan/all.json
 
   * **`-c, --category`**
     指定`包级别信息`，默认为oecp/conf/category/category.json
@@ -212,7 +212,7 @@ pip3 install -r requirement
     
   * **举例**
 
-    * **` python3 cli.py  /root/openEuler-20.03-LTS-aarch64-dvd.iso /root/openEuler-20.03-LTS-SP1-aarch64-dvd.iso`**
+    * **` python3 cli.py -p all /root/openEuler-20.03-LTS-aarch64-dvd.iso /root/openEuler-20.03-LTS-SP1-aarch64-dvd.iso`**
 
   * **比较计划说明**
     * **`all.json`**

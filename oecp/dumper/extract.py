@@ -15,6 +15,7 @@
 
 import os
 import logging
+import re
 import tempfile
 import magic
 
@@ -145,7 +146,10 @@ class RPMExtractDumper(AbstractDumper):
         if "dkms" in rpm_name:
             cmd = f"cd {extract_path_obj} && find . -name *.tar.gz | xargs -r tar -xf"
             os.system(cmd)
-        all_files = extract_path_obj.glob('**/*.ko*')
+        if re.match("ascend-hdk", rpm_name.lower()):
+            all_files = extract_path_obj.glob('usr/local/Ascend/driver/host_rpm/*.ko*')
+        else:
+            all_files = extract_path_obj.glob('**/*.ko*')
         self._ko_files.setdefault(extract_dir_name, [])
         for file in all_files:
             if not file.is_file():
