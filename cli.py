@@ -34,7 +34,6 @@ def init_args():
     parser = argparse.ArgumentParser()
 
     default_conf_path = os.path.join(os.path.dirname(__file__), "oecp/conf")
-    default_plan_path = os.path.join(default_conf_path, "plan/all.json")
     default_category_path = os.path.join(default_conf_path, "category/category.json")
     default_work_dir = "/tmp/oecp"
     default_output_file = "/tmp/oecp/"
@@ -43,7 +42,7 @@ def init_args():
     parser.add_argument("-d", "--debuginfo", help="read compare files from plan json", action='store_true')
     parser.add_argument("-n", "--parallel", type=int, dest="parallel", help="compare parallel, in order if 0")
     parser.add_argument("-w", "--work-dir", type=str, dest="work_dir", default=default_work_dir, help="work root dir")
-    parser.add_argument("-p", "--plan", type=str, dest="plan_path", default=default_plan_path, help="compare plan path")
+    parser.add_argument("-p", "--plan", type=str, dest="plan_name", default="all", help="compare plan name")
     parser.add_argument("-c", "--category", type=str, dest="category_path", default=default_category_path,
                         help="package category path")
     parser.add_argument("-f", "--format", type=str, dest="output_format", default="csv", help="result export format")
@@ -71,7 +70,7 @@ if __name__ == "__main__":
     logger = logging.getLogger("oecp")
 
     args = init_args()
-    logger.info(f"--plan: {args.plan_path}")
+    logger.info(f"--plan: {args.plan_name}")
     logger.info(f"--category: {args.category_path}")
     logger.info(f"--platform: {args.platform_test}")
     logger.info(f"--work_dir: {args.work_dir}")
