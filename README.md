@@ -136,5 +136,23 @@ pip3 install -r requirement
     比较内核配置变化差异，输入比较目标为内核配置文件（config-*）时，指定比较计划-p为该json配置文件
   * **`service_file.json`**
     比较服务文件配置变化差异，输入比较目标为服务文件（.service）时，指定比较计划-p为该json配置文件
-  * **`ko_file.json`**
-    比较内核模块文件配置变化差异，输入比较目标为服务文件（.ko）时，指定比较计划-p为该配置文件
+
+## 4. kabi/kapi基线化功能
+`python3 cli.py [-b BRANCH] [-a ARCH] [-s KERNEL_SOURCE] file1`
+
+* **位置参数(必选)**
+  * **`file`**
+    有别于oecp基础功能，当file参数传入仅有file1，即单个文件或者存放rpm包的目录时，工具进入kabi/kapi基线化功能模块
+
+* **可选参数**
+
+  * **`-b, --branch`**
+    指定`kabi基线分支`，默认为20.03-LTS-SP1分支，与--arch参数配合使用可指定目标kabi白名单，用于判断所提取的kabi是否在目标kabi白名单中
+  * **`-a, --arch`**
+    指定`架构`，目前支持x86_64、aarch64，与--branch参数配合使用可指定目标kabi白名单, 用于判断所提取的kabi是否在目标kabi白名单中
+  * **`-s, --src_kernel`**
+    指定`输入内核源码包路径`，路径下存放内核源码包：kernel-*.src.rpm，添加该参数可在对应版本的kernel源码中查找kapi函数原型
+
+* **举例**
+  * **`python3 cli.py -b 20.03-LTS-SP1 -a aarch64 -s /root/kernel-5.10.0-rc6.src.rpm /root/driver_rpm/`**
+* 最终生成的结果文件将保存在`/tmp/kabi/`目录下

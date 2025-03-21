@@ -164,7 +164,9 @@ Mulan V2
 |             |                        | kabi_whitelist          | 内核白名单                  |
 |             |                        | kernel_driver_range     | 内核驱动配置                 |
 |             |                        | directory_structure     | 结果目录结构                 |
-
+|             | kabi                   |                         | kabi/kapi基线化功能模块       |
+|             |                        | kabi_generate.py        | kabi提取                 |
+|             |                        | csv_result.py           | 结果csv文件生成              |
 ## 3.5、部署视图
 _真实环境如何部署，网络和存储如何划分，业务程序如何部署，如何扩展、备份等_
 
