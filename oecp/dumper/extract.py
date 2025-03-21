@@ -45,6 +45,7 @@ class RPMExtractDumper(AbstractDumper):
         self._config_files = {}
         self._library_files = {}
         self._service_files = {}
+        self._jar_files = {}
         self._header_files = {}
         self._cmd_files = {}
         self._ko_files = {}
@@ -63,6 +64,7 @@ class RPMExtractDumper(AbstractDumper):
             self._extract_info.setdefault(verbose_path, extract_dir_obj)
             self._collect_config_file(extract_dir_name)
             self._collect_library_files(extract_dir_name)
+            self._collect_jar_files(extract_dir_name)
             self._collect_service_files(extract_dir_name)
             self._collect_header_files(extract_dir_name)
             self._collect_cmd_files(extract_dir_name)
@@ -85,6 +87,14 @@ class RPMExtractDumper(AbstractDumper):
                 file_type = magic.from_file(file_path, mime=True)
                 if file_type in self._text_mime:
                     self._config_files.setdefault(extract_dir_name, []).append(file_path)
+
+    def _collect_jar_files(self, extract_dir_name):
+        extract_path_obj = Path(extract_dir_name)
+        all_files = extract_path_obj.glob('**/*.jar')
+        self._jar_files.setdefault(extract_dir_name, [])
+        for file in all_files:
+            if file.is_file():
+                self._jar_files.setdefault(extract_dir_name, []).append(file.as_posix())
 
     def _collect_library_files(self, extract_dir_name):
         link_so_file = extract_dir_name + "_linkfile"
@@ -168,6 +178,9 @@ class RPMExtractDumper(AbstractDumper):
 
     def get_library_files(self, extract_dir_name):
         return self._library_files.get(extract_dir_name)
+
+    def get_jar_files(self, extract_dir_name):
+        return self._jar_files[extract_dir_name]
 
     def get_service_files(self, extract_dir_name):
         return self._service_files[extract_dir_name]

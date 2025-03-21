@@ -25,7 +25,7 @@ from oecp.result.constants import CMP_DIFF_RESULT, CMP_TYPE_KCONFIG, BASE_SIDE, 
     CMP_TYPE_RPM_ABI, CMP_RESULT_MORE, CMP_RESULT_LESS, CMP_RESULT_SAME, CMP_RESULT_DIFF, CMP_RESULT_CHANGE, \
     PAT_DIR_VERSION, PAT_VER_CHANGED, UPSTREAM_DIST, CHANGE_DIRECTORY_VERSION, CHANGE_DIST_IN_FILENAME, STAND_DISTS, \
     CHANGE_FILE_VERSION, CHANGE_FILE_TYPE, CHANGE_LINKFILE_VERSION, CHANGE_LINK_TARGET_VERSION, CHANGE_FORMATS, \
-    CHANGE_FILE_FORMAT, CHANGE_LINK_TARGET_FILE, CMP_TYPE_KO
+    CHANGE_FILE_FORMAT, CHANGE_LINK_TARGET_FILE, CMP_TYPE_KO, CMP_TYPE_RPM_LIB, PAT_JAR
 
 # 两者category指定的级别不同或者未指定
 
@@ -589,48 +589,53 @@ class CompareExecutor(ABC):
         return map_files
 
     def match_library_pairs(self, base_datas, other_datas, flag_vrd, model):
-        map_files_base = self.split_files_mapping(base_datas, model)
-        map_files_other = self.split_files_mapping(other_datas, model)
-        base_files, other_files = set(map_files_base.keys()), set(map_files_other.keys())
+        map_base_libs = self.split_files_mapping(base_datas, model)
+        map_other_libs = self.split_files_mapping(other_datas, model)
+        base_files, other_files = set(map_base_libs.keys()), set(map_other_libs.keys())
         common_dump = base_files & other_files
         only_base_dump = base_files - other_files
         only_other_dump = other_files - base_files
-        dump_os_changed, dump_exist = [], []
+        dump_lib_changed, dump_exist = [], []
         less_dump, more_dump = only_base_dump, only_other_dump
-        so_pattern = re.compile(PAT_SO)
-        for other_so in sorted(only_other_dump):
-            for base_so in sorted(only_base_dump):
-                if base_so in dump_exist:
+        lib_pattern = re.compile(PAT_SO)
+        for other_lib in sorted(only_other_dump):
+            for base_lib in sorted(only_base_dump):
+                if base_lib in dump_exist:
                     continue
-                os_base_name, os_other_name = os.path.basename(base_so), os.path.basename(other_so)
-                cut_base_name = re.sub(so_pattern, '', os_base_name)
-                cut_other_name = re.sub(so_pattern, '', os_other_name)
+                elif len(list(filter(lambda x: x.endswith('.jar'), [base_lib, other_lib]))) == 1:
+                    continue
+
+                base_libname, other_libname = os.path.basename(base_lib), os.path.basename(other_lib)
+                if base_lib.endswith('.jar'):
+                    lib_pattern = re.compile(PAT_JAR)
+                cut_base_name = re.sub(lib_pattern, '', base_libname)
+                cut_other_name = re.sub(lib_pattern, '', other_libname)
                 if cut_base_name.lstrip('_') != cut_other_name.lstrip('_'):
                     continue
-                full_base_so = map_files_base.get(base_so)
-                full_other_so = map_files_other.get(other_so)
-                path_result = self.get_version_change_files(base_so, other_so, flag_vrd)
-                soname_result = self.get_library_pairs(full_base_so, full_other_so)
+                path_result = self.get_version_change_files(base_lib, other_lib, flag_vrd)
+                full_base_lib = map_base_libs.get(base_lib)
+                full_other_lib = map_other_libs.get(other_lib)
+                soname_result = self.get_library_pairs(full_base_lib, full_other_lib)
                 if path_result == CMP_RESULT_CHANGE or soname_result:
-                    dump_exist.append(base_so)
-                    less_dump.discard(base_so)
-                    more_dump.discard(other_so)
-                    if model == CMP_TYPE_RPM_ABI:
-                        dump_os_changed.append([full_base_so, full_other_so])
+                    dump_exist.append(base_lib)
+                    less_dump.discard(base_lib)
+                    more_dump.discard(other_lib)
+                    if model == CMP_TYPE_RPM_LIB:
+                        dump_lib_changed.append([base_lib, other_lib])
                     else:
-                        dump_os_changed.append([base_so, other_so])
+                        dump_lib_changed.append([full_base_lib, full_other_lib])
                     break
-        if model == CMP_TYPE_RPM_ABI:
-            common_dump = [[map_files_base.get(x), map_files_other.get(x)] for x in common_dump]
-            common_dump.extend(dump_os_changed)
-            return common_dump
+        if model == CMP_TYPE_RPM_LIB:
+            return [
+                [[x, x, CMP_RESULT_SAME] for x in common_dump],
+                [self.judge_changed_type(x, flag_vrd) for x in dump_lib_changed],
+                [[x, '', CMP_RESULT_LESS] for x in less_dump],
+                [['', x, CMP_RESULT_MORE] for x in more_dump]
+            ]
 
-        return [
-            [[x, x, CMP_RESULT_SAME] for x in common_dump],
-            [self.judge_changed_type(x, flag_vrd) for x in dump_os_changed],
-            [[x, '', CMP_RESULT_LESS] for x in less_dump],
-            [['', x, CMP_RESULT_MORE] for x in more_dump]
-        ]
+        common_dump = [[map_base_libs.get(x), map_other_libs.get(x)] for x in common_dump]
+        common_dump.extend(dump_lib_changed)
+        return common_dump
 
     def format_dump_provides(self, datas_a, datas_b, flag_v_r_d):
         common_files, common_file_a, common_file_b = [], [], []

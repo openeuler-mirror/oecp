@@ -36,7 +36,7 @@ from oecp.result.constants import CMP_RESULT_DIFF, CMP_TYPE_DIFFERENCES, ALL_DET
     CMP_TYPE_AT, CMP_TYPE_RPM, CMP_TYPE_CI_FILE_CONFIG, CMP_TYPE_CI_CONFIG, CMP_TYPE_PERFORMANCE, CMP_TYPE_RPMS_TEST, \
     CMP_TYPE_DRIVE_KABI, CMP_TYPE_SERVICE, CMP_TYPE_RPM_CONFIG, CMP_TYPE_RPM_ABI, CMP_TYPE_RPM_HEADER, \
     COUNT_ABI_DETAILS, CMP_TYPE_RPM_LEVEL, CMP_TYPE_RPM_REQUIRES, CMP_TYPE_SERVICE_DETAIL, DETAIL_PATH, \
-    CMP_RESULT_SAME, CMP_TYPE_KAPI, CMP_TYPE_KO, CMP_TYPE_KO_INFO
+    CMP_RESULT_SAME, CMP_TYPE_KAPI, CMP_TYPE_KO, CMP_TYPE_KO_INFO, JABI_TEMP_PATH, CMP_TYPE_RPM_JABI
 
 logger = logging.getLogger("oecp")
 
@@ -249,6 +249,7 @@ class CompareResultComposite(CompareResultComponent):
                 # eg: node just a single rpm-requires result
                 export_single_report(node, value, root_path, osv_title)
         all_rpm_report = os.path.join(export_floder, 'all-rpm-report.csv')
+        mv_jabi_cmp_reports(export_floder)
         if os.path.exists(all_rpm_report):
             # genrate single_calculate report.
             single_calculate = IndividualStatistics(all_rpm_report)
@@ -295,6 +296,18 @@ def save_detail_result(file_path, content):
         fd.write(content)
 
 
+def mv_jabi_cmp_reports(dir_report):
+    # move jabi compatibility report to final output report.
+    details_jabi = os.path.join(dir_report, DETAIL_PATH)
+    if os.path.exists(JABI_TEMP_PATH):
+        if not os.path.exists(details_jabi):
+            os.makedirs(details_jabi)
+        try:
+            shutil.move(JABI_TEMP_PATH, details_jabi)
+        except Exception as err:
+            logger.warning(err)
+
+
 def export_single_report(node, single_result, root_path, osv_title):
     for cmp_type, results in single_result.items():
         # for single result export, we should skip base level compare. like:
@@ -308,7 +321,8 @@ def export_single_report(node, single_result, root_path, osv_title):
         if cmp_type == CMP_TYPE_DRIVE_KABI and "effect drivers" not in headers:
             headers.append("effect drivers")
         if "details path" not in headers:
-            if cmp_type in [CMP_TYPE_SERVICE, CMP_TYPE_RPM_CONFIG, CMP_TYPE_RPM_ABI, CMP_TYPE_RPM_HEADER, CMP_TYPE_KO]:
+            if cmp_type in [CMP_TYPE_SERVICE, CMP_TYPE_RPM_CONFIG, CMP_TYPE_RPM_ABI, CMP_TYPE_RPM_HEADER,
+                            CMP_TYPE_RPM_JABI, CMP_TYPE_KO]:
                 headers.append("details path")
         export.create_csv_report(headers, results, report_path)
 
@@ -427,7 +441,7 @@ def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, 
             row["category level"] = detail
         if result.cmp_type == CMP_TYPE_DRIVE_KABI:
             row["effect drivers"] = result.detail
-        elif result.cmp_type in [CMP_TYPE_SERVICE, CMP_TYPE_KO]:
+        elif result.cmp_type in [CMP_TYPE_SERVICE, CMP_TYPE_RPM_JABI, CMP_TYPE_KO]:
             row["details path"] = result.detail
         elif result.cmp_type == CMP_TYPE_KAPI:
             row["kabi symbol"] = result.detail

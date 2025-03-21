@@ -61,6 +61,7 @@ CMP_TYPE_KCONFIG = "kconfig"
 CMP_TYPE_KCONFIG_DRIVE = "drive kconfig"
 CMP_TYPE_RPM_LEVEL = 'rpm package name'
 CMP_TYPE_RPM_ABI = "rpm abi"
+CMP_TYPE_RPM_JABI = "rpm jabi"
 CMP_TYPE_RPM_CONFIG = "rpm config"
 CMP_TYPE_RPM_PROVIDES = "rpm provides"
 CMP_TYPE_RPM_REQUIRES = "rpm requires"
@@ -99,6 +100,7 @@ RESULT_MORE = {"5", "more"}
 
 SIMILARITY_TYPES = {
     CMP_TYPE_RPM_ABI,
+    CMP_TYPE_RPM_JABI,
     CMP_TYPE_RPM_CONFIG,
     CMP_TYPE_SERVICE_DETAIL
 }
@@ -195,6 +197,7 @@ PLATFORM_RESULT_ITEMS = ['rpm test', 'AT', 'performance', 'ciconfig']
 
 # DETAIL PATH
 DETAIL_PATH = "details_analyse"
+JABI_TEMP_PATH = "/tmp/jabi/"
 
 # The Column names of the Details in the RPM REPORT
 ALL_DETAILS_NAME = ['effect drivers', 'details path', 'file_name', 'category level']
@@ -246,6 +249,7 @@ PAT_DIR_VERSION = [
     r"[-/](\d+\.){0,3}\d+"
 ]
 PAT_SO = r"(-?\d*([-_.]\d+){0,3}(\.cpython-(.*)-linux-gnu)?\.(so|a)([-_.][\dA-Za-z]+){0,4})|-[a-z0-9]{16}.(so|rlib)"
+PAT_JAR = r"[-_.]?(\d+[-.]){0,3}(v\d{8})?(-\d{4})?.?jar"
 
 # COMPRESS FORMAT
 CHANGE_FORMATS = [".md", ".xz"]
