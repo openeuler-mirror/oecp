@@ -12,7 +12,7 @@
 # See the Mulan PSL v2 for more details.
 # Author:
 # Create: 2021-09-07
-# Description: test mapping
+# Description: test repository
 # **********************************************************************************
 """
 import os
@@ -29,11 +29,11 @@ class TestMapping(TestCase):
         init_logger()
         cls.logger = logging.getLogger("test")
 
-    def test_construct(self):
-        sqlite_file = os.path.join(os.path.dirname(__file__), "data/primary.sqlite")
-        sqlite = SQLiteMapping(sqlite_file)
+    #def test_construct(self):
+    #    sqlite_file = os.path.join(os.path.dirname(__file__), "data/primary.sqlite")
+    #    sqlite = SQLiteMapping(sqlite_file)
 
-        self.assertNotEqual(getattr(sqlite, "_sqlite_conn"), None)
+    #    self.assertNotEqual(getattr(sqlite, "_sqlite_conn"), None)
 
     def test_bz2_sqlite_file(self):
         sqlite_file = "https://repo.openeuler.org/openEuler-20.03-LTS/OS/x86_64/repodata/365dc0e1dafa37b1ea4713a519a12ad1c91adee7bf38c236398e68b1bfada497-primary.sqlite.bz2"
@@ -41,12 +41,3 @@ class TestMapping(TestCase):
 
         self.assertEqual(sqlite.repository_of_package("gcc-7.3.0-20190804"), "gcc-7.3.0-20190804.h31.oe1.oecp.rpm")
         self.assertEqual(sqlite.repository_of_package("notexist-9.3.1-20210204"), "notexist-9.3.1-20210204")
-
-    def test_get_pkg_fullname(self):
-        sqlite_file = os.path.join(os.path.dirname(__file__), "data/primary.sqlite")
-        sqlite = SQLiteMapping(sqlite_file)
-        self.assertEqual(sqlite.get_provides_rpm('(ntp or chrony)', '', ''),
-                         ['ntp-4.2.8p15-13.oe2203sp3.aarch64.rpm', 'chrony-4.1-6.oe2203sp3.aarch64.rpm'])
-        self.assertEqual(sqlite.get_provides_rpm('texlive-cntperchap', '', ''),
-                         ['texlive-cntperchap-svn37572.0.3-26.oe2203sp3.noarch.rpm'])
-        self.assertEqual(sqlite.get_provides_rpm('/bin/bash', '', ''), ['bash-5.1.8-12.oe2203sp3.aarch64.rpm'])

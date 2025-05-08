@@ -13,31 +13,38 @@
 # **********************************************************************************
 """
 
+import os
+import re
+import logging
+
 from oecp.dumper.base import AbstractDumper
-from oecp.result.constants import CMP_TYPE_KCONFIG
 from oecp.utils.kernel import get_file_by_pattern
 
 
 class KconfigDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
         super(KconfigDumper, self).__init__(repository, cache, config)
+        cache_require_key = 'extract'
+        self.cache_dumper = self.get_cache_dumper(cache_require_key)
+        self._component_key = 'kconfig'
+        self.data = "data"
 
-    def load_kconfig(self, repository):
-        rpm_name = repository.get('verbose_path')
-        if self.cmp_model:
-            kconfig = repository.get('path')
-            rpm_name = repository.get('rpm_name')
-        else:
-            cache_dumper = self.get_cache_dumper(self.cache_require_key)
-            kconfig = get_file_by_pattern(r"^config(-)?", cache_dumper, rpm_name)
-
+    def load_kconfig(self):
+        kconfig = get_file_by_pattern(r"^config-", self.cache_dumper)
+        # CentOS-8.2.2004-aarch64-dvd1.iso 中config文件的文件名为：config
         if not kconfig:
-            return []
+            kconfig = get_file_by_pattern(r"^config", self.cache_dumper)
+            if not kconfig:
+                return []
 
         item = {}
-        item.setdefault('rpm', rpm_name)
-        item.setdefault('kind', CMP_TYPE_KCONFIG)
-        item.setdefault('category', repository['category'].value)
+        kernel = 'kernel'
+        if 'kernel-core' in kconfig:
+            kernel = 'kernel-core'
+
+        item.setdefault('rpm', self.repository.get(kernel).get('verbose_path'))
+        item.setdefault('kind', self._component_key)
+        item.setdefault('category', self.repository.get(kernel).get('category').value)
         with open(kconfig, "r") as f:
             for line in f.readlines():
                 line = line.strip().replace("\n", "")
@@ -47,11 +54,10 @@ class KconfigDumper(AbstractDumper):
                     continue
 
                 name, version = line.split("=", 1)
-                item.setdefault(self.data, []).append({'name': name, 'symbol': '=', 'version': version})
+                item.setdefault(self.data, []).append({'name': name, 'symbol': "=" , 'version': version})
         return [item]
 
     def run(self):
-        result = []
-        for _, repository in self.repository.items():
-            result.extend(self.load_kconfig(repository))
-        return result
+        return self.load_kconfig()
+
+

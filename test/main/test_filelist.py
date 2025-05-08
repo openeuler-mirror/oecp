@@ -30,24 +30,24 @@ class TestFilelists(TestCase):
 
     def test_mapping_filelist(self):
         file_a = [
-            "/lib/modules/4.19.90-2112.8.0.0131.oe1.aarch64/kernel/arch/arm64/crypto/aes-ce-blk.ko",
-            "/lib/modules/4.19.90-2112.8.0.0131.oe1.aarch64/kernel/arch/arm64/crypto/aes-ce-ccm.ko"
+            "/lib/modules/6.1.8-3.0.0.8.oe1.x86_64/vdso/.build-id/78/86b97f3ee72fb93a07229abe016c48b9d8ddaa.debug_[link]_../../vdso64.so",
+            "/lib/modules/6.1.8-3.0.0.8.oe1.x86_64/vdso/.build-id/6a/e8fc067b96a9c115a223a72596999c1afdc970.debug_[link]_../../vdso32.so"
         ]
         file_b = [
-            "/lib/modules/5.10.0-136.12.0.86.oe2203sp1.aarch64/kernel/arch/arm64/crypto/aes-ce-blk.ko.xz",
-            "/lib/modules/5.10.0-136.12.0.86.oe2203sp1.aarch64/kernel/arch/arm64/crypto/aes-ce-ccm.ko.xz"
+            "/lib/modules/6.1.8-3.0.0.9.oe1.x86_64/vdso/.build-id/74/1534e4fb0604d5043d2a9f37191106f409f8aa.debug_[link]_../../vdso32.so",
+            "/lib/modules/6.1.8-3.0.0.9.oe1.x86_64/vdso/.build-id/1a/28ad71204fd5d8cc64bd84a158571d7ca21b48.debug_[link]_../../vdso64.so"
         ]
         common_filelist = [
-                ["/lib/modules/4.19.90-2112.8.0.0131.oe1.aarch64/kernel/arch/arm64/crypto/aes-ce-blk.ko",
-                 "/lib/modules/5.10.0-136.12.0.86.oe2203sp1.aarch64/kernel/arch/arm64/crypto/aes-ce-blk.ko.xz",
-                 'File format changed'],
-                ["/lib/modules/4.19.90-2112.8.0.0131.oe1.aarch64/kernel/arch/arm64/crypto/aes-ce-ccm.ko",
-                 "/lib/modules/5.10.0-136.12.0.86.oe2203sp1.aarch64/kernel/arch/arm64/crypto/aes-ce-ccm.ko.xz",
-                 'File format changed']
-            ]
+            ["/lib/modules/6.1.8-3.0.0.8.oe1.x86_64/vdso/.build-id/6a/e8fc067b96a9c115a223a72596999c1afdc970.debug_[link]_../../vdso32.so",
+             "/lib/modules/6.1.8-3.0.0.9.oe1.x86_64/vdso/.build-id/1a/28ad71204fd5d8cc64bd84a158571d7ca21b48.debug_[link]_../../vdso64.so",
+             'changed'],
+            ["/lib/modules/6.1.8-3.0.0.8.oe1.x86_64/vdso/.build-id/78/86b97f3ee72fb93a07229abe016c48b9d8ddaa.debug_[link]_../../vdso64.so",
+             "/lib/modules/6.1.8-3.0.0.9.oe1.x86_64/vdso/.build-id/74/1534e4fb0604d5043d2a9f37191106f409f8aa.debug_[link]_../../vdso32.so",
+             'changed']
+        ]
         base = CompareExecutorTestFilelist([], [])
-        rpm_a = "kernel-4.19.90-2112.8.0.0131.oe1.aarch64.rpm"
-        rpm_b = "kernel-5.10.0-136.12.0.86.oe2203sp1.aarch64.rpm"
+        rpm_a = "kernel-6.1.8-3.0.0.8.oe1.x86_64.rpm"
+        rpm_b = "kernel-6.1.8-3.0.0.9.oe1.x86_64.rpm"
         flag_n_v_d = base.extract_version_flag(rpm_a, rpm_b)
         dump_result = base.format_dump(file_a, file_b, flag_n_v_d)
         self.assertEqual(dump_result[1], common_filelist)
@@ -58,6 +58,16 @@ class TestFilelists(TestCase):
         clear_file_name = base.clear_file_change_ext(file_name)
 
         self.assertEqual(clear_file_name, "nouveau.ko")
+
+    def test_mapping_files(self):
+        base = CompareExecutorTestFilelist([], [])
+        flag_nvd = "6.1.8-3.0.0.8.oe1"
+        dist = "oe1"
+        files = [
+            "/lib/modules/6.1.8-3.0.0.8.oe1.x86_64/vdso/.build-id/78/86b97f3ee72fb93a07229abe016c48b9d8ddaa.debug_[link]_../../vdso64.so"
+        ]
+        result = base.mapping_files(files, flag_nvd, dist)
+        print(result)
 
 
 class CompareExecutorTestFilelist(CompareExecutor):

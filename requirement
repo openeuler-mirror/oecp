@@ -5,4 +5,7 @@ requests
 chardet
 defusedxml
 openpyxl
-pandas
+pyyaml
+pymysql
+sqlalchemy
+sqlalchemy-utils

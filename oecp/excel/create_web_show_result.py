@@ -29,13 +29,11 @@ class WebShowResult:
         self.tools_result = tools_result
         self.conclusion = conclusion
 
-    @staticmethod
-    def to_a_percentage(date):
+    def to_a_percentage(self, date):
         percent_data = format(round(date, 4), '.2%')
         return percent_data
 
-    @staticmethod
-    def get_exists_item(similarity, items):
+    def get_exists_item(self, similarity, items):
         items_result = []
         for item in items:
             for single_check_result in similarity.keys():
@@ -88,8 +86,9 @@ class WebShowResult:
         if not floder_path:
             os.makedirs(floder_path)
         file_path = os.path.join(floder_path, 'web_show_result.json').replace("\\", '/')
+        json_result = json.dumps(self.web_show_result)
         with open(file_path, 'w') as rf:
-            json.dump(self.web_show_result, rf, indent=4)
+            rf.write(json_result)
 
     def write_json_result(self, *args):
         try:
@@ -97,7 +96,7 @@ class WebShowResult:
             self.web_show_result.setdefault('osv_name', side_b.split('-')[0])
             conclusion = 'PASS' if self.conclusion == '通过' else 'NO PASS'
             self.web_show_result.setdefault('total_result', conclusion)
-            arch = "aarch64" if "aarch64" in side_b or "arm64" in side_b else "X86"
+            arch = "aarch64" if "aarch64" in side_b else "X86"
             self.web_show_result.setdefault('arch', arch)
             self.web_show_result.setdefault('os_download_link', '')
             checksum = gen_hash_key(iso_path)
@@ -113,5 +112,5 @@ class WebShowResult:
                 self.create_report_json(root_path, osv_title)
             else:
                 logger.warning('The items displayed in the JSON report is empty.')
-        except(AttributeError, KeyError, IOError, OSError, ValueError) as e:
-            logger.exception(f"json statistics error, {e}")
+        except(AttributeError, KeyError, OSError, ValueError):
+            logger.exception("json statistics error")

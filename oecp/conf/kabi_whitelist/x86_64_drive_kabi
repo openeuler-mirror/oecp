@@ -1,3 +1,4 @@
+[_x86_64_drive_kabi_whitelist]
 ___pskb_trim
 ___ratelimit
 __alloc_pages_nodemask

@@ -20,7 +20,6 @@ from openpyxl import load_workbook
 from openpyxl.styles import Font
 from openpyxl.styles import PatternFill
 from pathlib import Path
-
 from oecp.result.compress import gen_hash_key
 from oecp.result.constants import *
 
@@ -46,26 +45,6 @@ class DataExcelFile:
         self.folder_path = None
         self.tools_result = {}
         self.conclusion = ''
-
-    @staticmethod
-    def convert_data(data):
-        """[summary]
-
-        Args:
-            data ([type]): [description]
-
-        Returns:
-            [type]: [description]
-        """
-        return "%.2f%%" % (data * 100)
-
-    @staticmethod
-    def obtain_base_os(side_a):
-        base_so = side_a.split("-")[:4]
-        for part in base_so:
-            if '.iso' in part or "aarch64" == part or "x86_64" == part:
-                base_so.remove(part)
-        return " ".join(base_so)
 
     def create_folder(self, root_path, osv_title):
         """
@@ -115,9 +94,27 @@ class DataExcelFile:
         read benchmark json
         """
 
-        with open(self.benchmark_json, 'r', encoding='utf8') as fp:
+        with open(self.benchmark_json, 'r', encoding='utf8')as fp:
             benchmark_criteria = json.load(fp)
         return benchmark_criteria
+
+    def convert_data(self, data):
+        """[summary]
+
+        Args:
+            data ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        return "%.2f%%" % (data * 100)
+    
+    def obtain_base_os(self, side_a):
+        base_so = side_a.split("-")[:4]
+        for part in base_so:
+            if '.iso' in part or "aarch64" == part or "x86_64" == part:
+                base_so.remove(part)
+        return " ".join(base_so)
 
     def result_comparison(self, similarity, content, option, data, index):
         """
@@ -137,7 +134,8 @@ class DataExcelFile:
                 lo_pkg = similarity.get("level1 pkg")
                 lt_pkg = similarity.get("level2 pkg")
                 result = "PASS" if lo_pkg >= benchmark[0]["level1 pkg"]["standard"] and lt_pkg >= \
-                                   benchmark[1]["level2 pkg"]["standard"] else "NO PASS"
+                                   benchmark[1]["level2 pkg"]["standard"] \
+                    else "NO PASS"
                 color = self.green if result == "PASS" else self.red
                 self.sheet.cell(row=TEN_ROW, column=5).value = f"{self.convert_data(lt_pkg)}"
                 self.sheet.cell(row=TEN_ROW, column=7).fill = color
@@ -209,7 +207,7 @@ class DataExcelFile:
         self.sheet.cell(row=FIFTEEN_ROW, column=FOUR_COLUMN).value = FIFTEEN_TITLE[0] + os_name + FIFTEEN_TITLE[1]
         self.sheet.cell(row=SIX_ROW, column=SIX_COLUMN).value = self.obtain_base_os(side_a)
         self.sheet.cell(row=TWO_ROW, column=SIX_COLUMN).value = edition
-        version = "aarch64" if "aarch64" in side_a else "x86"
+        version = "aarch64" if "aarch64" in edition else "X86"
         self.sheet.cell(row=THREE_ROW, column=SIX_COLUMN).value = version
         self.sheet.cell(row=FIVE_ROW, column=SIX_COLUMN).value = gen_hash_key(iso_path)
         font_color = self.green_font if self.conclusion == "通过" else self.red_font

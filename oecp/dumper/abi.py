@@ -26,8 +26,17 @@ class ABIDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
         super(ABIDumper, self).__init__(repository, cache, config)
         # 依赖rpm解压对象，暂时先写死，todo: 后面通过config字典中加入{'require': 'extract'}获取此dumper对应的依赖
-        self.cache_dumper = self.get_cache_dumper(self.cache_require_key)
+        cache_require_key = 'extract'
+        self.cache_dumper = self.get_cache_dumper(cache_require_key)
         self.extract_info = self.cache_dumper.get_extract_info()
+
+    def _get_library_files(self, rpm_extract_dir):
+        library_files = self.cache_dumper.get_library_files(rpm_extract_dir)
+        return library_files
+    
+    def _get_jar_files(self, rpm_extract_dir):
+        jar_files = self.cache_dumper.get_jar_files(rpm_extract_dir)
+        return jar_files
 
     def dump(self, repository):
         rpm_path = repository['path']
@@ -41,13 +50,17 @@ class ABIDumper(AbstractDumper):
             debuginfo_extract_name = None
         if not rpm_extract_name:
             logger.exception('RPM decompression path not found')
-        library_files = self.cache_dumper.get_library_files(rpm_extract_name)
-        link_files = self.cache_dumper.get_library_files(rpm_extract_linkfile)
+            raise
+        library_files = self._get_library_files(rpm_extract_name)
+        link_files = self._get_library_files(rpm_extract_linkfile)
+        # lib类型的dumper，也将jar文件取出。
+        if self.config["compare_type"] == "rpm lib":
+            jar_files = self._get_jar_files(rpm_extract_name)
+            library_files.extend(jar_files)
         item = {'rpm': os.path.basename(rpm_path),
                 'debuginfo_extract_path': debuginfo_extract_name,
-                'category': repository['category'].value,
-                'kind': 'abi',
-                self.data: library_files,
+                'category': repository['category'].value, 'kind': 'abi',
+                'data': library_files,
                 'link_file': link_files}
         return item
 

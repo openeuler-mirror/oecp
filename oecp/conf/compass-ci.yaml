@@ -8,7 +8,7 @@ at:
       os_mount: local
       os_lv_size: 30G
       os_lv: 20220119
-
+ 
     aarch64:
       testbox: taishan200-2280-2s48p-256g--a27
       queue: lys-arm

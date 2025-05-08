@@ -22,7 +22,6 @@ from oecp.utils.shell import shell_cmd
 
 logger = logging.getLogger('oecp')
 
-
 class SensitiveStrDumper(ComponentsDumper):
 
     def __init__(self, repository, cache=None, config=None):
@@ -39,7 +38,7 @@ class SensitiveStrDumper(ComponentsDumper):
 
     def dump(self, repository):
         rpm_path = repository['path']
-
+        
         dump_list = []
         if os.path.exists(rpm_path):
             tmp_path = tempfile.mkdtemp()
@@ -47,7 +46,7 @@ class SensitiveStrDumper(ComponentsDumper):
             cmd = f"cd {tmp_path} && rpm2cpio {rpm_path} | cpio -div"
             os.system(cmd)
             cmd = self._cmd + [tmp_path]
-
+            
             code, out, err = shell_cmd(cmd)
             if not code:
                 if err:
@@ -58,7 +57,7 @@ class SensitiveStrDumper(ComponentsDumper):
                             continue
                         line = line.strip(tmp_path)
                         dump_list.append(line)
-        item = {'rpm': os.path.basename(rpm_path), 'kind': self._component_key, self.data: dump_list}
+        item = {'rpm': os.path.basename(rpm_path), 'kind': self._component_key, 'data': dump_list}
         item.setdefault('category', repository['category'].value)
         return item
 
@@ -68,3 +67,4 @@ class SensitiveStrDumper(ComponentsDumper):
             dumper = self.dump(repository)
             dumper_list.append(dumper)
         return dumper_list
+

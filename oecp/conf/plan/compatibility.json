@@ -1,0 +1,49 @@
+{
+  "name": "compatibility",
+  "plan": [
+    {
+      "name": "packagelist",
+      "dumper": "PackageListDumper",
+      "executor": "list.ListCompareExecutor",
+      "config": {
+        "only_directory": true,
+        "compare_type": "CMP_TYPE_DIRECTORY"
+      }
+    },
+    {
+      "name": "requires",
+      "dumper": "RequiresDumper",
+      "executor": "nvs.NVSCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_RPM_REQUIRES"
+      }
+    },
+    {
+      "name": "provides",
+      "dumper": "ProvidesDumper",
+      "executor": "nvs.NVSCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_RPM_PROVIDES"
+      }
+    },
+    {
+      "name": "extract",
+      "dumper": "RPMExtractDumper",
+      "executor": "null.NullExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_NULL"
+      }
+    },
+    {
+      "name": "filelist",
+      "dumper": "FileListDumper",
+      "executor": "list.ListCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_RPM_FILES",
+        "strict": true,
+        "short_circut": false,
+        "show_same": true
+      }
+    }
+  ]
+}

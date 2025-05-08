@@ -15,20 +15,13 @@
 # Description: repository
 # **********************************************************************************
 """
-import logging
-import os
-import re
-import sys
 import traceback
 from collections import UserDict
 import tempfile
 
-from oecp.proxy.rpm_proxy import RPMProxy
-from oecp.result.compare_result import CompareResultComposite
-from oecp.result.constants import CMP_TYPE_REPOSITORY, CMP_RESULT_TO_BE_DETERMINED, CMP_MODEL_FILE
 from oecp.utils.misc import path_is_remote, basename_of_path
 from oecp.proxy.requests_proxy import do_download
-
+from oecp.result.compare_result import *
 from oecp.utils.shell import shell_cmd
 
 logger = logging.getLogger("oecp")
@@ -39,12 +32,12 @@ class Repository(UserDict):
     多个rpm包组成一个repository
     """
 
-    def __init__(self, work_dir, name, rpm_path, category=None):
+    def __init__(self, work_dir, rpm, rpm_path, category=None):
         """
 
         :param work_dir: 工作目录
-        :param name: repository名称
-        :param rpm_path: 软件包路径
+        :param rpm: repository名称
+        :param rpm_path: rpm包路径
         :param category: 类别
         """
         super(Repository, self).__init__()
@@ -52,9 +45,9 @@ class Repository(UserDict):
         self._work_dir = work_dir
         self._download_dir = None  # 如果包在远端，本地的下载路径，当不需要时删除此属性释放磁盘空间
 
-        self._name = RPMProxy.rpm_name(name)
-        self.verbose_path = os.path.basename(rpm_path)
-        self.src_package = self.acquire_source_package(rpm_path)
+        self._name = RPMProxy.rpm_name(rpm)
+        self.verbose_path = rpm
+        self._src_pkg = self.get_src_pkg(rpm_path)
 
         self._category = category
         self._category_level = category.category_of_src_package(self._name)
@@ -71,8 +64,7 @@ class Repository(UserDict):
         :param debuginfo_path: debuginfo包完整路径
         :return:
         """
-        package_name = basename_of_path(verbose_path)
-        name = RPMProxy.rpm_name(package_name)
+        name = RPMProxy.rpm_name(basename_of_path(verbose_path))
         category_level = self._category.category_of_bin_package(name)
         logger.debug(f"repo {self._name} upsert a rpm, name: {name}, "
                      f"path: {path}, debuginfo_path: {debuginfo_path}, level: {category_level}")
@@ -82,31 +74,13 @@ class Repository(UserDict):
             "category": category_level,
             "path": path,
             "verbose_path": verbose_path,
-            "src": self.src_package,
             "raw_path": path,
+            "src": self._src_pkg,
             "debuginfo_path": debuginfo_path,
             "raw_debuginfo_path": debuginfo_path
         }
 
-        self[package_name] = rpm
-
-    def upsert_a_file(self, path, rpm_name):
-        """
-        增加一个文件
-        @param path: 文件的完整路径
-        @param rpm_name: 文件所属rpm名
-        """
-        file_name = os.path.basename(path)
-        category_level = self._category.category_of_bin_package(rpm_name)
-        file = {
-            "rpm_name": rpm_name,
-            "path": path,
-            "src": rpm_name,
-            "category": category_level,
-            "model": CMP_MODEL_FILE
-        }
-
-        self[file_name] = file
+        self[name] = rpm
 
     @property
     def download_dir(self):
@@ -167,14 +141,11 @@ class Repository(UserDict):
         :return:
         """
         result = CompareResultComposite(
-            CMP_TYPE_REPOSITORY, CMP_RESULT_TO_BE_DETERMINED, self.src_package, that.src_package)
+            CMP_TYPE_REPOSITORY, CMP_RESULT_TO_BE_DETERMINED, self.verbose_path, that.verbose_path)
 
         # 比较项存在依赖关系，将config、dumper、executor缓存下来传递，缓存通过比较项名称索引
         # {"plan_name": {"config": config, "dumper": {"this": this_dumper, "that": that_dumper}, "executor": executor}}
         compare_cache = {}
-        if not self.src_package.endswith('.rpm') and plan._plan_name != CMP_MODEL_FILE:
-            logger.error("Please enter the correct args --plan to compare files, the value of plan name is file.")
-            sys.exit(1)
 
         try:
             for name in plan:
@@ -184,6 +155,10 @@ class Repository(UserDict):
 
                 if plan.check_specific_package(name, self._name):
                     logger.debug(f"plan.{name} not support {self._name}")
+                    continue
+
+                if plan.no_check_specific_package(name, self._src_pkg):
+                    logger.debug(f"plan.{name} not support {self._src_pkg}")
                     continue
 
                 if plan.check_specific_category(name, self._category_level):
@@ -202,15 +177,14 @@ class Repository(UserDict):
                 executor_ins = executor(this_dumper, that_dumper, config)
 
                 # set cache
-                cache_name = compare_cache.get(name)
-                cache_name.setdefault("dumper", [this_dumper, that_dumper])
-                cache_name.setdefault("work_dir", self._work_dir)
+                compare_cache[name]["dumper"] = [this_dumper, that_dumper]
+                compare_cache[name]["work_dir"] = self._work_dir
+                # compare_cache[name]["executor"] = weakref.proxy(executor_ins)
 
                 result.add_component(*executor_ins.run())
         except Exception as err:
             exstr = traceback.format_exc()
             logger.error(f"repository compare process {executor} error {err}: \n{exstr}")
-
         # clean cache for tempfile
         finally:
             for _, dumpers in compare_cache.items():
@@ -220,22 +194,6 @@ class Repository(UserDict):
         result.set_cmp_result()
 
         return result
-
-    def acquire_source_package(self, rpm_path):
-        if not rpm_path.endswith('.rpm'):
-            logger.debug(f"{rpm_path} is not a rpm.")
-            return os.path.basename(rpm_path)
-        cmd = ['rpm', '-qpi', '--nosignature', rpm_path]
-        code, out, err = shell_cmd(cmd)
-        if err:
-            logger.warning(err)
-        if out:
-            r_matchs = re.finditer("Source RPM\\s+:\\s+(.*)\\n", out)
-            for src_pkg in r_matchs:
-                if src_pkg:
-                    return src_pkg.group(1)
-            logger.warning(f"Not found {rpm_path} source package.")
-        return os.path.basename(rpm_path)
 
     def find_sensitive_str(self, plan):
         """
@@ -268,9 +226,9 @@ class Repository(UserDict):
                 executor_ins = executor(this_dumper, config)
 
                 # set cache
-                cache_name = compare_cache.get(name)
-                cache_name.setdefault("dumper", [this_dumper])
-                cache_name.setdefault("work_dir", self._work_dir)
+                compare_cache[name]["dumper"] = [this_dumper]
+                compare_cache[name]["work_dir"] = self._work_dir
+                # compare_cache[name]["executor"] = weakref.proxy(executor_ins)
 
                 res = executor_ins.run()
                 result.append(res)
@@ -282,6 +240,26 @@ class Repository(UserDict):
                     dumper.clean()
 
         return result
+
+    @staticmethod
+    def get_src_pkg(rpm_path):
+        # 获取源码包名
+        cmd = ['rpm', '-qpi', '--nosignature', rpm_path]
+        code, out, err = shell_cmd(cmd)
+        if err:
+            logger.warning(err)
+        if out:
+            match = re.search("Source RPM\\s+:\\s+(.*)\\n", out)
+            if match:
+                src_rpm = match.group(1)
+                src_name = RPMProxy.rpm_name(src_rpm)
+                if src_name in RENAME_KERNEL:
+                    return src_rpm.replace(src_name, CMP_TYPE_RPM_KERNEL, 1)
+
+                return match.group(1)
+        logger.warning(f"Not found {rpm_path} source package.")
+
+        return os.path.basename(rpm_path)
 
     def find_sensitive_image(self, plan):
         """
@@ -313,10 +291,9 @@ class Repository(UserDict):
                 executor_ins = executor(this_dumper, config)
 
                 # set cache
-                cache_name = compare_cache.get(name)
-                cache_name.setdefault("dumper", [this_dumper])
-                cache_name.setdefault("work_dir", self._work_dir)
-
+                compare_cache[name]["dumper"] = [this_dumper]
+                compare_cache[name]["work_dir"] = self._work_dir
+                # compare_cache[name]["executor"] = weakref.proxy(executor_ins)
                 res = executor_ins.run()
                 result.append(res)
 

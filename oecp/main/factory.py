@@ -16,7 +16,6 @@
 # **********************************************************************************
 """
 import os
-import sys
 import tempfile
 import logging
 
@@ -38,7 +37,7 @@ class Factory(object):
     def create(file_paths, args, file_type, side):
 
         work_dir = args.work_dir
-        category = Category(args.category_path)
+        category = Category()
         if file_type == 'repo':
             logger.info(f"treat {file_paths} as openEuler dist repository")
             return OEDistRepo(file_paths, work_dir, category, side)
@@ -83,7 +82,6 @@ class Factory(object):
                 file_path = local_path
 
             not path_is_remote(file_path) and logger.info(f"treat {file_path} as local rpm file")
-
             repository = Repository(work_dir, verbose_path, file_path, category)
             repository.upsert_a_rpm(file_path, verbose_path)
 
@@ -93,22 +91,12 @@ class Factory(object):
 
             # dist repo
             logger.info(f"treat {file_path} as openEuler dist repository")
-            return OEDistRepo(file_path, work_dir, category, side)
-        elif os.path.isdir(file_path):
+            return OEDistRepo([file_path], work_dir, category, side)
+        else:
             # directory
             logger.info(f"treat {file_path} as local directory")
 
             return Directory(file_path, work_dir, category, side, False)
-        elif os.path.isfile(file_path):
-            # file
-            logger.info(f"treat {file_path} as single comparison file")
-            if not args.rpm_name:
-                logger.error("Please input args --rpm-name: it's the rpm name of compare files.")
-                sys.exit(1)
-            repository = Repository(work_dir, args.rpm_name, file_path, category)
-            repository.upsert_a_file(file_path, args.rpm_name)
-
-            return repository
 
     @staticmethod
     def guess_obs_repo(remote_path):

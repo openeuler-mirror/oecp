@@ -5,12 +5,12 @@
             "drive kconfig",
             "kabi",
             "kconfig",
-            "kapi",
             "ko"
           ],
   "rpmabi_analyse":
           [
-            "rpm abi"
+            "rpm abi",
+            "rpm jabi"
           ],
   "rpm_analyse":
           [
@@ -24,11 +24,7 @@
             "rpm header",
             "rpm cmd",
             "rpm service",
-            "rpm lib"
-          ],
-    "details_analyse":
-          [
-            "service detail",
-            "ko info"
+            "rpm lib",
+            "rpm symbol"
           ]
 }

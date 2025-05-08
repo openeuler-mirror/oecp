@@ -29,10 +29,11 @@ class PackageListDumper:
         item = {}
         for repo, repo_item in self.directory.items():
             for rpm_name in repo_item:
+                rpm = repo_item[rpm_name]['verbose_path']
                 category = repo_item[rpm_name]['category'].value
-                source_package = repo_item.src_package
+                source_package = repo_item[rpm_name]['src']
                 attr = {'category': category, 'source_package': source_package}
-                item.setdefault(rpm_name, attr)
+                item.setdefault(rpm, attr)
         result = {'path': self.directory.verbose_path, self.data: item}
         return result
 

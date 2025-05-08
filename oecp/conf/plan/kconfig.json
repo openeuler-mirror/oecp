@@ -7,7 +7,7 @@
       "executor": "null.NullExecutor",
       "config": {
         "compare_type": "CMP_TYPE_NULL",
-	    "package": "kernel"
+	"package": "kernel"
       }
     },
     {
