@@ -2,14 +2,14 @@
 """
 # **********************************************************************************
 # Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
-# [oecp] is licensed under the Mulan PSL v2.
-# You can use this software according to the terms and conditions of the Mulan PSL v2.
-# You may obtain a copy of Mulan PSL v2 at:
-#     http://license.coscl.org.cn/MulanPSL2
+# [oecp] is licensed under the Mulan PSL v1.
+# You can use this software according to the terms and conditions of the Mulan PSL v1.
+# You may obtain a copy of Mulan PSL v1 at:
+#     http://license.coscl.org.cn/MulanPSL
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
 # PURPOSE.
-# See the Mulan PSL v2 for more details.
+# See the Mulan PSL v1 for more details.
 # **********************************************************************************
 """
 
@@ -20,6 +20,7 @@ import shutil
 import hashlib
 import glob
 from oecp.dumper.base import ComponentsDumper
+from oecp.utils.shell import shell_cmd
 
 logger = logging.getLogger('oecp')
 
@@ -33,10 +34,11 @@ class SensitiveImageDumper(ComponentsDumper):
         self._target_image = []
         self.init_target_image_md5()
 
+
     def init_target_image_md5(self):
         image_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'conf', 'image'))
         image_list = find_all_images(image_path)
-
+        
         for image in image_list:
             md5 = compute_md5(image)
             if md5:
@@ -59,7 +61,7 @@ class SensitiveImageDumper(ComponentsDumper):
             os.system(cmd)
             cmd = f"cd {tmp_path} && find . -name *.tar.xz | xargs -r tar -xf"
             os.system(cmd)
-            images = find_all_images(tmp_path)
+            images = find_all_images(tmp_path)            
             for image in images:
                 if not image:
                     continue
@@ -83,7 +85,7 @@ def find_all_images(image_path):
     target_image_path = os.path.abspath(os.path.join(image_path, '**', '*.png'))
     image_list = glob.glob(target_image_path, recursive=True)
     target_image_path = os.path.abspath(os.path.join(image_path, '**', '*.jpg'))
-    image_list += glob.glob(target_image_path, recursive=True)
+    image_list += glob.glob(target_image_path, recursive=True)     
     return image_list
 
 
@@ -94,5 +96,5 @@ def compute_md5(file_path):
             md5 = hashlib.md5(data).hexdigest()
             return md5
     else:
-        logger.error(f"file {file_path} not exists")
-        return ''
+        logger.error((f'file {file_path} not exists'))
+        return ''        

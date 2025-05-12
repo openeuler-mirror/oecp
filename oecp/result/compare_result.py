@@ -2,41 +2,38 @@
 """
 # **********************************************************************************
 # Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
-# [oecp] is licensed under the Mulan PSL v2.
-# You can use this software according to the terms and conditions of the Mulan PSL v2.
-# You may obtain a copy of Mulan PSL v2 at:
-#     http://license.coscl.org.cn/MulanPSL2
+# [oecp] is licensed under the Mulan PSL v1.
+# You can use this software according to the terms and conditions of the Mulan PSL v1.
+# You may obtain a copy of Mulan PSL v1 at:
+#     http://license.coscl.org.cn/MulanPSL
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
 # PURPOSE.
-# See the Mulan PSL v2 for more details.
+# See the Mulan PSL v1 for more details.
 # Author:
 # Create: 2021-09-06
 # Description: compare result
 # **********************************************************************************
 """
-import os
 import logging
-import stat
-import shutil
-import operator
+import os
+import re
+import sys
+import time
 import uuid
 
 from oecp.excel.create_web_show_result import WebShowResult
-from oecp.excel.individual_statistics import IndividualStatistics
 from oecp.excel.osv_data_summary import DataExcelFile
 from oecp.result import export
+from oecp.utils.shell import shell_cmd
 from oecp.result.export import get_second_path
-from oecp.result.json_result import json_result
-from oecp.result.similar_result_calculate import calculate_similarity
 from oecp.result.similarity import get_similarity
-from oecp.result.test_result import performance_result_parser, test_result_parser, ciconfig_result_parser, \
-    at_result_parser, assgin_rpm_summay
-from oecp.result.constants import CMP_RESULT_DIFF, CMP_TYPE_DIFFERENCES, ALL_DETAILS_NAME, CMP_TYPE, COMPOSITE_CMPS, \
-    CMP_TYPE_AT, CMP_TYPE_RPM, CMP_TYPE_CI_FILE_CONFIG, CMP_TYPE_CI_CONFIG, CMP_TYPE_PERFORMANCE, CMP_TYPE_RPMS_TEST, \
-    CMP_TYPE_DRIVE_KABI, CMP_TYPE_SERVICE, CMP_TYPE_RPM_CONFIG, CMP_TYPE_RPM_ABI, CMP_TYPE_RPM_HEADER, \
-    COUNT_ABI_DETAILS, CMP_TYPE_RPM_LEVEL, CMP_TYPE_RPM_REQUIRES, CMP_TYPE_SERVICE_DETAIL, DETAIL_PATH, \
-    CMP_RESULT_SAME, CMP_TYPE_KAPI, CMP_TYPE_KO, CMP_TYPE_KO_INFO
+from oecp.result.json_result import json_result
+from oecp.result.test_result import test_result_parser, ciconfig_result_parser, at_result_parser, assgin_rpm_summay
+from oecp.result.constants import CMP_RESULT_DIFF, CMP_RESULT_SAME, CMP_TYPE_CI_CONFIG, CMP_TYPE_CI_FILE_CONFIG, \
+    CMP_TYPE_RPM, CMP_TYPE_RPMS_TEST, CMP_TYPE_AT, CMP_TYPE_DIFFERENCES, ALL_DETAILS_NAME, COMPOSITE_CMPS, \
+    CMP_TYPE_RPM_LEVEL, OBSOLETES, PROVIDES, CMP_TYPE_SERVICE_DETAIL, CMP_TYPE_KO_INFO, CMP_TYPE_RPM_SYMBOL, \
+    CMP_TYPE_RPM_ABI, CMP_TYPE_DRIVE_KABI
 
 logger = logging.getLogger("oecp")
 
@@ -46,24 +43,23 @@ class CompareResultComponent(object):
     比较结果对象
     """
 
-    def __init__(self, cmp_type, cmp_result, cmp_side_a, cmp_side_b, detail=None, detail_file=None):
+    def __init__(self, cmp_type, cmp_result, cmp_side_a, cmp_side_b, detail=None):
         """
 
         :param cmp_type: 比较名称，eg：kernel abi，kernel config
         :param cmp_result: 比较结果
         :param cmp_side_a: 比较对象
         :param cmp_side_b: 比较对象
-        :param detail: 比较结果详细内容路径
+        :param detail: 比较结果详细内容
         """
         self.cmp_type = cmp_type
         self.cmp_result = cmp_result
         self.cmp_side_a = cmp_side_a
         self.cmp_side_b = cmp_side_b
         self.detail = detail
-        self.detail_file = detail_file
-        self._binary_rpm_package = None
-        self._source_package = None
-        self._level = None
+        self.binary_rpm_package = None
+        self.source_package = None
+        self.level = None
 
     def set_cmp_type(self, cmp_type):
         """
@@ -74,7 +70,7 @@ class CompareResultComponent(object):
         self.cmp_type = cmp_type
 
     def set_binary_rpm_package(self, binary_rpm_package):
-        self._binary_rpm_package = binary_rpm_package
+        self.binary_rpm_package = binary_rpm_package
 
     def set_cmp_result(self, cmp_result):
         """
@@ -85,13 +81,13 @@ class CompareResultComponent(object):
         self.cmp_result = cmp_result
 
     def set_source_package(self, source_package):
-        self._source_package = source_package
+        self.source_package = source_package
 
     def set_level(self, level):
         """
         :param level: rpm包的兼容性等级
         """
-        self._level = level
+        self.level = level
 
     def __str__(self):
         return "{} {} {} {} {}".format(
@@ -136,10 +132,10 @@ class CompareResultComposite(CompareResultComponent):
             return
         for diff_component in self.diff_components:
             if diff_component.cmp_result == CMP_RESULT_DIFF:
-                self.cmp_result = CMP_RESULT_DIFF
+                self._cmp_result = CMP_RESULT_DIFF
                 break
         else:
-            self.cmp_result = CMP_RESULT_SAME
+            self._cmp_result = CMP_RESULT_SAME
 
     def __str__(self):
         """
@@ -147,47 +143,59 @@ class CompareResultComposite(CompareResultComponent):
         :return:
         """
         string = ["{} {} {} {} {}".format(
-            self.cmp_type, self.cmp_result, self.cmp_side_a, self.cmp_side_b, self.detail)] + \
+            self.cmp_type, self._cmp_result, self.cmp_side_a, self.cmp_side_b, self.detail)] + \
                  [str(component) for component in self.diff_components]
         return "\n".join(string)
 
-    def export(self, *e_args):
-        root_path, result_format, iso_path, platform_path = e_args
-        base_side_a, base_side_b = format_base_side(self.cmp_side_a, self.cmp_side_b, iso_path)
-        osv_title = 'report-' + get_title(base_side_a) + '-' + get_title(base_side_b)
-        export_floder = os.path.join(root_path, osv_title)
-        if os.path.exists(export_floder):
-            shutil.rmtree(export_floder)
+    def export(self, *args_use):
+        root_path, result_format, iso_path, spec_dir, branch_arch, plan_name = args_use
+        base_side_a = self.cmp_side_a
+        base_side_b = self.cmp_side_b
+        osv_title = 'report-' + time.strftime("%Y%m%d%H%M%S", time.localtime())
+
+        # performance_rows = performance_result_parser(base_side_a, base_side_b, root_path, baseline)
+        # rpm_test_rows, rpm_test_details = test_result_parser(base_side_a, base_side_b, root_path)
 
         # all result which need to export as csv
+        # eg:
+        # {
+        #   "rpm": [
+        #     result_row1,
+        #     ...
+        #   ],
+        #   "xxx.rpm": {
+        #     "rpm require": [
+        #       single_result_row1,
+        #       ...
+        #     ],
+        #     ...
+        #   },
+        #   ...
+        # }
         rows = {}
-        count_abi = {
-            "all_packages_abi": [0, 0, 0],
-            "l1_packages_abi": [0, 0, 0],
-            "l2_packages_abi": [0, 0, 0]
-        }
-        all_report_path = os.path.join(root_path, osv_title)
-        parse_result(self, base_side_a, base_side_b, rows, count_abi, all_report_path)
+        parse_result(self, base_side_a, base_side_b, rows)
         if result_format == 'json':
-            result = json_result(rows, base_side_a, base_side_b)
+            # rpm_package_name = rows.get("rpm")[0]
+            # src_rpm = rpm_package_name.get(base_side_b + " source package") if rpm_package_name.get(
+            # base_side_b + " source package") else rpm_package_name.get(base_side_a + " source package")
+            export.export_details_info(rows, root_path, osv_title)
+            result = json_result(rows, base_side_a, base_side_b, branch_arch, plan_name)
+            # Check deleted binary rpm compatibility.
             export.export_json(root_path, 'osv', osv_title, result)
-            details_path = os.path.join(root_path, osv_title, DETAIL_PATH)
-            if os.path.exists(details_path):
-                shutil.rmtree(details_path)
             logger.info(
                 f"all results have compare done, please check: {os.path.join(os.path.realpath(root_path), osv_title)}")
             return osv_title
 
-        performance_rows = performance_result_parser(base_side_a, base_side_b, platform_path)
-        rpm_test_rows, rpm_test_details = test_result_parser(base_side_a, base_side_b, platform_path)
-        ciconfig_rows, file_config_rows = ciconfig_result_parser(base_side_a, base_side_b, platform_path)
-        at_rows = at_result_parser(base_side_b, platform_path)
+        # performance_rows = performance_result_parser(base_side_a, base_side_b, root_path, baseline)
+        rpm_test_rows, rpm_test_details = test_result_parser(base_side_a, base_side_b, root_path)
+        ciconfig_rows, file_config_rows = ciconfig_result_parser(base_side_a, base_side_b, root_path)
+        at_rows = at_result_parser(base_side_b, root_path)
         if ciconfig_rows:
             rows[CMP_TYPE_CI_CONFIG] = ciconfig_rows
         if file_config_rows:
             rows[CMP_TYPE_CI_FILE_CONFIG] = file_config_rows
-        if performance_rows:
-            rows[CMP_TYPE_PERFORMANCE] = performance_rows
+        # if performance_rows:
+            # rows[CMP_TYPE_PERFORMANCE] = performance_rows
         if rpm_test_rows and rpm_test_details:
             rows[CMP_TYPE_RPM] = rows[CMP_TYPE_RPM] + rpm_test_rows
             # there is a pkg named: rpm
@@ -202,12 +210,15 @@ class CompareResultComposite(CompareResultComponent):
         similarity = get_similarity(rows, base_side_a, base_side_b)
         # Write data to excel
         excel_file = DataExcelFile()
-        args = (similarity, base_side_a, base_side_b, root_path, osv_title, iso_path[1])
+        args = (similarity, base_side_a, base_side_b, root_path, osv_title, iso_path)
         excel_file.write_summary_file(*args)
         web_show_result = WebShowResult(excel_file.tools_result, excel_file.conclusion)
         web_show_result.write_json_result(*args)
         rows["similarity"] = [similarity]
+        summary = assgin_summary_result(rows, base_side_a, base_side_b)
         differences = get_differences_info(rows)
+        if summary:
+            rows["result"] = summary
         if differences:
             rows[CMP_TYPE_DIFFERENCES] = differences
 
@@ -224,39 +235,26 @@ class CompareResultComposite(CompareResultComponent):
                 headers = value[0].keys()
                 if node == CMP_TYPE_RPM:
                     # add explanation for rpm package name result
-                    explan = "rpm package name explain:\n\
-                    1   -- same name + version + release num + distributor\n\
-                    1.1 -- same name + version + release num\n\
+                    explan = "rpm package name explan:\n\
+                    1   -- same name + version + son-version + release num\n\
+                    1.1 -- same name + version + son-version\n\
                     2   -- same name + version\n\
                     3   -- same name\n\
                     4   -- less\n\
                     5   -- more"
-                    column_side_a = base_side_a + " binary rpm package"
                     rpm_name_info = {
-                        column_side_a: explan
+                        base_side_a + " binary rpm package": explan
                     }
-                    value = [rpm_name_info] + sorted(value, key=operator.itemgetter(CMP_TYPE, column_side_a))
+                    value = [rpm_name_info] + value
                 elif node == CMP_TYPE_DIFFERENCES:
                     for details_name in ALL_DETAILS_NAME:
                         if details_name not in headers:
                             headers = list(headers)
                             headers.append(details_name)
-
                 export.create_csv_report(headers, value, report_path)
             else:
-                if node is None:
-                    return ""
                 # eg: node just a single rpm-requires result
                 export_single_report(node, value, root_path, osv_title)
-        all_rpm_report = os.path.join(export_floder, 'all-rpm-report.csv')
-        if os.path.exists(all_rpm_report):
-            # genrate single_calculate report.
-            single_calculate = IndividualStatistics(all_rpm_report)
-            single_calculate.run_statistics(count_abi)
-            # generate similar_calculate_result report.
-            calculate_similarity(all_rpm_report)
-        else:
-            logger.info(f"Report: {os.path.basename(all_rpm_report)} not exists! unable to generate calculate report.")
         logger.info(
             f"all results have compare done, please check: {os.path.join(os.path.realpath(root_path), osv_title)}")
         logger.info(f"all similatity are: {similarity}")
@@ -264,35 +262,12 @@ class CompareResultComposite(CompareResultComponent):
         return osv_title
 
 
-def format_base_side(cmp_side_a, cmp_side_b, iso_path):
-    # rpm单包比较结果
-    if cmp_side_a.endswith('.src.rpm') and cmp_side_b.endswith('.src.rpm'):
-        return os.path.basename(iso_path[0]), os.path.basename(iso_path[1])
-    # 远端repo比较结果
-    elif 'repodata' in cmp_side_a and 'repodata' in cmp_side_b:
-        side_a = cmp_side_a.split(',')[0]
-        side_b = cmp_side_b.split(',')[0]
-        return side_a.split('://')[-1], side_b.split('://')[-1]
-    # iso比较结果
-    else:
-        return cmp_side_a, cmp_side_b
-
-
 def get_title(base_side):
     if not base_side.endswith('.iso'):
-        if '/' in base_side:
-            base_side = base_side.replace('/', '-').strip('-')
         return base_side
 
     title = base_side.split('.')[:-1]
     return '-'.join(title)
-
-
-def save_detail_result(file_path, content):
-    flags = os.O_RDWR | os.O_CREAT
-    modes = stat.S_IROTH | stat.S_IRWXU
-    with os.fdopen(os.open(file_path, flags, modes), 'w', encoding='utf-8') as fd:
-        fd.write(content)
 
 
 def export_single_report(node, single_result, root_path, osv_title):
@@ -302,35 +277,75 @@ def export_single_report(node, single_result, root_path, osv_title):
         if cmp_type in COMPOSITE_CMPS:
             continue
 
-        report_path = export.create_directory(root_path, node.replace(' ', '-'), osv_title, cmp_type)
+        uid = str(uuid.uuid4())
+        uid = ''.join(uid.split('-'))
+        report_path = export.create_directory(root_path, node.replace(' ', '-'), osv_title, cmp_type, uid)
         headers = results[0].keys()
-        headers = list(headers)
-        if cmp_type == CMP_TYPE_DRIVE_KABI and "effect drivers" not in headers:
-            headers.append("effect drivers")
-        if "details path" not in headers:
-            if cmp_type in [CMP_TYPE_SERVICE, CMP_TYPE_RPM_CONFIG, CMP_TYPE_RPM_ABI, CMP_TYPE_RPM_HEADER, CMP_TYPE_KO]:
-                headers.append("details path")
         export.create_csv_report(headers, results, report_path)
 
 
-def parse_result(result, base_side_a, base_side_b, rows, count_abi, report_path, parent_side_a=None, parent_side_b=None,
-                 cmp_type=None, detail=None):
+def parse_result(result, base_side_a, base_side_b, rows, parent_side_a=None, parent_side_b=None, cmp_type=None,
+                 detail=None):
     if hasattr(result, 'diff_components') and result.diff_components:
         if result.cmp_type == CMP_TYPE_RPM:
-            assgin_composite_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, count_abi)
+            assgin_composite_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b)
 
         for son_result in result.diff_components:
-            parse_result(son_result, base_side_a, base_side_b, rows, count_abi, report_path, result.cmp_side_a,
-                         result.cmp_side_b, result.cmp_type, result.detail)
+            parse_result(son_result, base_side_a, base_side_b, rows, result.cmp_side_a, result.cmp_side_b,
+                         result.cmp_type, result.detail)
     else:
         if result.cmp_type == CMP_TYPE_RPM_LEVEL:
-            assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b)
+            assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b, result.cmp_side_a, result.cmp_side_b)
         else:
-            assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail,
-                                 report_path)
+            assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail)
+
+
+def assgin_summary_result(rows, side_a, side_b):
+    # eg:
+    #   {
+    #     "1": {"xxx0_rpm": "same", "xxx1_rpm": "diff", "xxx2_rpm": "less", ... },
+    #     "2": {"xxx3_rpm": "same", "xxx4_rpm": "diff", ...},
+    #     "3": {"xxx5_rpm": "same", ...
+    #   }
+    summary = {}
+    pkg_name = {
+        '1': "same",
+        '1.1': "same",
+        '2': "same",
+        '3': "diff",
+        '4': "less",
+        '5': "more"
+    }
+    for rpm in rows.get(CMP_TYPE_RPM, {}):
+        level = str(rpm.get("category level")) if rpm.get("category level") else "6"
+        summary.setdefault(level, {})
+        rpm_name = rpm[side_a + " binary rpm package"] + rpm[side_b + " binary rpm package"]
+        cmp_result = rpm["compare result"]
+        if rpm["compare type"] == CMP_TYPE_RPM_LEVEL:
+            cmp_result = pkg_name.get(cmp_result)
+
+        summary[level].setdefault(rpm_name, "same")
+        if summary[level][rpm_name] == "same" and cmp_result:
+            summary[level][rpm_name] = cmp_result
+
+    summary_dict = {}
+    for k, rpms in summary.items():
+        summary_row = {
+            "category level": k,
+            "same": 0,
+            "diff": 0,
+            "less": 0,
+            "more": 0
+        }
+        for rpm_name, result in rpms.items():
+            summary_row[result] += 1
+        summary_dict[k] = summary_row
+
+    return sorted(summary_dict.values(), key=lambda i: i["category level"])
 
 
 def assgin_end_result(summary_dict):
+    end_result = ''
     if summary_dict.get("1"):
         if summary_dict["1"]["diff"] == 0:
             end_result = "基础兼容"
@@ -346,10 +361,69 @@ def assgin_end_result(summary_dict):
     return sorted(summary_dict.values(), key=lambda i: i["category level"])
 
 
-def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_side_b, count_abi):
-    side = result.cmp_side_b if result.cmp_side_b else result.cmp_side_a
+def prase_spec_with_plag(spec_path, src_name, flag):
+    """
+    prase obsoletes or provides rpms from spec file.
+    @param spec_path: path of spec file.
+    @param src_name: source rpm name.
+    @param flag: obsoletes or provides
+    @return:
+    """
+    obtain_results = []
+    if not spec_path:
+        return obtain_results
+
+    cmd = f"rpmspec -q --{flag.lower()} {spec_path}"
+    code, out, err = shell_cmd(cmd.split())
+    if not code:
+        if err:
+            logger.debug(err)
+        if out:
+            for line in out.split("\n"):
+                if not line:
+                    continue
+                symbol = re.search(r"[><=]=?", line)
+                if symbol:
+                    tar_name = line.split(symbol.group())[0].strip()
+                    obtain_results.append(tar_name)
+                else:
+                    obtain_results.append(line.strip())
+        else:
+            logger.debug("%s not found %s.", spec_path, flag)
+    else:
+        logger.warning(f"Prase spec Error: {cmd}")
+        with open(spec_path, "r") as spec_f:
+            content = spec_f.read()
+        name_version_pat = r"(\S+)\s([><=]=?)\s(\S+)"
+        for line in content.split('\n'):
+            pat = r"^" + flag + ":"
+            if re.match(pat, line):
+                line_strips = re.sub(pat, '', line).strip()
+                match_result = re.findall(name_version_pat, line_strips)
+                if match_result:
+                    for single_tar in match_result:
+                        obtain_results.append(single_tar[0].replace("%{name}", src_name))
+                else:
+                    component_tar = [single.replace("%{name}", src_name) for single in line_strips.split()]
+                    obtain_results.extend(component_tar)
+
+    return obtain_results
+
+
+def check_rpm_obsoletes(spec_path, src_rpm, less_details):
+    obsolete_rpms = prase_spec_with_plag(spec_path, src_rpm, OBSOLETES)
+    provides = prase_spec_with_plag(spec_path, src_rpm, PROVIDES)
+    remove_rpms = list(less_details.keys())
+    for del_rpm in remove_rpms:
+        if del_rpm in obsolete_rpms:
+            less_details[del_rpm][OBSOLETES] = "yes"
+        if del_rpm in provides:
+            less_details[del_rpm][PROVIDES] = "yes"
+
+
+def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_side_b):
+    side = result.cmp_side_a if result.cmp_side_a else result.cmp_side_b
     category_level = result.detail
-    count_results = result.count_result
     compare_type = result.diff_components[0].cmp_type
     second_path = get_second_path(compare_type)
     compare_detail = ' ' + second_path + '/' + side + '.csv ' if side else ''
@@ -363,91 +437,59 @@ def assgin_composite_result(rows, result, side_a, side_b, parent_side_a, parent_
         "compare detail": compare_detail,
         "compare type": compare_type,
         "category level": category_level,
-        "same": "N/A",
         "more": "N/A",
         "less": "N/A",
         "diff": "N/A"
     }
     if hasattr(result, 'count_result'):
-        row["same"] = count_results['same']
-        row["more"] = count_results['more']
-        row["less"] = count_results['less']
-        row["diff"] = count_results['diff']
+        row["more"] = result.count_result['more_count']
+        row["less"] = result.count_result['less_count']
+        row["diff"] = result.count_result['diff_count']
     rows.setdefault(result.cmp_type, [])
     rows[result.cmp_type].append(row)
 
-    if compare_type == CMP_TYPE_RPM_ABI and result.cmp_result == CMP_RESULT_DIFF and hasattr(result, 'count_result'):
-        for i, type_abi in enumerate(COUNT_ABI_DETAILS):
-            count_abi["all_packages_abi"][i] += count_results[type_abi]
-        if category_level == 1:
-            for i, type_abi in enumerate(COUNT_ABI_DETAILS):
-                count_abi["l1_packages_abi"][i] += count_results[type_abi]
-        elif category_level == 2:
-            for i, type_abi in enumerate(COUNT_ABI_DETAILS):
-                count_abi["l2_packages_abi"][i] += count_results[type_abi]
 
-
-def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail, report_path):
-    parent_side = parent_side_b if parent_side_b else parent_side_a
-    if result.cmp_type == CMP_TYPE_RPM_REQUIRES:
-        row = {
-            "binary rpm package": parent_side,
-            base_side_a + " symbol name": result.cmp_side_a.get('name', '') if result.cmp_side_a else '',
-            base_side_a + " package name": result.cmp_side_a.get('packages', '') if result.cmp_side_a else '',
-            base_side_a + " dependence type": result.cmp_side_a.get('dependence', None) if result.cmp_side_a else None,
-            base_side_b + " symbol name": result.cmp_side_b.get('name', '') if result.cmp_side_b else '',
-            base_side_b + " package name": result.cmp_side_b.get('packages', '') if result.cmp_side_b else '',
-            base_side_b + " dependence type": result.cmp_side_b.get('dependence', None) if result.cmp_side_b else None,
-            "compare result": result.cmp_result,
-            "compare type": result.cmp_type
-        }
+def assgin_single_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b, detail):
+    parent_side = parent_side_a if parent_side_a else parent_side_b
+    row = {
+        "binary rpm package": parent_side,
+        base_side_a: result.cmp_side_a.strip(),
+        base_side_b: result.cmp_side_b.strip(),
+        "compare result": result.cmp_result,
+        "compare type": result.cmp_type
+    }
+    if result.cmp_type == CMP_TYPE_SERVICE_DETAIL:
+        row["file_name"] = detail.get("file_name")
     elif result.cmp_type == CMP_TYPE_KO_INFO:
-        parent_side_bd, uid = parent_side_b.split('_ko_')
         parent_side = f"{os.path.basename(parent_side_a)}_vs_{os.path.basename(parent_side_b)}"
         row = {
-            "Base__" + parent_side_a: result.cmp_side_a.strip(),
-            "Check__" + parent_side_bd: result.cmp_side_b.strip(),
+            "base_ko__" + parent_side_a: result.cmp_side_a.strip(),
+            "check_ko__" + parent_side_b: result.cmp_side_b.strip(),
             "compare result": result.cmp_result,
             "compare type": result.cmp_type,
             "kabi white list": result.detail
         }
     else:
-        row = {
-            "binary rpm package": parent_side,
-            "Base__" + base_side_a: result.cmp_side_a.strip(),
-            "Check__" + base_side_b: result.cmp_side_b.strip(),
-            "compare result": result.cmp_result,
-            "compare type": result.cmp_type
-        }
-    if result.cmp_type == CMP_TYPE_SERVICE_DETAIL:
-        if detail:
-            row["file_name"] = detail.get("file_name")
-    else:
-        if result.cmp_type != CMP_TYPE_KO_INFO:
-            row["category level"] = detail
-        if result.cmp_type == CMP_TYPE_DRIVE_KABI:
-            row["effect drivers"] = result.detail
-        elif result.cmp_type in [CMP_TYPE_SERVICE, CMP_TYPE_KO]:
-            row["details path"] = result.detail
-        elif result.cmp_type == CMP_TYPE_KAPI:
-            row["kabi symbol"] = result.detail
+        row["category level"] = detail
+        if result.cmp_type == CMP_TYPE_RPM_ABI or result.cmp_type == CMP_TYPE_RPM_SYMBOL:
+            row["abi details"] = {}
+            if result.detail:
+                row["abi details"] = result.detail
+        elif result.cmp_type == CMP_TYPE_DRIVE_KABI:
+            row["effect drivers"] = ''
+            if result.detail:
+                row["effect drivers"] = result.detail
+
     # handle kabi result
+    # if is_kernel:
+    #    row.pop("binary rpm package")
 
     rows.setdefault(parent_side, {})
     rows[parent_side].setdefault(result.cmp_type, [])
     rows[parent_side][result.cmp_type].append(row)
-    if result.detail_file:
-        dir_path = os.path.join(report_path, DETAIL_PATH, result.cmp_type.split()[-1], parent_side_b)
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path)
-        file_a = os.path.basename(result.cmp_side_a)
-        file_b = os.path.basename(result.cmp_side_b)
-        file_path = os.path.join(dir_path, f'{file_a}__cmp__{file_b}_{uuid.uuid4().clock_seq}.md')
-        row["details path"] = DETAIL_PATH + file_path.split(DETAIL_PATH)[-1]
-        save_detail_result(file_path, result.detail_file)
 
 
-def assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b):
+def assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b, parent_side_a, parent_side_b):
     category_level = result.detail['category']
     row = {
         base_side_a + " binary rpm package": result.cmp_side_a,
@@ -458,11 +500,15 @@ def assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b):
         "compare detail": '',
         "compare type": result.cmp_type,
         "category level": category_level,
-        "same": 'N/A',
         "more": 'N/A',
         "less": 'N/A',
         "diff": 'N/A'
     }
+
+    # single rpm package name report seem useless,
+    # because we will merge them to all-rpm-report.csv
+    # rows.setdefault(result._cmp_type, [])
+    # rows[result._cmp_type].append(row)
 
     # add rpm_pkg_result to rpm list
     rows.setdefault(CMP_TYPE_RPM, [])
@@ -471,32 +517,21 @@ def assgin_rpm_pkg_result(rows, result, base_side_a, base_side_b):
 
 def get_differences_info(rows):
     differences_info = []
-    if not rows:
-        return []
     for key in rows.keys():
-        if key is None:
-            return []
         if key.endswith('.rpm') and not key.endswith('.src.rpm'):
             for cmp_type, results in rows[key].items():
+                if cmp_type == CMP_TYPE_SERVICE_DETAIL:
+                    continue
                 for single_result in results:
                     if single_result['compare result'] != CMP_RESULT_SAME:
-                        if cmp_type == CMP_TYPE_RPM_REQUIRES:
-                            single_result = get_require_differencs_info(single_result)
                         differences_info.append(single_result)
     return differences_info
 
 
-def get_require_differencs_info(single_result):
-    differencs_info = {'binary rpm package': single_result['binary rpm package']}
-    result_keys = list(single_result.keys())
-    side_a = "Base__" + result_keys[1].split(" ")[0]
-    side_b = "Check__" + result_keys[4].split(" ")[0]
-    symbol_a, package_a = single_result.get(result_keys[1]), single_result.get(result_keys[2])
-    symbol_b, package_b = single_result.get(result_keys[4]), single_result.get(result_keys[5])
-    differencs_info[side_a] = None if not symbol_a and not package_a else symbol_a.strip() + "  [" + package_a + "]"
-    differencs_info[side_b] = None if not symbol_b and not package_b else symbol_b.strip() + "  [" + package_b + "]"
-    differencs_info['compare result'] = single_result['compare result']
-    differencs_info['compare type'] = single_result['compare type']
-    differencs_info['category level'] = single_result['category level']
-
-    return differencs_info
+def compare_result_name_to_attr(name):
+    """
+    plan中的compare_type对应的属性变量
+    :param name:
+    :return:
+    """
+    return getattr(sys.modules[__name__], name)
