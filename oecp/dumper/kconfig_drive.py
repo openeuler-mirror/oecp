@@ -19,7 +19,6 @@ from json.decoder import JSONDecodeError
 from pathlib import Path
 
 from oecp.dumper.base import AbstractDumper
-from oecp.result.constants import CMP_TYPE_KCONFIG
 from oecp.utils.kernel import get_file_by_pattern
 
 logger = logging.getLogger('oecp')
@@ -28,14 +27,9 @@ logger = logging.getLogger('oecp')
 class KconfigDriveDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
         super(KconfigDriveDumper, self).__init__(repository, cache, config)
-
-    @staticmethod
-    def get_config_data(kconfig_range_data):
-        all_config_datas = []
-        for driver_name, config_datas in kconfig_range_data.items():
-            if driver_name != "annotation":
-                all_config_datas.extend(config_datas)
-        return all_config_datas
+        cache_require_key = 'extract'
+        self.cache_dumper = self.get_cache_dumper(cache_require_key)
+        self._component_key = 'kconfig'
 
     @staticmethod
     def _load_kconfig_json():
@@ -52,29 +46,29 @@ class KconfigDriveDumper(AbstractDumper):
         try:
             with open(kconfig_json_path, "r", encoding="utf-8") as file:
                 kconfig_range_data = json.load(file)
-        except (FileNotFoundError, JSONDecodeError) as e:
-            logger.exception(f"Failed to read kconfig range configuration file, {e}")
+        except (FileNotFoundError, JSONDecodeError):
+            logger.exception("Failed to read kconfig range configuration file")
         return kconfig_range_data
 
-    def load_kconfig_range(self, repository):
-        rpm_name = repository.get('verbose_path')
-        if self.cmp_model:
-            kconfig = repository.get('path')
-            rpm_name = repository.get('rpm_name')
-        else:
-            cache_dumper = self.get_cache_dumper(self.cache_require_key)
-            kconfig = get_file_by_pattern(r"^config(-)?", cache_dumper, rpm_name)
+    def load_kconfig_range(self):
+        kconfig = get_file_by_pattern(r"^config-", self.cache_dumper)
         if not kconfig:
-            return []
+            kconfig = get_file_by_pattern(r"^config", self.cache_dumper)
+            if not kconfig:
+                return []
 
         kconfig_range_data = self._load_kconfig_json()
         # A collection of non-annotated phases in the configuration file
-        not_annotated_config = self.get_config_data(kconfig_range_data)
+        not_annotated_config = [config_data for driver_name, config_datas in kconfig_range_data.items()
+                                if driver_name != "annotation" for config_data in config_datas]
+        kernel = 'kernel'
+        if 'kernel-core' in kconfig:
+            kernel = 'kernel-core'
         item = {
-            "rpm": rpm_name,
-            "kind": CMP_TYPE_KCONFIG,
-            "category": repository.get('category').value,
-            self.data: []
+            "rpm": self.repository.get(kernel).get('verbose_path'),
+            "kind": self._component_key,
+            "category": self.repository.get(kernel).get('category').value,
+            "data": []
         }
         with open(kconfig, "r") as f:
             for line in f.readlines():
@@ -84,15 +78,12 @@ class KconfigDriveDumper(AbstractDumper):
                 if line.startswith("#"):
                     for annotation in kconfig_range_data.get("annotation"):
                         if annotation in line:
-                            item.get(self.data).append({'name': line, 'symbol': "=", 'version': ""})
+                            item.get("data").append({'name': line, 'symbol': "=", 'version': ""})
                     continue
                 name, version = line.split("=", 1)
                 if name in not_annotated_config:
-                    item.get(self.data).append({'name': name, 'symbol': "=", 'version': version})
+                    item.get("data").append({'name': name, 'symbol': "=", 'version': version})
         return [item]
 
     def run(self):
-        result = []
-        for _, repository in self.repository.items():
-            result.extend(self.load_kconfig_range(repository))
-        return result
+        return self.load_kconfig_range()

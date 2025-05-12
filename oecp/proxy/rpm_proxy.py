@@ -15,14 +15,11 @@
 # Description: rpm proxy
 # **********************************************************************************
 """
-import os
 import re
 import subprocess
 import logging
-import tarfile
-import tempfile
 
-from oecp.result.constants import STAND_DISTS, CMP_TYPE_RPM_KERNEL
+from oecp.result.constants import STAND_DISTS, NO_CHECK_PKG
 
 logger = logging.getLogger('oecp')
 
@@ -48,8 +45,6 @@ class RPMProxy(object):
 
     @classmethod
     def rpm_name_version(cls, rpm):
-        if not rpm.endswith('.rpm'):
-            return rpm, ''
         name = cls.rpm_name(rpm)
         m = re.match(r"-(.+)-.+", rpm.replace(name, "", 1))
         return name, m.group(1)
@@ -64,8 +59,8 @@ class RPMProxy(object):
         m = re.match(r"^.+-.+-(.+)", rpm)
 
         if m:
-            d = re.match(r"\d+\.([a-zA-Z]\w+)\.\w+\.rpm", m.group(1))
-            return d.group(1) if d else ''
+            d = re.search(r"oe\w+", m.group(1))
+            return d.group() if d else ''
         return ''
 
     @classmethod
@@ -76,61 +71,52 @@ class RPMProxy(object):
         :param dist:
         :return:
         """
-        if not rpm.endswith('.rpm'):
-            logger.debug(f"RPMProxy rpm_n_v_r_d_a is not a rpm: {rpm}")
-            return rpm, '', '', '', ''
         try:
             if dist == "openEuler":
                 # 名称-版本号-发布号.发行商.体系.rpm
                 # eg: grpc-1.31.0-6.oe1.x86_64.rpm
                 name, version = cls.rpm_name_version(rpm)
-                matchs = re.match(r"-(.+)\.(.+)\.rpm", rpm.replace(name + '-' + version, "", 1))
-                if not matchs:
+                m = re.match(r"-(.+)\.(.+)\.rpm", rpm.replace(name + '-' + version, "", 1))
+                if not m:
                     # eg: RAID-3858_3758-EulerOS2.10-hiraid-1.0.0.18-aarch64.rpm
-                    matchs = re.match(r"-(.+)\.rpm", rpm.replace(name + '-' + version, "", 1))
-                    return name, version, '', '', matchs.group(1)
-                release_dist, arch = matchs.group(1), matchs.group(2)
-                for dist_flag in STAND_DISTS.values():
-                    if not dist_flag or dist_flag not in release_dist:
+                    m = re.match(r"-(.+)\.rpm", rpm.replace(name + '-' + version, "", 1))
+                    return name, version, '', '', m.group(1)
+                r_d, arch = m.group(1), m.group(2)
+                for d_flag in STAND_DISTS.values():
+                    if not d_flag or d_flag not in r_d:
                         continue
                     else:
-                        sp_release = release_dist.split(dist_flag)[0].rstrip('.')
+                        sp_release = r_d.split(d_flag)[0].rstrip('.')
                         release = re.sub(r'.module[_+]+', '.module', sp_release)
-                        initial_dist = release_dist.split(sp_release)[-1].strip('.')
+                        d = d_flag + r_d.split(d_flag)[1]
                         # eg: caja-core-extensions-1.22.0-1.ky3.kb58.x86_64.rpm
-                        kb_num = re.search(r"kb\d+", initial_dist)
+                        kb_num = re.search(r"kb\d+", d)
                         if kb_num:
                             release = release + '.' + kb_num.group()
-                        return name, version, release, dist_flag, arch
-                matchs = re.match(r"([\d._]+)\.([a-zA-Z]\w+)", release_dist)
-                if matchs:
-                    return name, version, matchs.group(1), matchs.group(2), arch
+                            d = d.split(kb_num.group())[0].rstrip('.')
+                        return name, version, release, d, arch
+                m = re.match(r"([\d._]+)\.([a-zA-Z]\w+)", r_d)
+                if m:
+                    return name, version, m.group(1), m.group(2), arch
                 else:
                     # 名称-版本号-发布号.体系.rpm
                     # eg: grpc-1.31.0-6.x86_64.rpm
-                    return name, version, release_dist, '', arch
+                    return name, version, r_d, '', arch
             elif dist == "category":
                 # 名称-版本号-发布号.发行商-类型
                 # eg: texlive-base-20180414-28.oe1.oecp
-                matchs = re.match(r"^(.+)-(.+)-(.+)\.(.+)\.(.+)", rpm)
-                return matchs.group(1), matchs.group(2), matchs.group(3), matchs.group(4), matchs.group(5)
+                m = re.match(r"^(.+)-(.+)-(.+)\.(.+)\.(.+)", rpm)
+                return m.group(1), m.group(2), m.group(3), m.group(4), m.group(5)
 
             return (None,) * 5
         except AttributeError as attr_error:
-            logger.exception("Package %s attribute matching error %s" % rpm, attr_error)
+            logger.exception("Package %s attribute matching error, %s" % rpm, attr_error)
         except Exception as general_error:
-            logger.exception(f"error rpm: {rpm}, {general_error}")
+            logger.exception(f"prase {rpm} rpm name error: {general_error}")
 
     @classmethod
     def is_rpm_file(cls, rpm):
         return rpm.endswith(".rpm")
-
-    @classmethod
-    def filter_specific_rpm(cls, rpm):
-        specific_rpm = ['kernel-source']
-        rpm_name = cls.rpm_name(rpm)
-
-        return rpm_name in specific_rpm
 
     @classmethod
     def is_rpm_focus_on(cls, rpm):
@@ -139,10 +125,14 @@ class RPMProxy(object):
         :param rpm:
         :return:
         """
+        # 对特定包不做检查
+        if cls.rpm_name(rpm) in NO_CHECK_PKG:
+            return False
+
         return not ("-javadoc-" in rpm or "-doc-" in rpm or "-docs-" in rpm
                     or "-debuginfo-" in rpm or "-debugsource-" in rpm
-                    or ".oecp.rpm" in rpm
-                    or "-help-" in rpm)
+                    or ".oecp.rpm" in rpm or "-help-" in rpm
+                    )
 
     @classmethod
     def is_debuginfo_rpm(cls, rpm):
@@ -192,22 +182,3 @@ class RPMProxy(object):
                              stdout=subprocess.DEVNULL,
                              stderr=subprocess.STDOUT)
         p.communicate()
-
-    @classmethod
-    def _extract_tar_gz(cls, extract_dir_name, tar_file):
-        file_path = os.path.join(extract_dir_name, tar_file)
-        with tarfile.open(file_path, "r:gz") as tar:
-            tar.extractall(path=extract_dir_name)
-
-    @classmethod
-    def uncompress_source_rpm(cls, src_package, src_kernel=True):
-        dir_path = os.path.dirname(src_package)
-        extract_dir_obj = tempfile.TemporaryDirectory(suffix='__srpm__', dir=dir_path)
-        extract_dir_name = extract_dir_obj.name
-        os.chdir(extract_dir_name)
-        RPMProxy.perform_cpio(src_package)
-        if src_kernel:
-            tar_file = "%s.tar.gz" % CMP_TYPE_RPM_KERNEL
-            cls._extract_tar_gz(extract_dir_name, tar_file)
-
-        return extract_dir_obj

@@ -19,9 +19,11 @@
 import csv
 import os
 import json
+import uuid
 from pathlib import Path
 
 from oecp.proxy.rpm_proxy import RPMProxy
+from oecp.result.constants import CMP_TYPE_SERVICE_DETAIL, CMP_TYPE_KO_INFO
 
 
 def create_csv_report(header, rows, report_path):
@@ -51,13 +53,13 @@ def create_directory(root_path, report_name, osv_title, cmp_type=None, uid='', f
             if not os.path.exists(first_path):
                 os.makedirs(first_path)
             second_path = get_second_path(cmp_type)
-            full_second_path = first_path + '/' + second_path
+            if cmp_type in ['service detail', 'ko info']:
+                full_second_path = os.path.join(root_path, "details_analyse", second_path)
+            else:
+                full_second_path = first_path + '/' + second_path
             if not os.path.exists(full_second_path):
                 os.makedirs(full_second_path)
-            if uid:
-                report_path = full_second_path + '/' + report_name + '-' + uid + '.' + file_format
-            else:
-                report_path = full_second_path + '/' + report_name + '.' + file_format
+            report_path = full_second_path + '/' + report_name + '-' + uid + '.' + file_format
             return report_path
         else:
             return None
@@ -70,6 +72,20 @@ def create_directory(root_path, report_name, osv_title, cmp_type=None, uid='', f
             return report_path
         else:
             return None
+
+
+def export_details_info(rows, root_path, osv_title):
+    for node, value in rows.items():
+        if isinstance(value, list):
+            continue
+        for cmp_type, results in value.items():
+            # create server-details report to details_analyse directory:
+            if cmp_type not in [CMP_TYPE_SERVICE_DETAIL, CMP_TYPE_KO_INFO]:
+                continue
+            uid = str(uuid.uuid4().clock_seq)
+            report_path = create_directory(root_path, node, osv_title, cmp_type, uid)
+            headers = list(results[0].keys())
+            create_csv_report(headers, results, report_path)
 
 
 def get_second_path(cmp_type):

@@ -1,0 +1,122 @@
+{
+  "20.03-LTS": {
+    "x86_64": {
+      "everything": "x86_64/repodata/e2a6b9bfb310fddc97b0138360d801d498f61339b069442828c05a6d6752de9e-primary.sqlite.bz2",
+      "EPOL": "x86_64/repodata/c38a855b5eccf374f71507a4bf3b32a7131c8cdb9b90d61fa6609e169a1c5342-primary.sqlite.bz2"
+    },
+    "aarch64": {
+      "everything": "aarch64/repodata/ec190462f84dca9a3efde8dd960a8b76504488b76172dcade988fb7990783f49-primary.sqlite.bz2",
+      "EPOL": "aarch64/repodata/bb3de1d56686ba11e2c5c61f695204e09b9e58e42d3cdb41894bd84821fa381a-primary.sqlite.bz2"
+    }
+  },
+  "openEuler-20.03-LTS-SP1": {
+    "x86_64": {
+      "everything": "x86_64/repodata/b2ff15e307bf9834e2f3731d10c2287afa93851fb7218e0ee1f8dba95eec97cb-primary.sqlite.bz2",
+      "EPOL": "x86_64/repodata/6a0b20aeede7ae5eee9e47db41cb69cd486e640e90fcbd130328b4b4174ff85e-primary.sqlite.bz2"
+    },
+    "aarch64": {
+      "everything": "aarch64/repodata/48cb594dddd31d9fff4531eae8a2e7328b0349bb3058d3ee76a47079165e5c46-primary.sqlite.bz2",
+      "EPOL": "aarch64/repodata/58ec880d69c9da6625ae7fa9bc07ea521e6e939b0b917fe9e227d3d1bda05e60-primary.sqlite.bz2"
+    }
+  },
+  "openEuler-20.03-LTS-SP2": {
+    "x86_64": {
+      "everything": "x86_64/repodata/b2c7f7e0bf1d1c4141a9c229397679c6a33479ae39894e1e70d44b9383a58a14-primary.sqlite.bz2",
+      "EPOL": "main/x86_64/repodata/a108e70570249f1202387848346a4f0401cbdedd6c0263856e03f80014f6bb25-primary.sqlite.bz2"
+    },
+    "aarch64": {
+      "everything": "aarch64/repodata/219ca5b42a5de6d0c61dc8c92ba52b97702afcd9a8f4d09dee470ebeabdca934-primary.sqlite.bz2",
+      "EPOL": "main/aarch64/repodata/4eff5ade55f4a2cd9444c01deeb10ebc2d2f1222abbadf97eeacab2095ee00c8-primary.sqlite.bz2"
+    }
+  },
+  "openEuler-20.03-LTS-SP3": {
+    "x86_64": {
+      "everything": "x86_64/repodata/f763001d330de7a183bbf5b54d96bf18912205337c3c5d3b3fc0b52f099b8f36-primary.sqlite.bz2",
+      "EPOL": "main/x86_64/repodata/0e92cefcce61d5e91267a24a876f45ebdb635b3477ccd2e55bfda931530eefff-primary.sqlite.bz2"
+    },
+    "aarch64": {
+      "everything": "aarch64/repodata/74e3f9cc69f83c89d67938d776712a47d28fe1527cfd984813523a739aa6efcc-primary.sqlite.bz2",
+      "EPOL": "main/aarch64/repodata/026a12257620ec5554e82527e268f56a6f53503100cf5b86454efafbb2e2c24f-primary.sqlite.bz2"
+    }
+  },
+  "openEuler-20.09": {
+    "x86_64": {
+      "everything": "x86_64/repodata/bffbde66dfd80c0404233b4f283d94e91720ef17d2a149b0cd845cc345743630-primary.sqlite.bz2",
+      "EPOL": "x86_64/repodata/cfb89e809ad0abf5d089a0cadc8491e886c98e670aca5292e01b2dc1ef4988c8-primary.sqlite.bz2"
+    },
+    "aarch64": {
+      "everything": "aarch64/repodata/132d4db0712a476f4378740963b678b600b0294f0616715cdec08ba1e3a80e21-primary.sqlite.bz2",
+      "EPOL": "aarch64/repodata/f0264222d63b3657fb24880d98af5c5f44dde297fffcd2d9ac67cf2f003ee24a-primary.sqlite.bz2"
+    }
+  },
+  "openEuler-21.03": {
+    "x86_64": {
+      "everything": "x86_64/repodata/2b29c1d3c1bc02cfa830af1a6c93301b4029b2a20180c5e5d23cea6bbdac1820-primary.sqlite.bz2",
+      "EPOL": "x86_64/repodata/66a8e1a141134a2c45dd2433218a63cbc52980c04a4ba9adc82c770e2fc948e2-primary.sqlite.bz2"
+    },
+    "aarch64": {
+      "everything": "aarch64/repodata/f61f5458d8e484ab21275626e5a78deefaa7c212d40b3123ed1e9c79c95e4315-primary.sqlite.bz2",
+      "EPOL": "aarch64/repodata/91b2bd34f173c7eeb3911b4dc5d21d8f94574e29d9b3102d7affd382fee5cb69-primary.sqlite.bz2"
+    }
+  },
+  "openEuler-21.09": {
+    "x86_64": {
+      "everything": "x86_64/repodata/76428d0c3f8e3301d1653229fab0640cf1f16a10ecac3d5657640edfe2fdde81-primary.sqlite.bz2",
+      "EPOL": "main/x86_64/repodata/b2fdfd4519ffb67ec021fe31bbb07a2faf6d2234eb2b84a8e656cdcad77deff2-primary.sqlite.bz2"
+    },
+    "aarch64": {
+      "everything": "aarch64/repodata/a6eafd6131214bbb63cad02aaa27d02afee0c2e5cea83756eebb66b8a8863a9d-primary.sqlite.bz2",
+      "EPOL": "main/aarch64/repodata/b2fdfd4519ffb67ec021fe31bbb07a2faf6d2234eb2b84a8e656cdcad77deff2-primary.sqlite.bz2"
+    }
+  },
+  "openEuler-22.03-LTS": {
+    "x86_64": {
+      "everything": "x86_64/repodata/f344a955efaed1bd8fffc33ce0e7412fd4794215424588cfcfa5a49b166c099a-primary.sqlite.bz2",
+      "EPOL": "main/x86_64/repodata/532644db045711b665f8207909c0be07a7b878e3840cc643a3e2051f58af6d03-primary.sqlite.bz2"
+    },
+    "aarch64": {
+      "everything": "aarch64/repodata/43ddbef3753a3149e4679b6b76bcd82febfff2a787a0346e120374fb12989ce0-primary.sqlite.bz2",
+      "EPOL": "main/aarch64/repodata/a1b2abd76c90e65db87e2e98605788862aa0ef5dc5868166d62f03981e7c9164-primary.sqlite.bz2"
+    }
+  },
+  "openEuler-22.03-LTS-SP1": {
+    "x86_64": {
+      "everything": "x86_64/repodata/b69a6ef659a96c9f872085e1eb95b8514c0ebd61b781d7aa38bc8323cee669f2-primary.sqlite.bz2",
+      "EPOL": "main/x86_64/repodata/14a958c5e3eb952ae4140e5098cc68fc6ee0d148a36eae18b6ecf3be40c0c84b-primary.sqlite.bz2"
+    },
+    "aarch64": {
+      "everything": "aarch64/repodata/681dee2596c018db0bcd16a219904a2f165023e3a1fc8bac12978da9709e2e60-primary.sqlite.bz2",
+      "EPOL": "main/aarch64/repodata/dd8acebd3d88e98dc71f5d5597541d9b5ba4f617deece098e0e3a98326c88c1d-primary.sqlite.bz2"
+    }
+  },
+  "openEuler-22.03-LTS-SP2": {
+    "x86_64": {
+      "everything": "x86_64/repodata/f29318f9b0cd6387921a68c63ae38f00ec6f4532797108b889ab6d84d0af18a2-primary.sqlite.bz2",
+      "EPOL": "main/x86_64/repodata/6ae7b7526f0635d2208756921e6a204f3059a45e1fbcd81b1db9671b88e7a564-primary.sqlite.bz2"
+    },
+    "aarch64": {
+      "everything": "aarch64/repodata/5eb48cf9a57e67903fa83ef25489e6b4e68a1ea703cf235ebedc8c5c640bd60f-primary.sqlite.bz2",
+      "EPOL": "main/aarch64/repodata/2e196d593c578f488d719dec30d47dc236b797cf6657891eed59db4912f65cff-primary.sqlite.bz2"
+    }
+  },
+  "openEuler-22.09": {
+    "x86_64": {
+      "everything": "x86_64/repodata/32c612a0b2c07e75e843980f04ed6aad39dc3dcf95483f5e5e4dcf1f75c6cda1-primary.sqlite.bz2",
+      "EPOL": "main/x86_64/repodata/5fd0e398dfd6066842e30ef386e40d274b9cbe7eb5bdbc28f42dd4c72d646921-primary.sqlite.bz2"
+    },
+    "aarch64": {
+      "everything": "aarch64/repodata/418a37026b29bc08c12067a41eb9b8a696dafb00ffe79584165be3d31ce495f5-primary.sqlite.bz2",
+      "EPOL": "main/aarch64/repodata/08b995b47d735f21f450e6b2701304e7fc30ff53691dff72c90e07e0b30f9d94-primary.sqlite.bz2"
+    }
+  },
+  "openEuler-23.03": {
+    "x86_64": {
+      "everything": "x86_64/repodata/a2b86239cac534752f3943521050cd800e0c92b456e486e3197e907ba8542977-primary.sqlite.bz2",
+      "EPOL": "main/x86_64/repodata/ca8e4ee61e709ef9ba5cf0c99e1d230a627430fdf65296f674422c6254ece515-primary.sqlite.bz2"
+    },
+    "aarch64": {
+      "everything": "aarch64/repodata/209d51c3f6de7246275aea11faa88da4738404f3b336d9c7981038897070eccf-primary.sqlite.bz2",
+      "EPOL": "main/aarch64/repodata/ddae8225d47498ed2ba2e5e195b5ebdc932f8b939a422d4dea67281b20d55dbf-primary.sqlite.bz2"
+    }
+  }
+}

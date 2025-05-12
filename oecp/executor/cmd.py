@@ -17,40 +17,43 @@ import logging
 
 from oecp.executor.base import CompareExecutor
 from oecp.result.compare_result import CompareResultComposite, CompareResultComponent
-from oecp.result.constants import CMP_RESULT_SAME, CMP_TYPE_RPM, CMP_SAME_RESULT, CMP_RESULT_DIFF
+from oecp.result.constants import *
+from oecp.proxy.rpm_proxy import RPMProxy
 
 logger = logging.getLogger('oecp')
 
 
 class CmdCompareExecutor(CompareExecutor):
 
-    def __init__(self, base_dump, other_dump, config=None):
-        super(CmdCompareExecutor, self).__init__(base_dump, other_dump, config)
-        self.base_dump = base_dump.run()
-        self.other_dump = other_dump.run()
-        self.data = 'data'
+    def __init__(self, dump_a, dump_b, config=None):
+        super(CmdCompareExecutor, self).__init__(dump_a, dump_b, config)
+        self.dump_a = dump_a.run()
+        self.dump_b = dump_b.run()
 
-    def compare_result(self, base_dump, other_dump, single_result=CMP_RESULT_SAME):
-        count_result = {'same': 0, 'more': 0, 'less': 0, 'diff': 0}
-        category = base_dump['category']
-        result = CompareResultComposite(CMP_TYPE_RPM, single_result, base_dump['rpm'], other_dump['rpm'], category)
-        base_cmd_files = base_dump[self.data]
-        other_cmd_files = other_dump[self.data]
-        flag_v_r_d = self.extract_version_flag(base_dump['rpm'], other_dump['rpm'])
-        if not base_cmd_files and not other_cmd_files:
+    def _compare_result(self, dump_a, dump_b, single_result=CMP_RESULT_SAME):
+        count_result = {'more_count': 0, 'less_count': 0, 'diff_count': 0}
+        category = dump_a['category']
+        result = CompareResultComposite(CMP_TYPE_RPM, single_result, dump_a['rpm'], dump_b['rpm'], category)
+        cmd_a_file = dump_a[self.data]
+        cmd_b_file = dump_b[self.data]
+        flag_v_r_d = self.extract_version_flag(dump_a['rpm'], dump_b['rpm'])
+        if not cmd_a_file and not cmd_b_file:
             logger.debug(
-                f"No {self.config.get('compare_type')} package found, "
-                f"ignored with {base_dump['rpm']} and {other_dump['rpm']}")
+                f"No {self.config.get('compare_type')} package found, ignored with {dump_b['rpm']} and {dump_b['rpm']}")
             return result
-        component_results = self.format_dump(base_cmd_files, other_cmd_files, flag_v_r_d)
+        component_results = self.format_dump(cmd_a_file, cmd_b_file, flag_v_r_d)
         for component_result in component_results:
             for sub_component_result in component_result:
-                self.count_cmp_result(count_result, sub_component_result[-1])
                 if not self.config.get('show_same', False) and sub_component_result[-1] == CMP_RESULT_SAME:
                     continue
+                if sub_component_result[-1] == 'more':
+                    count_result["more_count"] += 1
+                elif sub_component_result[-1] == 'less':
+                    count_result["less_count"] += 1
                 data = CompareResultComponent(self.config.get('compare_type'), sub_component_result[-1],
                                               sub_component_result[0], sub_component_result[1])
-                if sub_component_result[-1] not in CMP_SAME_RESULT and single_result == CMP_RESULT_SAME:
+                if sub_component_result[-1] not in [CMP_RESULT_SAME,
+                                                    CMP_RESULT_CHANGE] and single_result == CMP_RESULT_SAME:
                     single_result = CMP_RESULT_DIFF
                     result.set_cmp_result(single_result)
                 result.add_component(data)
@@ -60,12 +63,12 @@ class CmdCompareExecutor(CompareExecutor):
 
     def compare(self):
         compare_list = []
-        similar_dumpers = self.get_similar_rpm_pairs(self.base_dump, self.other_dump)
-        for single_pair in similar_dumpers:
-            if single_pair:
-                base_dump, other_dump = single_pair[0], single_pair[1]
-                result = self.compare_result(base_dump, other_dump)
-                compare_list.append(result)
+        for dump_a in self.dump_a:
+            for dump_b in self.dump_b:
+                # 取rpm name 相同进行比较
+                if RPMProxy.rpm_name(dump_a['rpm']) == RPMProxy.rpm_name(dump_b['rpm']):
+                    result = self._compare_result(dump_a, dump_b)
+                    compare_list.append(result)
         return compare_list
 
     def run(self):

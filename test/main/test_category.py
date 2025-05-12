@@ -12,7 +12,7 @@
 # See the Mulan PSL v2 for more details.
 # Author:
 # Create: 2021-09-07
-# Description: test rpm compatibility category
+# Description: test compare plan
 # **********************************************************************************
 """
 import os
@@ -30,27 +30,19 @@ class TestCategory(TestCase):
         cls.logger = logging.getLogger("test")
 
     def test_construct(self):
-        category_file = os.path.join(os.path.dirname(__file__), "data/category.json")
-        category = Category(category_file)
+        category = Category()
         self.assertIsNotNone(getattr(category, "_src_categories"))
         self.assertIsNotNone(getattr(category, "_bin_categories"))
 
-    def test_category_file_not_found(self):
-        category_file = os.path.join(os.path.dirname(__file__), "data/data_not_found")
-
-        with self.assertRaises(FileNotFoundError):
-            Category(category_file)
 
     def test_category_item(self):
-        category_file = os.path.join(os.path.dirname(__file__), "data/category.json")
-        category = Category(category_file)
+        category = Category()
 
-        self.assertEqual(category.category_of_bin_package("gcc"), CategoryLevel.CATEGORY_LEVEL_ONE)
+        self.assertEqual(category.category_of_bin_package("gcc"), CategoryLevel.CATEGORY_LEVEL_ZERO)
         self.assertEqual(category.category_of_bin_package("coreutils"), CategoryLevel.CATEGORY_LEVEL_TWO)
         self.assertEqual(category.category_of_bin_package("man-db"), CategoryLevel.CATEGORY_LEVEL_THREE)
-        self.assertEqual(category.category_of_bin_package("cairo"), CategoryLevel.CATEGORY_LEVEL_NOT_SPECIFIED)
-        self.assertEqual(category.category_of_src_package("gcc"), CategoryLevel.CATEGORY_LEVEL_ONE)
+        self.assertEqual(category.category_of_bin_package("cairo"), CategoryLevel.CATEGORY_LEVEL_TWO)
+        self.assertEqual(category.category_of_src_package("gcc"), CategoryLevel.CATEGORY_LEVEL_ZERO)
         self.assertEqual(category.category_of_src_package("coreutils"), CategoryLevel.CATEGORY_LEVEL_TWO)
         self.assertEqual(category.category_of_src_package("man-db"), CategoryLevel.CATEGORY_LEVEL_THREE)
-        self.assertEqual(category.category_of_bin_package("cairo"), CategoryLevel.CATEGORY_LEVEL_NOT_SPECIFIED)
-        self.assertEqual(category.category_of_src_package(""), CategoryLevel.CATEGORY_LEVEL_NOT_SPECIFIED)
+        self.assertEqual(category.category_of_bin_package("cairo"), CategoryLevel.CATEGORY_LEVEL_TWO)

@@ -16,15 +16,15 @@
 # **********************************************************************************
 """
 import json
-import os
+import os.path
 import re
 import logging
 import importlib
 from collections import UserDict
 from multiprocessing import cpu_count
 
-from oecp.result.constants import OPENEULER, CMP_TYPE_KABI, CMP_TYPE_DRIVE_KABI, X86_64, CMP_TYPE_KAPI, CMP_TYPE_KO, \
-    AARCH64
+from oecp.proxy.rpm_proxy import RPMProxy
+from oecp.result.constants import DETAIL_CMP_TYPES, CMP_TYPE_EXTRACT, OPENEULER, AARCH64, X86_64
 
 logger = logging.getLogger("oecp")
 
@@ -33,40 +33,20 @@ class Plan(UserDict):
     """
 
     """
-
-    def __init__(self, args):
+    def __init__(self, path, output_path, branch):
         """
-        :param args: 主程序入口参数
+
+        :param path: 比较计划路径
         """
         super(Plan, self).__init__()
 
         self._type = ''
         self._base = []
         self._other = []
-        self._plan = self.load_plan(args.plan_name)
-        self._base_file = os.path.basename(args.compare_files[0])
-        self._branch = self.cut_branch(args.branch)
-        self._arch = args.arch
-        self._kpath = args.src_kpath
-        self._load(self._plan)
+        self._plan = path
+        self._load(path, output_path, branch)
 
-    @staticmethod
-    def cut_branch(branch):
-        os_branch = branch.lower().replace(OPENEULER, '').strip('-_.')
-        return os_branch.upper()
-
-    @staticmethod
-    def load_plan(plan_name):
-        dir_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "conf/plan")
-        plan_path = os.path.join(dir_path, "%s.json" % plan_name)
-        if not os.path.exists(plan_path):
-            logger.error(
-                "Incorrect plan name and check in: %s, please input 'abi' specified plan as 'abi.json'" % dir_path)
-            raise SystemExit(-1)
-
-        return plan_path
-
-    def _load(self, path):
+    def _load(self, path, output_path, branch):
         """
         加载比较计划
         :param path:
@@ -88,13 +68,14 @@ class Plan(UserDict):
                     try:
                         name = item["name"]
                         config = item.get("config", dict())
-                        if name in [CMP_TYPE_KABI, CMP_TYPE_DRIVE_KABI, CMP_TYPE_KAPI, CMP_TYPE_KO]:
-                            self.get_cmp_branch_arch(config)
-                            if name == CMP_TYPE_KAPI:
-                                config["src_kernel"] = self._kpath
+                        if name == CMP_TYPE_EXTRACT:
+                            self.get_kabi_whitelist_arch(config, branch)
+
+                        if self._plan_name in DETAIL_CMP_TYPES:
+                            config.setdefault('detail_path', os.path.join(output_path, "details_analyse"))
 
                         # update compare type
-                        from oecp.result.constants import compare_result_name_to_attr
+                        from oecp.result.compare_result import compare_result_name_to_attr
                         config["compare_type"] = compare_result_name_to_attr(config["compare_type"])
 
                         # load executor
@@ -110,7 +91,7 @@ class Plan(UserDict):
                             self[name] = {"name": name, "direct": True, "executor": executor, "config": config}
                         else:
                             # load dumper
-                            if name in [CMP_TYPE_DRIVE_KABI, CMP_TYPE_KAPI]:
+                            if name == 'drive kabi':
                                 module_name, class_name = 'kabi', item["dumper"]
                             elif name == 'lib':
                                 module_name, class_name = 'abi', item["dumper"]
@@ -122,8 +103,7 @@ class Plan(UserDict):
                             logger.debug(f"load {self._plan_name}.{name} dumper, {module_name}.{class_name}")
 
                             dumper = load_module_class("oecp.dumper", module_name, class_name)
-                            self[item["name"]] = {"name": name, "dumper": dumper, "executor": executor,
-                                                  "config": config}
+                            self[item["name"]] = {"name": name, "dumper": dumper, "executor": executor, "config": config}
                     except KeyError:
                         logger.exception(f"illegal plan, check {self._plan}")
                         raise
@@ -170,8 +150,7 @@ class Plan(UserDict):
         :param name:
         :return:
         """
-        if self.get(name, []):
-            return self[name].get("config", dict())
+        return self[name].get("config", dict())
 
     def only_for_directory(self, name):
         """
@@ -192,6 +171,18 @@ class Plan(UserDict):
 
         return specific_package and specific_package != package_name
 
+    def no_check_specific_package(self, name, src_package):
+        """
+        计划项对特定的包不做比较
+        :param name:
+        :param src_package:
+        :return:
+        """
+        specific_package = self.config_of(name).get("no_package")
+        src_name = RPMProxy.rpm_name(src_package)
+
+        return specific_package and specific_package == src_name
+
     def check_specific_category(self, name, category_level):
         """
         计划项只针对特定分类的包
@@ -202,7 +193,7 @@ class Plan(UserDict):
         specific_category = self.config_of(name).get("category")
 
         return specific_category and specific_category < category_level
-
+        
     def check_sensitive_str(self, name):
         """
         
@@ -219,31 +210,20 @@ class Plan(UserDict):
         """
         return self.config_of(name).get("sensitive_image", False)
 
-    def get_cmp_branch_arch(self, conf):
-        if self._base_file.endswith('.iso'):
-            all_split_info = self._base_file.split('-')
-            if all_split_info[0].lower() == OPENEULER:
-                try:
-                    if re.match(r"SP", all_split_info[3]):
-                        version = '-'.join(all_split_info[1:4])
-                        self._branch = version
-                    elif "LTS" in self._base_file:
-                        self._branch = '-'.join(all_split_info[1:3])
-                except IndexError:
-                    logger.warning(
-                        f"Please check the base iso name: {self._base_file}, not get the iso branch.")
-        if self._arch:
-            if self._arch not in [X86_64, AARCH64]:
-                self._arch = ""
-                logger.warning("only support two arch: x86_64 and aarch64")
+    def get_kabi_whitelist_arch(self, conf, branch):
+        arch = ''
+        if AARCH64 in branch:
+            arch = AARCH64
+            branch = branch.rstrip(arch)
+        elif X86_64 in branch:
+            arch = X86_64
+            branch = branch.rstrip(arch)
         else:
-            if re.search(r"x86[_|-]64", self._base_file):
-                self._arch = X86_64
-            elif re.search(r"%s" % AARCH64, self._base_file):
-                self._arch = AARCH64
+            logger.warning(f"branch: {branch} not get arch in (x86_64, aarch64).")
+        conf.setdefault("arch", arch)
+        branch = branch.lstrip(OPENEULER).strip('-_')
 
-        conf.setdefault("branch", self._branch)
-        conf.setdefault("arch", self._arch)
+        conf.setdefault("white_list", branch)
 
 
 def load_module_class(package, module_name, class_name):

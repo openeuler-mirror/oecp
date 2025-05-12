@@ -25,7 +25,9 @@ if PRJ_PATH not in os.sys.path:
     os.sys.path.insert(0, PRJ_PATH)
 
 from oecp.utils.logger import init_logger
+from oecp.main.directory import DistISO, OEDistRepo
 from oecp.main.plan import Plan
+from oecp.main.category import Category
 from oecp.result.export import export_sensitive_results
 
 def init_args():

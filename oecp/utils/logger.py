@@ -22,10 +22,6 @@ def init_logger():
     :return:
     """
     conf_path = os.path.realpath(os.path.join(os.path.dirname(__file__), "../conf/logger.conf"))
-    log_path = '/var/log/oecp'
-    if not os.path.exists(log_path):
-        os.makedirs(log_path)
+    defaults = {'args': str(('oecp.log', 'a+', 50 * 1024 * 1024, 5))}
 
-    defaults = {}
-    defaults['args'] = str((os.path.join(log_path, 'oecp.log'), 'a+', 50 * 1024 * 1024, 5))
     logging.config.fileConfig(conf_path, defaults=defaults)

@@ -1,6 +1,15 @@
 {
-  "name": "test",
+  "name": "kabi",
   "plan": [
+    {
+      "name": "packagelist",
+      "dumper": "PackageListDumper",
+      "executor": "list.ListCompareExecutor",
+      "config": {
+        "only_directory": true,
+        "compare_type": "CMP_TYPE_DIRECTORY"
+      }
+    },
     {
       "name": "extract",
       "dumper": "RPMExtractDumper",
@@ -16,39 +25,6 @@
       "executor": "nvs.NVSCompareExecutor",
       "config": {
         "compare_type": "CMP_TYPE_KABI",
-        "package": "kernel",
-        "show_same": true,
-        "white_list": "kabi_whitelist/aarch64"
-      }
-    },
-    {
-      "name": "drive kabi",
-      "dumper": "KabiDumper",
-      "executor": "nvs.NVSCompareExecutor",
-      "config": {
-        "compare_type": "CMP_TYPE_DRIVE_KABI",
-        "package": "kernel",
-        "show_same": true,
-        "white_list": "kabi_whitelist/aarch64_drive_kabi"
-      }
-    },
-    {
-      "name": "kapi",
-      "dumper": "KabiDumper",
-      "executor": "kapi.KAPICompareExecutor",
-      "config": {
-        "compare_type": "CMP_TYPE_KAPI",
-        "package": "kernel",
-        "show_same": true,
-        "white_list": "kabi_whitelist/aarch64"
-      }
-    },
-    {
-      "name": "ko",
-      "dumper": "KoDumper",
-      "executor": "ko.KoCompareExecutor",
-      "config": {
-        "compare_type": "CMP_TYPE_KO",
         "package": "kernel",
         "show_same": true
       }
