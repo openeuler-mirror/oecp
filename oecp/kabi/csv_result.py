@@ -16,13 +16,14 @@
 import os
 import csv
 import logging
+from datetime import datetime, timezone
 
 logger = logging.getLogger("oecp")
 
 
 class CsvResult:
-    def __init__(self, file_path):
-        self.file_path = file_path
+    def __init__(self):
+        self.file_path = "/tmp/oecp/kabi-result-%s.csv" % datetime.now(tz=timezone.utc).strftime('%Y-%m-%d_%H-%M-%S')
         # Ensure the directory exists
         os.makedirs(os.path.dirname(self.file_path), exist_ok=True)
         # Create an empty CSV file if it doesn't exist

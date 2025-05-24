@@ -17,8 +17,8 @@ import os
 import re
 import logging
 import tempfile
-from datetime import datetime, timezone
 
+from oecp.dumper.base import AbstractDumper
 from oecp.utils.shell import shell_cmd
 from oecp.kabi.csv_result import CsvResult
 from oecp.proxy.rpm_proxy import RPMProxy
@@ -29,36 +29,44 @@ logger = logging.getLogger("oecp")
 
 
 class KabiGenerate:
-    def __init__(self, in_dir, kb_dir=None, src_kpath=None):
+    def __init__(self, in_dir, branch, arch, src_kpath=None):
         self.in_dir = in_dir
-        self.kb_dir = kb_dir
+        self.branch = branch
+        self.arch = arch
         self.src_kpath = src_kpath
-        csv_name = f"result-{datetime.now(tz=timezone.utc)}.csv"
-        self.result = CsvResult(f"/tmp/kabi/{csv_name}")
+        self.result = CsvResult()
 
     def generate(self):
         """
         Generate KABI and KAPI lists based on input directory, kabi whitelist directory, and kernel source path.
         :param self: Instance of KabiGenerate
         """
-        if not os.path.exists("/tmp/kabi"):
-            os.makedirs("/tmp/kabi")
 
         if os.path.exists(self.in_dir):
             kabi_list = []
 
             if os.path.isdir(self.in_dir):
                 logger.info("Input is directory, start kabi generating")
-                kabi_dic = self.kabi_generate(self.in_dir)
+                kabi_dic = self.dir_kabi_generate(self.in_dir)
                 crc_list = list(kabi_dic.keys())
                 kabi_list = list(kabi_dic.values())
                 self.result.create("crc", crc_list)
                 self.result.create("driver_kabi", kabi_list)
+            elif self.in_dir.endswith(".rpm"):
+                logger.info("Input is driver rpm file")
+                kabi_dic = self.rpm_kabi_generate(self.in_dir)
+                kabi_list = list(kabi_dic.values())
+                self.result.create("crc", list(kabi_dic.keys()))
+                self.result.create("driver_kabi", kabi_list)
             else:
                 logger.info("Input is kabi_list file")
-                with open(self.in_dir, "r") as f:
-                    for line in f.readlines():
-                        kabi_list.append(line.strip())
+                try:
+                    with open(self.in_dir, "r") as f:
+                        for line in f.readlines():
+                            kabi_list.append(line.strip())
+                except Exception as e:
+                    logger.error("Failed to read kabi_list file: %s, error: %s", self.in_dir, e)
+                    raise UnicodeDecodeError from e
                 self.result.create("kabi", kabi_list)
 
             if self.src_kpath:
@@ -66,14 +74,15 @@ class KabiGenerate:
                 kapi_dic = self.kapi_generate(kabi_list, self.src_kpath)
                 self.result.create("kapi", [kapi_dic[key] for key in kabi_list])
 
-            if self.kb_dir:
+            kabi_whitelist = self.get_kabiwhite_list()
+            if kabi_whitelist:
                 logger.info("Kabi whitelist directory is provided, start comparing")
-                judgment_list = self.is_kabi_whitelist(kabi_list, self.kb_dir)
+                judgment_list = self.is_kabi_whitelist(kabi_list, kabi_whitelist)
                 self.result.create("is_kabi_whitelist", judgment_list)
         else:
             logger.error(f"The {self.in_dir} does not exist.")
 
-    def kabi_generate(self, driver_dir):
+    def dir_kabi_generate(self, driver_dir):
         """
         Generate KABI list from .ko files, RPM packages, or .ko.xz files in the specified directory.
         :param driver_dir: Directory containing .ko files, RPM packages, or .ko.xz files.
@@ -90,12 +99,27 @@ class KabiGenerate:
                     logger.info(f"Processing .ko file: {file_path}")
                     kabi_set.update(self.extract_kabi(file_path))
 
+        dict_kabi = self.component_kabi(kabi_set)
+        return dict_kabi
+
+    def rpm_kabi_generate(self, rpm_file):
+        kabi_set = set()
+        kabi_set.update(self.extract_kabi_from_rpm(rpm_file))
+
+        dict_kabi = self.component_kabi(kabi_set)
+
+        return dict_kabi
+
+    @staticmethod
+    def component_kabi(kabi_symbols):
         kabi_dic = {}
-        for item in kabi_set:
+        for item in kabi_symbols:
             parts = item.split()
             kabi_dic[parts[0]] = parts[1]
         sorted_kabi_dic = {k: v for k, v in sorted(kabi_dic.items(), key=lambda item: item[1])}
-        return sorted_kabi_dic  
+
+        return sorted_kabi_dic
+
 
     @staticmethod
     def kapi_generate(kabi_symbols, src_kpath):
@@ -106,9 +130,21 @@ class KabiGenerate:
         current_dir = os.getcwd()
         src_obj = RPMProxy.uncompress_source_rpm(src_kpath)
         extract = EXTRACTKAPI()
-        results = extract.multi_get_prototype(kabi_symbols, src_obj)
+        results = extract.multithread_get_prototype(kabi_symbols, src_obj)
         os.chdir(current_dir)
         return results
+
+    def get_kabiwhite_list(self):
+        dir_kabi_whitelist = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                          "conf/kabi_whitelist")
+        if self.branch and self.arch:
+            branch = AbstractDumper.get_branch_dir(dir_kabi_whitelist, self.branch)
+            kb_dir = os.path.join(dir_kabi_whitelist, branch, self.arch)
+            if os.path.exists(kb_dir):
+                logger.debug("Get correct kabi_whitelist: %s", kb_dir)
+                return kb_dir
+        logger.warning("Not input branch and arch of kabi whitelist.")
+        return None
 
     def extract_kabi_from_rpm(self, rpm_file):
         """
@@ -134,9 +170,9 @@ class KabiGenerate:
                             extracted_kabi.update(self.extract_kabi(extracted_ko_path))
                 # Switch back to the original directory
                 os.chdir(current_dir)
-                logger.info(f"Switched back to original directory: {current_dir}")
+                logger.info("Switched back to original directory: %s", current_dir)
         except Exception as e:
-            logger.error(f"Error extracting .ko files from {rpm_file}: {e}")
+            logger.error("Error extracting .ko files from %s: %s", rpm_file, e)
         return extracted_kabi
 
     @staticmethod
