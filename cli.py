@@ -24,7 +24,6 @@ from oecp.result.compress import compress_report
 from oecp.result.constants import BASE_SIDE, OSV_SIDE
 from oecp.utils.logger import init_logger
 from oecp.main.plan import Plan
-from oecp.dumper.base import AbstractDumper
 from oecp.kabi.kabi_generate import KabiGenerate
 
 
@@ -94,28 +93,19 @@ if __name__ == "__main__":
         product_b = Factory.create(plan.get_other(), args, plan.get_type(), OSV_SIDE)
     else:
         cmp_files_num = len(args.compare_files)
-        if cmp_files_num != 2:
-            if cmp_files_num != 1:
-                logger.error(f"Illegal number of files: {cmp_files_num}")
-                sys.exit(1)
-            else:
-                in_dir = args.compare_files[0]
-                kb_dir = None
-                if args.branch and args.arch:
-                    branch = AbstractDumper.get_branch_dir("./oecp/conf/kabi_whitelist/", args.branch)
-                    kb_dir = os.path.join("./oecp/conf/kabi_whitelist/", branch, args.arch)
-                    if not os.path.exists(kb_dir):
-                        logger.error(f"The file {kb_dir} does not exist.")
-                        sys.exit(1)
-                logger.info(f"Starting KABI/KAPI whitelist generation...")
-                result_gen = KabiGenerate(in_dir, kb_dir, args.src_kpath)
-                result_gen.generate()
-                sys.exit(0)
+        if cmp_files_num == 1:
+            logger.info(f"Starting KABI/KAPI whitelist generation...")
+            result_gen = KabiGenerate(args.compare_files[0], args.branch, args.arch, args.src_kpath)
+            result_gen.generate()
+            sys.exit(0)
 
-        else:
+        elif cmp_files_num == 2:
             logger.info(f"start compare {args.compare_files[0]} with {args.compare_files[1]}")
             product_a = Factory.create(args.compare_files[0], args, "none", BASE_SIDE)
             product_b = Factory.create(args.compare_files[1], args, "none", OSV_SIDE)
+        else:
+            logger.error(f"Illegal number of files: {cmp_files_num}")
+            sys.exit(1)
 
     result = product_a.compare(product_b, plan)
     e_args = (args.output_file, args.output_format, args.compare_files, args.platform_test)
