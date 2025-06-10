@@ -1,0 +1,170 @@
+{
+  "name": "symbol",
+  "plan": [
+    {
+      "name": "packagelist",
+      "dumper": "PackageListDumper",
+      "executor": "list.ListCompareExecutor",
+      "config": {
+        "only_directory": true,
+        "compare_type": "CMP_TYPE_DIRECTORY"
+      }
+    },
+    {
+      "name": "requires",
+      "dumper": "RequiresDumper",
+      "executor": "nvs.NVSCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_RPM_REQUIRES"
+      }
+    },
+    {
+      "name": "provides",
+      "dumper": "ProvidesDumper",
+      "executor": "nvs.NVSCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_RPM_PROVIDES"
+      }
+    },
+    {
+      "name": "extract",
+      "dumper": "RPMExtractDumper",
+      "executor": "null.NullExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_NULL"
+      }
+    },
+    {
+      "name": "filelist",
+      "dumper": "FileListDumper",
+      "executor": "list.ListCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_RPM_FILES",
+        "strict": true,
+        "short_circut": false,
+        "show_same": true
+      }
+    },
+    {
+      "name": "config",
+      "dumper": "ConfigDumper",
+      "executor": "plain.PlainCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_RPM_CONFIG"
+      }
+    },
+    {
+      "name": "kconfig",
+      "dumper": "KconfigDumper",
+      "executor": "nvs.NVSCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_KCONFIG",
+        "package": "kernel",
+        "show_same": true
+      }
+    },
+    {
+      "name": "kabi",
+      "dumper": "KabiDumper",
+      "executor": "nvs.NVSCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_KABI",
+        "package": "kernel",
+        "show_same": true
+      }
+    },
+    {
+      "name": "drive kabi",
+      "dumper": "KabiDumper",
+      "executor": "nvs.NVSCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_DRIVE_KABI",
+        "package": "kernel",
+        "show_same": true
+      }
+    },
+    {
+      "name": "ko",
+      "dumper": "KoDumper",
+      "executor": "ko.KoCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_KO",
+        "show_same": true
+      }
+    },
+    {
+      "name": "jabi",
+      "dumper": "JABIDumper",
+      "executor": "jabi.JABICompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_RPM_JABI"
+      }
+    },
+    {
+      "name": "abi",
+      "dumper": "ABIDumper",
+      "executor": "abi.ABICompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_RPM_ABI",
+        "no_package": "kernel"
+      }
+    },
+    {
+      "name": "kconfig_drive",
+      "dumper": "KconfigDriveDumper",
+      "executor": "nvs.NVSCompareExecutor",
+      "config": {
+        "compare_type": "CMP_TYPE_KCONFIG_DRIVE",
+        "package": "kernel",
+        "show_same": true
+      }
+    },
+	{
+      "name": "service",
+      "dumper": "ServiceDumper",
+      "executor": "service.ServiceCompareExecutor",
+        "config": {
+          "compare_type": "CMP_TYPE_SERVICE"
+        }
+    },
+    {
+      "name": "header",
+      "dumper": "HeaderDumper",
+      "executor": "header.HeaderCompareExecutor",
+        "config": {
+          "compare_type": "CMP_TYPE_RPM_HEADER",
+          "no_detail": true
+        }
+    },
+    {
+      "name": "cmd",
+      "dumper": "CmdDumper",
+      "executor": "cmd.CmdCompareExecutor",
+        "config": {
+          "compare_type": "CMP_TYPE_CMD",
+          "show_same": true
+        }
+    },
+    {
+      "name": "lib",
+      "dumper": "ABIDumper",
+      "executor": "lib.LibCompareExecutor",
+        "config": {
+          "compare_type": "CMP_TYPE_RPM_LIB",
+          "show_same": true
+        }
+    },
+    {
+      "name": "symbol",
+      "dumper": "SymbolDumper",
+      "executor": "symbol.SymbolCompareExecutor",
+        "config": {
+          "compare_type": "CMP_TYPE_RPM_SYMBOL",
+          "no_package": "kernel",
+          "branch_name": "",
+          "db_password": "",
+          "show_same": true
+        }
+    }
+  ]
+}

@@ -2,26 +2,22 @@
 """
 # **********************************************************************************
 # Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
-# [openeuler-jenkins] is licensed under the Mulan PSL v2.
-# You can use this software according to the terms and conditions of the Mulan PSL v2.
-# You may obtain a copy of Mulan PSL v2 at:
-#     http://license.coscl.org.cn/MulanPSL2
+# [openeuler-jenkins] is licensed under the Mulan PSL v1.
+# You can use this software according to the terms and conditions of the Mulan PSL v1.
+# You may obtain a copy of Mulan PSL v1 at:
+#     http://license.coscl.org.cn/MulanPSL
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
 # PURPOSE.
-# See the Mulan PSL v2 for more details.
+# See the Mulan PSL v1 for more details.
 # **********************************************************************************
 """
-import json
+import re
 import sqlite3
 import os
-import re
 import bz2
 import gzip
-from pathlib import Path
 from itertools import groupby
-from oecp.proxy.rpm_proxy import RPMProxy
-from oecp.result.constants import BOOLEAN_OPERATORS
 
 try:
     import lzma
@@ -36,23 +32,8 @@ from oecp.utils.misc import path_is_remote
 logger = logging.getLogger("oecp")
 
 
-class RepositoryPackageMapping(object):
-    def __init__(self):
-        pass
-
-    def read_rename_kernel(self):
-        directory_json_path = os.path.join(Path(__file__).parents[1], 'conf', 'rename_kernel')
-        with open(os.path.join(directory_json_path, 'all_rename_kernel.json'), 'r') as f:
-            all_rename_kernel = json.load(f)
-
-        return all_rename_kernel
-
-    def repository_of_package(self, package):
-        return package
-
-
-class SQLiteMapping(RepositoryPackageMapping):
-    def __init__(self, sqlite_path):
+class SQLiteMapping(object):
+    def __init__(self, sqlite_path, log=True):
         """
 
         :param sqlite_path:
@@ -60,16 +41,17 @@ class SQLiteMapping(RepositoryPackageMapping):
         super(SQLiteMapping, self).__init__()
         self._raw_sqlite_path = sqlite_path
 
-        self._get_connection(sqlite_path)
+        self._get_connection(sqlite_path, log)
 
-    def _get_connection(self, sqlite_path):
+    def _get_connection(self, sqlite_path, log):
         """
         :param sqlite_path:
         :return:
         """
         # sqlite在远端
         if path_is_remote(sqlite_path):
-            logger.info(f"treat {sqlite_path} as remote file")
+            if log:
+                logger.info(f"treat {sqlite_path} as remote file")
             local_sqlite_fp = tempfile.NamedTemporaryFile("w", suffix=os.path.splitext(sqlite_path)[1])
             if do_download(sqlite_path, local_sqlite_fp.name) is None:
                 raise FileNotFoundError(f"{sqlite_path} is not exist")
@@ -97,21 +79,22 @@ class SQLiteMapping(RepositoryPackageMapping):
         return packages
 
     @staticmethod
-    def acquire_whole_version(cursor_record):
-        epoch = cursor_record[1].strip() + ':' if cursor_record[1] else ''
-        version = cursor_record[2].strip() if cursor_record[2] else ''
-        release = '-' + cursor_record[3].strip() if cursor_record[3] else ''
-
-        return epoch + version + release
-
-    @staticmethod
     def _split_version(version):
         ret = []
         if version is None:
             return ret
+
         for item in re.split('[_.+-]', version):
             ret += [''.join(list(g)) for k, g in groupby(item, key=lambda x: x.isdigit())]
+
         return ret
+
+    @staticmethod
+    def _get_flag_symbol(flag):
+
+        return {
+            "LT": "<", "LE": "<=", "EQ": "=", "GE": ">=", "GT": ">"
+        }.get(flag, "")
 
     @staticmethod
     def _compare_signle_version(require_version, symbol, target_version):
@@ -142,12 +125,11 @@ class SQLiteMapping(RepositoryPackageMapping):
             return is_eq, False
         return is_eq, True
 
-    @staticmethod
-    def filter_pkg_name(pkg):
-        return pkg.strip("\(\)") not in BOOLEAN_OPERATORS
-
     def _compare_version(self, require_version, symbol, target_version):
         is_pass = False
+
+        if not symbol or not list(filter(lambda x: x, target_version.values())):
+            return True
         for version_type in ['epoch', 'version', 'release']:
             for ver, target in zip(require_version[version_type], target_version[version_type]):
                 if version_type == "epoch" and not ver:
@@ -169,76 +151,53 @@ class SQLiteMapping(RepositoryPackageMapping):
                 return True
         return is_pass
 
-    def _parse_version(self, spec_version):
-        tmp_version = spec_version
-        version = {'epoch': [], 'version': [], 'release': []}
-        if ':' in tmp_version:
-            epoch, tmp_version = tmp_version.split(':')[:2]
-            version['epoch'] = self._split_version(epoch)
-        if '-' in tmp_version:
-            tmp_version, release = tmp_version.split('-')[:2]
-            version['release'] = self._split_version(release)
-        version['version'] = self._split_version(tmp_version)
-        return version
-
-    def is_package_name(self, name):
-        pkgs = []
-        matchs = re.match(r"^\(.*\)$", name)
-        if matchs:
-            match_result = matchs.group()
-            list_pkgs = [pkg.strip("\(\)") for pkg in match_result.split()]
-            pkgs = filter(self.filter_pkg_name, list_pkgs)
-        else:
-            regex = re.compile(r'[\w-]*')
-            sub_name = regex.sub('', name)
-            if not sub_name:
-                pkgs.append(name)
-
-        return pkgs
-
-    def get_provides_rpm(self, name, symbol, version):
-        package_name = []
+    def get_rpm_provides(self, rpm_name, database="everything"):
+        provides_result = {}
         cursor = self._sqlite_conn.cursor()
-        pkg_names = self.is_package_name(name)
-        if pkg_names:
-            for name in pkg_names:
-                query_rpms = []
-                try:
-                    cursor.execute(f"select location_href from packages where location_href like '%/{name}%'")
-                    rpm_result = cursor.fetchall()
-                    if rpm_result:
-                        for query_rpm in rpm_result:
-                            query_rpms.append(query_rpm[0].split('/')[-1])
-                except Exception as e:
-                    logger.error(f'query location_href from packages error,packages name={name}, error={e}')
-                for rpm_name in query_rpms:
-                    if rpm_name and name == RPMProxy.rpm_name(rpm_name):
-                        package_name.append(rpm_name)
-            if package_name:
-                return package_name
-
-        cursor.execute(f"select pkgKey,epoch,version,release from provides where name='{name}'")
-        result = cursor.fetchall()
-        if not result and name.startswith('/'):
-            cursor.execute(f"select pkgKey from files where name='{name}'")
-            result = cursor.fetchall()
-        if len(result) == 1:
-            cursor.execute(f"select location_href from packages where pkgKey={result[0][0]}")
+        try:
+            cursor.execute(f'select pkgKey from packages where name="{rpm_name}"')
             rpm_result = cursor.fetchall()
-            rpm_name = rpm_result[0][0].split('/')[-1]
-            package_name.append(rpm_name)
-        else:
-            for pkginfo in result:
-                cursor.execute(f"select location_href from packages where pkgKey={pkginfo[0]}")
-                rpm_record = cursor.fetchall()[0]
-                if version and len(pkginfo) == 4:
-                    whole_version = self.acquire_whole_version(pkginfo)
-                    target_version = self._parse_version(whole_version)
-                    require_version = self._parse_version(version)
-                    is_pass = self._compare_version(require_version, symbol, target_version)
-                    if is_pass:
-                        package_name.append(rpm_record[0].split('/')[-1])
-                else:
-                    package_name.append(rpm_record[0].split('/')[-1])
+            if not rpm_result:
+                logger.warning(f"No query rpm: {rpm_name} in {database} database of repodata.")
+                return provides_result
+            cursor.execute(f'select name,epoch,version,release from provides where pkgKey="{rpm_result[0][0]}"')
+            all_provides = cursor.fetchall()
+            if not all_provides:
+                logger.warning(f"No query rpm: {rpm_name} provides in {database} database of repodata.")
+                return provides_result
+            for provide in all_provides:
+                provide_info = {
+                    "epoch": self._split_version(provide[1]),
+                    "version": self._split_version(provide[2]),
+                    "release": self._split_version(provide[3])
+                }
+                provides_result.setdefault(provide[0], provide_info)
 
-        return list(set(package_name))
+        except Exception as e:
+            logger.error(f"query provides from packages error,packages name={rpm_name}, databse={database}, error={e}")
+
+        return provides_result
+
+    def get_direct_require_rpms(self, all_provides):
+        requires_packages = []
+        cursor = self._sqlite_conn.cursor()
+        for provide, provide_version in all_provides.items():
+            cursor.execute(f'select pkgKey,flags,epoch,version,release from requires where name="{provide}"')
+            require_rpms = cursor.fetchall()
+            for require in require_rpms:
+                symbol = self._get_flag_symbol(require[1])
+                require_version = {
+                    'epoch': self._split_version(require[2]),
+                    'version': self._split_version(require[3]),
+                    'release': self._split_version(require[4])
+                }
+                if symbol:
+                    is_pass = self._compare_version(require_version, symbol, provide_version)
+                    if not is_pass:
+                        continue
+                cursor.execute(f'select location_href from packages where pkgKey="{require[0]}"')
+                require_rpm_name = cursor.fetchall()[0][0].split("/")[-1]
+                requires_packages.append(require_rpm_name)
+
+        return requires_packages
+

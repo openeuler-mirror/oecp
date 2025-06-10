@@ -2,24 +2,23 @@
 """
 # **********************************************************************************
 # Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
-# [oecp] is licensed under the Mulan PSL v2.
-# You can use this software according to the terms and conditions of the Mulan PSL v2.
-# You may obtain a copy of Mulan PSL v2 at:
-#     http://license.coscl.org.cn/MulanPSL2
+# [oecp] is licensed under the Mulan PSL v1.
+# You can use this software according to the terms and conditions of the Mulan PSL v1.
+# You may obtain a copy of Mulan PSL v1 at:
+#     http://license.coscl.org.cn/MulanPSL
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
 # PURPOSE.
-# See the Mulan PSL v2 for more details.
+# See the Mulan PSL v1 for more details.
 # Author:
 # Create: 2021-09-08
 # Description: compare result
 # **********************************************************************************
 """
+
 import os
 import json
 import logging
-
-from oecp.main.category import Category
 from oecp.result.constants import CMP_RESULT_SAME, CMP_TYPE_CI_FILE_CONFIG, CMP_TYPE_CI_CONFIG, CMP_RESULT_MORE, \
     CMP_RESULT_LESS, CMP_RESULT_DIFF, CMP_TYPE_RPMS_TEST
 
@@ -29,7 +28,7 @@ logger = logging.getLogger("oecp")
 # ------------------------------------------------------------------------------------
 # parse compass-ci test result for export csv report
 # requires:
-#   - performacne: 2 performace test result at least in root_path(the platform test result path)
+#   - performacne: 2 performace test result at least in root_path(the result output path)
 #     eg:
 #        openEuler-20.03-LTS-aarch64-dvd.iso.performance.json
 #        openEuler-20.03-LTS-SP1-aarch64-dvd.iso.performance.json
@@ -42,24 +41,31 @@ logger = logging.getLogger("oecp")
 #       eg: EulixOS-Server-1.0-aarch64.iso.at.json
 # ------------------------------------------------------------------------------------
 
-def performance_result_parser(side_a, side_b, root_path):
+def performance_result_parser(side_a, side_b, root_path, baseline):
     perf_result = []
+    side_a_result = get_performacnce_result(side_a, root_path)
     side_b_result = get_performacnce_result(side_b, root_path)
-    if not side_b_result:
-        logger.warning("not exists target performance json file.")
+    base_line_result = load_json_result(baseline)
+    small_better_reg = get_perf_reg()['small_better']
 
+    if not (base_line_result and side_b_result and side_a_result):
         return perf_result
 
-    side_a_result = get_performacnce_result(side_a, root_path)
-    if not side_a_result:
-        base_path = os.path.realpath(os.path.dirname(os.path.dirname(__file__)))
-        base_performance = os.path.join(base_path, "conf/performance/baseline-openEuler-20.03-LTS-SP1-everything"
-                                                   "-aarch64-dvd.iso.performance.json")
-        side_a_result = load_json_result(base_performance)
+    for metric, value in base_line_result.items():
+        avg_b = side_b_result[metric]['average'] if side_b_result.get(metric) else ''
 
-    for metric, value in side_a_result.items():
-        avg_b = side_b_result.get(metric, {}).get('average')
-        baseline_avg, cmp_result = cmp_performance_metric(metric, value, avg_b)
+        if small_better(metric, small_better_reg):
+            baseline_avg = value['average'] + (value['average'] * 0.05)
+            if avg_b:
+                cmp_result = 'pass' if avg_b - baseline_avg < 0 else 'fail'
+            else:
+                cmp_result = ''
+        else:
+            baseline_avg = value['average'] - (value['average'] * 0.05)
+            if avg_b:
+                cmp_result = 'fail' if avg_b - baseline_avg < 0 else 'pass'
+            else:
+                cmp_result = ''
         row = {
             "metric": metric,
             side_a: side_a_result[metric]['average'] if side_a_result.get(metric) else '',
@@ -70,31 +76,6 @@ def performance_result_parser(side_a, side_b, root_path):
         perf_result.append(row)
 
     return perf_result
-
-
-def cmp_performance_metric(metric, value, avg_b):
-    """
-    lmbench性能测试指标项结果与基线平均值比较计算
-    @param metric: 测试指标项
-    @param value: 基线文件性能测试指标项均值
-    @param avg_b: osv性能测试指标项均值
-    @return: baseline_avg（区分延迟指标测试项与其它指标项），cmp_result（比较结果）
-    """
-    small_better_reg = get_perf_reg()['small_better']
-    if small_better(metric, small_better_reg):
-        baseline_avg = value['average'] * 1.05
-        if avg_b:
-            cmp_result = 'pass' if avg_b - baseline_avg < 0 else 'fail'
-        else:
-            cmp_result = ''
-    else:
-        baseline_avg = value['average'] * 0.95
-        if avg_b:
-            cmp_result = 'fail' if avg_b - baseline_avg < 0 else 'pass'
-        else:
-            cmp_result = ''
-
-    return baseline_avg, cmp_result
 
 
 def get_performacnce_result(side, root_path):
@@ -112,6 +93,9 @@ def ciconfig_result_parser(side_a, side_b, root_path):
     config_file_result = []
     side_a_result = get_ciconfig_result(side_a, root_path)
     side_b_result = get_ciconfig_result(side_b, root_path)
+    # base_line_result = load_json_result(baseline)
+    # if not (side_a_result and side_b_result):
+    #     return ciconfig_result
     if not side_a_result or not side_b_result:
         logger.warning("json file not exist")
         return ciconfig_result, config_file_result
@@ -163,7 +147,7 @@ def ciconfig_result_parser(side_a, side_b, root_path):
 
 
 def get_ciconfig_result(side, root_path):
-    file_name = side + '.ciconfig.json'
+    file_name = 'oecp/conf/ci_config/' + side + '.ciconfig.json'
     result_path = os.path.join(root_path, file_name)
     return load_json_result(result_path)
 
@@ -184,6 +168,7 @@ def format_ciconfig_detail(data_a, data_b):
     all_dump.append(same)
     all_dump.append(changed)
     all_dump.append(losted)
+
     return all_dump
 
 
@@ -207,7 +192,8 @@ def test_result_parser(side_a, side_b, root_path):
     dump_b = get_test_result(side_b, root_path)
 
     if dump_b and dump_a:
-        return assain_rpm_test_result(side_a, side_b, dump_a, dump_b)
+        category_map = create_category_map()
+        return assain_rpm_test_result(side_a, side_b, dump_a, dump_b, category_map)
     else:
         return [], {}
 
@@ -219,28 +205,26 @@ def assgin_rpm_summay(rpm_test_details, side_a, side_b):
         values = rpm_result[CMP_TYPE_RPMS_TEST]
         assgin_fail_test_row(values, fail_rows, side_a, side_b)
         rpm_side_result = {
-            side_a: "pass",
-            side_b: "pass"
-        }
-        level = ''
+                side_a: "pass",
+                side_b: "pass"
+                }
         for v in values:
-            level = v.get("category level")
+            level = v.get("category level") if v.get("category level") else "6"
             summary.setdefault(level, {
                 "category level": level,
                 "[success] " + side_a: 0,
                 "[fail] " + side_a: 0,
                 "[success] " + side_b: 0,
                 "[fail] " + side_b: 0,
-            })
+                })
             for side in [side_a, side_b]:
                 if v[side].endswith("fail"):
                     rpm_side_result[side] = "fail"
         for s, result in rpm_side_result.items():
             if result == "fail":
-                summary.get(level)["[fail] " + s] += 1
+                summary[level]["[fail] " + s] += 1
             else:
-                summary.get(level)["[success] " + s] += 1
-
+                summary[level]["[success] " + s] += 1
     return sorted(summary.values(), key=lambda i: i["category level"]) + fail_rows
 
 
@@ -262,16 +246,19 @@ def assgin_fail_test_row(results, fail_rows, side_a, side_b):
         fail_rows.append(row)
 
 
-def assain_rpm_test_result(side_a, side_b, dump_a, dump_b):
+def assain_rpm_test_result(side_a, side_b, dump_a, dump_b, category_map):
     rpm_test_rows = []
     rpm_test_details = {}
     a_keys = dump_a.keys()
     b_keys = dump_b.keys()
     keys = list(set(a_keys).union(set(b_keys)))
-    category_file = os.path.join(os.path.dirname(__file__), "../conf/category/category.json")
     for key in keys:
         va = dump_a.get(key, {})
         vb = dump_b.get(key, {})
+
+        src_side = va.get('rpm_src_name') if va else vb.get('rpm_src_name')
+        category_level = category_map.get(src_side, 'level6')[-1]
+
         defatule_side_a = key if va else ''
         rpm_side_a = va.get('rpm_full_name', defatule_side_a)
         rpm_side_b = vb.get('rpm_full_name', defatule_side_a)
@@ -282,11 +269,10 @@ def assain_rpm_test_result(side_a, side_b, dump_a, dump_b):
 
         remove_useless_result(va, vb)
         rpm_pkg = key
-        category_level = Category(category_file).category_of_bin_package(rpm_pkg)
         rpm_cmp_result = compare(va, vb)
         rpm_test_details.setdefault(rpm_pkg, {})
-        rpm_test_details.get(rpm_pkg)[CMP_TYPE_RPMS_TEST] = assain_rpm_test_details(rpm_pkg, side_a, side_b, va, vb,
-                                                                                    category_level)
+        rpm_test_details[rpm_pkg][CMP_TYPE_RPMS_TEST] = assain_rpm_test_details(rpm_pkg, side_a, side_b, va, vb,
+                                                                                category_level)
 
         row = {
             side_a + " binary rpm package": rpm_side_a,
@@ -296,7 +282,7 @@ def assain_rpm_test_result(side_a, side_b, dump_a, dump_b):
             "compare result": rpm_cmp_result,
             "compare detail": ' ' + CMP_TYPE_RPMS_TEST.replace(' ', '-') + '/' + key + '.csv ',
             "compare type": CMP_TYPE_RPMS_TEST,
-            "category level": category_level.value
+            "category level": category_level
         }
         rpm_test_rows.append(row)
 
@@ -321,7 +307,7 @@ def assain_rpm_test_details(rpm_pkg, side_a, side_b, dump_a, dump_b, level):
             side_b: vb,
             "compare result": compare(va, vb),
             "compare type": CMP_TYPE_RPMS_TEST,
-            "category level": level.value
+            "category level": level
         }
         rows.append(row)
     return rows
@@ -336,18 +322,18 @@ def remove_useless_result(va, vb):
 
 
 def format_test_detail(result):
-    '''
+    """
     :param: result
-        eg: {
-                "install": "pass"
-	        "cmds": {
-                    "/usr/bin/dockerd": "pass",
-                    "/usr/bin/runc": "pass",
-                    "/usr/bin/docker": "pass"
-                },
+    eg: {
+        "install": "pass"
+        "cmds": {
+                "/usr/bin/dockerd": "pass",
+                "/usr/bin/runc": "pass",
+                "/usr/bin/docker": "pass"
+            },
         ...
-	    }
-    '''
+        }
+    """
     if not result:
         return ''
     new_result = {}
@@ -394,12 +380,22 @@ def load_json_result(result_path):
         return None
 
 
+def create_category_map():
+    category_map = {}
+    category_file = os.path.join(os.path.dirname(__file__), "../conf/category/category.json")
+    categorys = load_json_result(category_file)
+    for category in categorys:
+        category_map[category['src']] = category['level']
+
+    return category_map
+
+
 # ------------------------------------------------------------------------
 # parse the AT result
 NON_AT_RESULT = {
-    "osv-smoke.osv_smoke_nr_total",
-    "osv-smoke.osv_smoke_nr_pass",
-    "osv-smoke.osv_smoke_nr_fail"
+        "osv-smoke.osv_smoke_nr_total",
+        "osv-smoke.osv_smoke_nr_pass",
+        "osv-smoke.osv_smoke_nr_fail"
 }
 
 

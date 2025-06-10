@@ -3,9 +3,9 @@
 # **********************************************************************************
 # Copyright (c) Huawei Technologies Co., Ltd. 2021-2021. All rights reserved.
 # [oecp] is licensed under the Mulan PSL v2.
-# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v1.
 # You may obtain a copy of Mulan PSL v2 at:
-#     http://license.coscl.org.cn/MulanPSL2
+#     http://license.coscl.org.cn/MulanPSL
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
 # PURPOSE.
@@ -88,8 +88,9 @@ class WebShowResult:
         if not floder_path:
             os.makedirs(floder_path)
         file_path = os.path.join(floder_path, 'web_show_result.json').replace("\\", '/')
+        json_result = json.dumps(self.web_show_result)
         with open(file_path, 'w') as rf:
-            json.dump(self.web_show_result, rf, indent=4)
+            rf.write(json_result)
 
     def write_json_result(self, *args):
         try:
@@ -97,7 +98,7 @@ class WebShowResult:
             self.web_show_result.setdefault('osv_name', side_b.split('-')[0])
             conclusion = 'PASS' if self.conclusion == '通过' else 'NO PASS'
             self.web_show_result.setdefault('total_result', conclusion)
-            arch = "aarch64" if "aarch64" in side_b or "arm64" in side_b else "X86"
+            arch = "aarch64" if "aarch64" in side_b else "X86"
             self.web_show_result.setdefault('arch', arch)
             self.web_show_result.setdefault('os_download_link', '')
             checksum = gen_hash_key(iso_path)
@@ -113,5 +114,5 @@ class WebShowResult:
                 self.create_report_json(root_path, osv_title)
             else:
                 logger.warning('The items displayed in the JSON report is empty.')
-        except(AttributeError, KeyError, IOError, OSError, ValueError) as e:
-            logger.exception(f"json statistics error, {e}")
+        except(AttributeError, KeyError, OSError, ValueError):
+            logger.exception("json statistics error")

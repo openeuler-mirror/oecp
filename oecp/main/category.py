@@ -2,14 +2,14 @@
 """
 # **********************************************************************************
 # Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
-# [oecp] is licensed under the Mulan PSL v2.
-# You can use this software according to the terms and conditions of the Mulan PSL v2.
-# You may obtain a copy of Mulan PSL v2 at:
-#     http://license.coscl.org.cn/MulanPSL2
+# [oecp] is licensed under the Mulan PSL v1.
+# You can use this software according to the terms and conditions of the Mulan PSL v1.
+# You may obtain a copy of Mulan PSL v1 at:
+#     http://license.coscl.org.cn/MulanPSL
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
 # PURPOSE.
-# See the Mulan PSL v2 for more details.
+# See the Mulan PSL v1 for more details.
 # Author:
 # Create: 2021-09-06
 # Description: package category
@@ -17,6 +17,7 @@
 """
 import json
 import logging
+import os
 from enum import Enum, unique
 
 from oecp.proxy.rpm_proxy import RPMProxy
@@ -43,23 +44,24 @@ class CategoryLevel(Enum):
 
 
 class Category(object):
-    def __init__(self, path):
+    def __init__(self):
         """
 
         :param path: 分类文件，json格式
         """
         self._src_categories = {}
         self._bin_categories = {}
-        self._load(path)
 
-    def _load(self, path):
+        self._load()
+
+    def _load(self):
         """
 
-        :param path:
         :return:
         """
+        category_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "conf/category/category.json")
         try:
-            with open(path, "r") as f:
+            with open(category_path, "r") as f:
                 categories = json.load(f)
 
                 for category in categories:
@@ -75,7 +77,7 @@ class Category(object):
                         logger.exception(f"\"{category['oecp']}\" or \"{category['bin']}\" is illegal rpm name")
                         raise
         except FileNotFoundError:
-            logger.exception(f"{path} not exist")
+            logger.exception(f"{category_path} not exist")
             raise
 
     def category_of_src_package(self, name):

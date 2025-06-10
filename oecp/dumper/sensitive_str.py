@@ -2,14 +2,14 @@
 """
 # **********************************************************************************
 # Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
-# [oecp] is licensed under the Mulan PSL v2.
-# You can use this software according to the terms and conditions of the Mulan PSL v2.
-# You may obtain a copy of Mulan PSL v2 at:
-#     http://license.coscl.org.cn/MulanPSL2
+# [oecp] is licensed under the Mulan PSL v1.
+# You can use this software according to the terms and conditions of the Mulan PSL v1.
+# You may obtain a copy of Mulan PSL v1 at:
+#     http://license.coscl.org.cn/MulanPSL
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
 # PURPOSE.
-# See the Mulan PSL v2 for more details.
+# See the Mulan PSL v1 for more details.
 # **********************************************************************************
 """
 
@@ -39,7 +39,7 @@ class SensitiveStrDumper(ComponentsDumper):
 
     def dump(self, repository):
         rpm_path = repository['path']
-
+        
         dump_list = []
         if os.path.exists(rpm_path):
             tmp_path = tempfile.mkdtemp()
@@ -47,7 +47,7 @@ class SensitiveStrDumper(ComponentsDumper):
             cmd = f"cd {tmp_path} && rpm2cpio {rpm_path} | cpio -div"
             os.system(cmd)
             cmd = self._cmd + [tmp_path]
-
+            
             code, out, err = shell_cmd(cmd)
             if not code:
                 if err:
@@ -58,7 +58,7 @@ class SensitiveStrDumper(ComponentsDumper):
                             continue
                         line = line.strip(tmp_path)
                         dump_list.append(line)
-        item = {'rpm': os.path.basename(rpm_path), 'kind': self._component_key, self.data: dump_list}
+        item = {'rpm': os.path.basename(rpm_path), 'kind': self._component_key, 'data': dump_list}
         item.setdefault('category', repository['category'].value)
         return item
 
@@ -68,3 +68,4 @@ class SensitiveStrDumper(ComponentsDumper):
             dumper = self.dump(repository)
             dumper_list.append(dumper)
         return dumper_list
+

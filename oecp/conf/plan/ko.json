@@ -1,6 +1,15 @@
 {
-  "name": "test",
+  "name": "ko",
   "plan": [
+    {
+      "name": "packagelist",
+      "dumper": "PackageListDumper",
+      "executor": "list.ListCompareExecutor",
+      "config": {
+        "only_directory": true,
+        "compare_type": "CMP_TYPE_DIRECTORY"
+      }
+    },
     {
       "name": "extract",
       "dumper": "RPMExtractDumper",

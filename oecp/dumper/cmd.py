@@ -3,9 +3,9 @@
 # **********************************************************************************
 # Copyright (c) Huawei Technologies Co., Ltd. 2021-2021. All rights reserved.
 # [oecp] is licensed under the Mulan PSL v2.
-# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v1.
 # You may obtain a copy of Mulan PSL v2 at:
-#     http://license.coscl.org.cn/MulanPSL2
+#     http://license.coscl.org.cn/MulanPSL
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
 # PURPOSE.
@@ -15,18 +15,22 @@
 
 import os
 import logging
+logger = logging.getLogger('oecp')
 
 from oecp.dumper.base import AbstractDumper
-
-logger = logging.getLogger('oecp')
 
 
 class CmdDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
         super(CmdDumper, self).__init__(repository, cache, config)
-        self.cache_dumper = self.get_cache_dumper(self.cache_require_key)
+        cache_require_key = 'extract'
+        self.cache_dumper = self.get_cache_dumper(cache_require_key)
         self.extract_info = self.cache_dumper.get_extract_info()
         self._component_key = 'cmd'
+
+    def _get_cmd_files(self, rpm_extract_dir):
+        cmd_files = self.cache_dumper.get_cmd_files(rpm_extract_dir)
+        return cmd_files
 
     def dump(self, repository):
         rpm_path = repository['path']
@@ -35,9 +39,9 @@ class CmdDumper(AbstractDumper):
         rpm_extract_dir = self.extract_info.get(verbose_path)
         rpm_extract_name = rpm_extract_dir.name
         if not rpm_extract_name:
-            logger.exception(f"RPM {verbose_path} decompression path not found.")
-        cmd_files = self.cache_dumper.get_cmd_files(rpm_extract_name)
-        item = {'rpm': verbose_path, 'category': category, 'kind': self._component_key, self.data: cmd_files}
+            raise Exception('RPM decompression path not found')
+        cmd_files = self._get_cmd_files(rpm_extract_name)
+        item = {'rpm': verbose_path, 'category': category, 'kind': self._component_key, 'data': cmd_files}
         return item
 
     def run(self):
