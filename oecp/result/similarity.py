@@ -15,14 +15,14 @@
 # Description: similarity
 # **********************************************************************************
 """
-import os
 import logging
 
 from oecp.proxy.rpm_proxy import RPMProxy
-from oecp.result.test_result import get_perf_reg, load_json_result, small_better
+from oecp.result.test_result import get_perf_reg, small_better
 from oecp.result.constants import CMP_TYPE_RPM, SIMILARITY_TYPES, KERNEL_TYPES, CMP_TYPE_RPMS_TEST, CMP_TYPE_AT, \
     CMP_TYPE_CI_CONFIG, CMP_TYPE_PERFORMANCE, CMP_TYPE_RPM_ABI, PKG_SIMILARITY_SON_TYPES, CMP_TYPE_RPM_FILES, \
-    CMP_SAME_RESULT, RESULT_SAME, CMP_RESULT_DIFF, CMP_RESULT_LESS, CMP_TYPE_RPM_LEVEL, CMP_TYPE_KO, RESULT_MORE
+    CMP_SAME_RESULT, RESULT_SAME, CMP_RESULT_DIFF, CMP_RESULT_LESS, CMP_TYPE_RPM_LEVEL, CMP_TYPE_KO, RESULT_MORE, \
+    CMP_TYPE_RPM_JABI
 
 logger = logging.getLogger("oecp")
 
@@ -43,7 +43,12 @@ def count_all_cmp_type_result(rows):
             for rpm_type, rpm_results in results.items():
                 if rpm_type in SIMILARITY_TYPES:
                     for result in rpm_results:
-                        count_single_result(count, result, rpm_type)
+                        if rpm_type == CMP_TYPE_RPM_JABI:
+                            count.setdefault(CMP_TYPE_RPM_JABI, [])
+                            score = float(result["compare result"][:-1])
+                            count[CMP_TYPE_RPM_JABI].append(score)
+                        else:
+                            count_single_result(count, result, rpm_type)
                 elif rpm_type in KERNEL_TYPES:
                     count_kernel_result(count, rpm_results, rpm_type, keys)
     return count
@@ -100,20 +105,25 @@ def get_similarity(rows, side_base, side_other):
     get_platform_similarity(similarity, count_rpm_test, rows, side_other)
 
     for count_type in count:
-        if count_type == CMP_TYPE_RPM_ABI:
-            get_abi_similarity(similarity, count, count_type)
-        elif count_type in KERNEL_TYPES:
-            rate = 0
-            for single_kernel in count.get(count_type).values():
-                single_rate = count_rate(single_kernel.get('same'),
-                                         single_kernel.get('same') + single_kernel.get('diff'))
-                rate = single_rate if single_rate > rate else rate
-            similarity[count_type] = rate
-            continue
+        if count_type == CMP_TYPE_RPM_JABI:
+            jabi_rate = count_rate(sum(count[CMP_TYPE_RPM_JABI]), len(count[CMP_TYPE_RPM_JABI]))
+            similarity[CMP_TYPE_RPM_JABI] = round(jabi_rate / 100, 4)
+        else:
+            if count_type == CMP_TYPE_RPM_ABI:
+                get_abi_similarity(similarity, count, count_type)
+            elif count_type in KERNEL_TYPES:
+                rate = 0
+                for single_kernel in count.get(count_type).values():
+                    single_rate = count_rate(single_kernel.get('same'),
+                                             single_kernel.get('same') + single_kernel.get('diff'))
+                    rate = single_rate if single_rate > rate else rate
+                similarity[count_type] = rate
+                continue
 
-        rate = count_rate(count.get(count_type).get("all").get("same"),
-                          count.get(count_type).get("all").get("same") + count.get(count_type).get("all").get("diff"))
-        similarity[count_type] = rate
+            rate = count_rate(count.get(count_type).get("all").get("same"),
+                              count.get(count_type).get("all").get("same") + count.get(count_type).get("all").get(
+                                  "diff"))
+            similarity[count_type] = rate
 
     return similarity
 

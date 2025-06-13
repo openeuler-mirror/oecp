@@ -10,7 +10,8 @@
           ],
   "rpmabi_analyse":
           [
-            "rpm abi"
+            "rpm abi",
+            "rpm jabi"
           ],
   "rpm_analyse":
           [

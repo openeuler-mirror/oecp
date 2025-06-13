@@ -45,6 +45,14 @@ install createrepo: ''' yum install -y createrepo '''
 
 install binutils: ''' yum install -y binutils '''
 
+install japi:
+'''
+git clone https://github.com/lvc/japi-compliance-checker &&
+cd japi-compliance-checker &&
+sudo make install prefix=/usr
+'''
+'''japi-compliance-checker执行依赖jar命令(openeuler): yum install -y java-1.8.0-openjdk-devel'''
+
 注意：openeuler需要配置openEuler-20.03-SP2以上版本everything仓库
 install abidiff (openEuler): ''' yum install -y libabigail '''
 
@@ -128,6 +136,8 @@ pip3 install -r requirement
     比较rpm的provides和requires差异，可通过rpm -pq --provides/requires ${rpm_path}查询
   * **`abi.json`**
     比较rpm动态库文件的abi接口差异，使用abidiff工具（详细文档：https://sourceware.org/libabigail/manual/abidiff.html）
+  * **`jabi.json`**
+    比较rpm中jar包的java接口，需依赖RPMExtractDumper（提取解压rpm的dumper类）
   * **`service.json`**
     比较rpm的默认服务配置，需依赖RPMExtractDumper（提取解压rpm的dumper类）
   * **`kabi_file.json`**
