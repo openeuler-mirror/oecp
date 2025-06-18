@@ -204,6 +204,7 @@ UPSTREAM_DIST = {
     OPENEULER,
     "fedora"
 }
+NO_FILE = "(contains no files)"
 
 # DETAIL REPROT DIRECTORY PATH
 DETAIL_PATH = "details_analyse"

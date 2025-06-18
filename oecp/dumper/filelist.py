@@ -20,7 +20,7 @@ import re
 
 from oecp.dumper.base import AbstractDumper
 from oecp.utils.shell import shell_cmd
-from oecp.result.constants import KERNEL, VDSO_BUILD_ID, FILTER_PATTERN
+from oecp.result.constants import KERNEL, VDSO_BUILD_ID, FILTER_PATTERN, NO_FILE
 
 logger = logging.getLogger('oecp')
 
@@ -47,6 +47,8 @@ class FileListDumper(AbstractDumper):
     @staticmethod
     def filter_not_focus_files(line, rpm_name):
         if not line or "metadata_list-compact" in line:
+            return False
+        elif line == NO_FILE:
             return False
         elif rpm_name == KERNEL and re.match(VDSO_BUILD_ID, line):
             return False
