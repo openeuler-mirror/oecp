@@ -238,30 +238,51 @@ pip3 install -r requirement
     * **`provides_requires.json`**
       比较rpm的provides和requires差异，可通过rpm -pq --provides/requires ${rpm_path}查询
 
-## 6. oecp kabi/kapi基线化功能模块使用
-`python3 cli.py [-b BRANCH] [-a ARCH] [-s KERNEL_SOURCE] file1`
+## 6. 昇腾kabi/kapi基线化功能
+`python3 cli.py [-b BRANCH] [-a ARCH] [-s KERNEL_SOURCE] file`
+
+* **模块说明**
+  * 实现对单个、多个驱动rpm包的kabi列表提取，生成kabi基线化列表文件；并支持驱动kabi列表与社区kabi基线进行对比，检查硬件驱动是否适配社区OS基线版本
 
 * **位置参数(必选)**
-  * **`file`**
-    有别于oecp基础功能，当file参数传入仅有file1，即单个文件或者存放rpm包的目录时，工具进入kabi/kapi基线化功能模块
+  * **`入参file支持类型`**
+    * 文件路径类型：
+      * 指定单个驱动rpm包路径，如：/root/driver_rpm/Ascend-hdk-910-npu-driver-24.1.0-1.aarch64.rpm
+      * 指定驱动kabi列表文件：/root/kabi_list/kabi_list.txt
+    * 目录类型：
+      * 指定存放多个驱动rpm包目录，如：/root/driver_rpm
+      * 指定存放多个ko文件目录，如：/root/ko_list
 
 * **可选参数**
 
   * **`-b, --branch`**
-    指定`kabi基线分支`，默认为20.03-LTS-SP1分支，与--arch参数配合使用可指定目标kabi白名单，用于判断所提取的kabi是否在目标kabi白名单中
+    指定`kabi基线分支`，默认为20.03-LTS-SP1分支，与--arch参数配合使用可指定社区基线kabi白名单，用于对比提取的驱动kabi列表与os基线kabi白名单是否适配
   * **`-a, --arch`**
-    指定`架构`，目前支持x86_64、aarch64，与--branch参数配合使用可指定目标kabi白名单, 用于判断所提取的kabi是否在目标kabi白名单中
+    指定`架构`，目前支持x86_64、aarch64，与--branch参数配合使用可指定社区基线kabi白名单
   * **`-s, --src_kernel`**
-    指定`输入内核源码包路径`，路径下存放内核源码包：kernel-*.src.rpm，添加该参数可在对应版本的kernel源码中查找kapi函数原型
+    指定`输入内核源码包路径`，路径下存放内核源码包：kernel-*.src.rpm，添加该参数可在对应版本的kernel源码中查找对应kapi函数原型
 
 * **举例**
-  * **`python3 cli.py -b 20.03-LTS-SP1 -a aarch64 -s /root/kernel-5.10.0-rc6.src.rpm /root/driver_rpm/`**
-* 最终生成的结果文件将保存在`/tmp/kabi/`目录下
+  * **`python3 cli.py -b 20.03-LTS-SP1 -a aarch64 -s /root/kernel-5.10.0-rc6.src.rpm /root/driver_rpm/Ascend-hdk-910-npu-driver-24.1.0-1.aarch64.rpm`**
 
+* 最终生成的csv格式结果文件将保存在`/tmp/kabi/`目录下
 
-## 6.  软件卸载与环境清理
+## 7. 昇腾适配osv版本kabi兼容性检测
 
-## 7.  OECP报告说明
+`python3 cli.py openeuler_iso osv_iso`
+
+* **使用前提**
+  * 昇腾驱动已适配待测openeuler社区版本
+
+* **模块说明**
+  * 昇腾为适配openEuler系OS（openEuler社区版本 + openEuler商业发行版 + 部分企业自用版），检查昇腾驱动是否适配osv版本内核kabi列表，目前oecp工具暂不支持入参形式传入昇腾kabi列表，若要使用该能力，需手动将昇腾kabi列表根据iso架构（目前支持aarch64、x86_64）替换oecp\conf\kabi_whitelist\20.03-LTS-SP下kabi白名单文件，昇腾kabi列表文件格式需与社区kabi列表保持一致，使用示例命令可进行昇腾适配osv版本兼容性测试。
+
+* **结果分析**
+  * 报告默认生成在`/tmp/oecp/`下，在报告中的`kernel_analyse/kabi/`目录下存放kabi比较结果kernel-*.csv文件
+
+## 8.  软件卸载与环境清理
+
+## 9.  OECP报告说明
 
  1）最终报告
 
@@ -352,7 +373,7 @@ oecp工具会展示一份最终报告，用于展示最终的测试结果，测�
 
                 level 4   --  未指定的软件包
 
-## 8.  平台验证说明
+## 10.  平台验证说明
 
 平台验证需要使用lkp工具，对待测系统进行有关项目检测，oecp工具分析平台验证测试报告（json）报告说明及相似度计算公式如下所示：
  

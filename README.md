@@ -147,22 +147,32 @@ pip3 install -r requirement
   * **`service_file.json`**
     比较服务文件配置变化差异，输入比较目标为服务文件（.service）时，指定比较计划-p为该json配置文件
 
-## 4. kabi/kapi基线化功能
-`python3 cli.py [-b BRANCH] [-a ARCH] [-s KERNEL_SOURCE] file1`
+## 4. 昇腾kabi/kapi基线化功能
+`python3 cli.py [-b BRANCH] [-a ARCH] [-s KERNEL_SOURCE] file`
+
+* **模块说明**
+  * 实现对单个、多个驱动rpm包的kabi列表提取，生成kabi基线化列表文件；并支持驱动kabi列表与社区kabi基线进行对比，检查硬件驱动是否适配社区OS基线版本
 
 * **位置参数(必选)**
-  * **`file`**
-    有别于oecp基础功能，当file参数传入仅有file1，即单个文件或者存放rpm包的目录时，工具进入kabi/kapi基线化功能模块
+  * **`入参file支持类型`**
+    * 文件路径类型：
+      * 指定单个驱动rpm包路径，如：/root/driver_rpm/Ascend-hdk-910-npu-driver-24.1.0-1.aarch64.rpm
+      * 指定驱动kabi列表文件：/root/kabi_list/kabi_list.txt
+    * 目录类型：
+      * 指定存放多个驱动rpm包目录，如：/root/driver_rpm
+      * 指定存放多个ko文件目录，如：/root/ko_list
 
 * **可选参数**
 
   * **`-b, --branch`**
-    指定`kabi基线分支`，默认为20.03-LTS-SP1分支，与--arch参数配合使用可指定目标kabi白名单，用于判断所提取的kabi是否在目标kabi白名单中
+    指定`kabi基线分支`，默认为20.03-LTS-SP1分支，与--arch参数配合使用可指定社区基线kabi白名单，用于对比提取的驱动kabi列表与os基线kabi白名单是否适配
   * **`-a, --arch`**
-    指定`架构`，目前支持x86_64、aarch64，与--branch参数配合使用可指定目标kabi白名单, 用于判断所提取的kabi是否在目标kabi白名单中
+    指定`架构`，目前支持x86_64、aarch64，与--branch参数配合使用可指定社区基线kabi白名单
   * **`-s, --src_kernel`**
-    指定`输入内核源码包路径`，路径下存放内核源码包：kernel-*.src.rpm，添加该参数可在对应版本的kernel源码中查找kapi函数原型
+    指定`输入内核源码包路径`，路径下存放内核源码包：kernel-*.src.rpm，添加该参数可在对应版本的kernel源码中查找对应kapi函数原型
 
 * **举例**
-  * **`python3 cli.py -b 20.03-LTS-SP1 -a aarch64 -s /root/kernel-5.10.0-rc6.src.rpm /root/driver_rpm/`**
-* 最终生成的结果文件将保存在`/tmp/kabi/`目录下
+  * **`python3 cli.py -b 20.03-LTS-SP1 -a aarch64 -s /root/kernel-5.10.0-rc6.src.rpm /root/driver_rpm/Ascend-hdk-910-npu-driver-24.1.0-1.aarch64.rpm`**
+
+* 最终生成的csv格式结果文件将保存在`/tmp/kabi/`目录下
+
