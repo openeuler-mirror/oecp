@@ -48,7 +48,7 @@ class FileListDumper(AbstractDumper):
     def filter_not_focus_files(line, rpm_name):
         if not line or "metadata_list-compact" in line:
             return False
-        elif line == NO_FILE:
+        elif line in NO_FILE:
             return False
         elif rpm_name == KERNEL and re.match(VDSO_BUILD_ID, line):
             return False
