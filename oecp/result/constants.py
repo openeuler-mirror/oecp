@@ -204,7 +204,7 @@ UPSTREAM_DIST = {
     OPENEULER,
     "fedora"
 }
-NO_FILE = "(contains no files)"
+NO_FILE = ["(没有包含文件)", "(contains no files)"]
 
 # DETAIL REPROT DIRECTORY PATH
 DETAIL_PATH = "details_analyse"
