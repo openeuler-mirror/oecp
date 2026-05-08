@@ -7,7 +7,7 @@ RUN mkdir -p /etc/oecpreport
 RUN mkdir -p /var/log/oecp
 COPY ./conf.ini /etc/oecpreport
 RUN yum install git libabigail python3-uWSGI python3-pip createrepo -y
-RUN git clone https://gitee.com/openeuler/oecp.git /app/oecp
+RUN git clone https://atomgit.com/openeuler/oecp.git /app/oecp
 RUN chmod +x oecp-report
 RUN chmod -R 777 /app
 RUN pip3 install -i https://pypi.douban.com/simple/ -r requirements.txt 
