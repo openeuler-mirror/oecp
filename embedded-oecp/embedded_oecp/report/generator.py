@@ -1209,7 +1209,7 @@ class ReportGenerator:
         shape_id = "_x0000_i1026"
         object_id = "_1468075725"
 
-        obj_elem = etree.SubElement(ole__docx_element(run), qn("w:object"))
+        obj_elem = etree.SubElement(_docx_element(ole_run), qn("w:object"))
 
         shape_elem = etree.SubElement(obj_elem, f"{{{ns_vml}}}shape")
         shape_elem.set("id", shape_id)
@@ -1376,7 +1376,7 @@ class ReportGenerator:
         shape_id = f"_x0000_i102{ole_idx + 5}"
         object_id = f"_14680757{ole_idx + 25}"
 
-        obj_elem = etree.SubElement(ole__docx_element(run), qn("w:object"))
+        obj_elem = etree.SubElement(_docx_element(ole_run), qn("w:object"))
 
         shape_elem = etree.SubElement(obj_elem, f"{{{ns_vml}}}shape")
         shape_elem.set("id", shape_id)
