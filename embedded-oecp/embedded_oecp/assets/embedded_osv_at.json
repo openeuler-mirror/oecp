@@ -1,0 +1,48 @@
+{
+  "export": {
+    "DOWNLOAD_BRANCH": "openEuler-24.03-LTS",
+    "FIND_TINY_DIR": "/home/openeuler/tmp_image/tiny",
+    "OS_RELEASE_NAME": "openeuler"
+  },
+  "env": [
+    {
+      "type": "host",
+      "name": "raspberrypi4-64",
+      "ip": "192.168.136.132",
+      "password": "openEuler@123",
+      "port": "22",
+      "user": "root",
+      "run_remote": true,
+      "sdk_path": "/opt/sdk/raspberrypi4-64/",
+      "put_all": true
+    }
+  ],
+  "combination": [
+    {
+      "name": "at_test_for_device",
+      "testcases": [
+        {
+          "testsuite": "embedded_os_basic_test"
+        },
+        {
+          "testsuite": "embedded_os_basic_extra_test"
+        },
+        {
+          "testsuite": "embedded_security_config_test"
+        },
+        {
+          "testsuite": "embedded_application_develop_tests"
+        }
+      ]
+    }
+  ],
+  "execute": [
+    {
+      "env": [
+        "raspberrypi4-64"
+      ],
+      "combination": "at_test_for_device"
+    }
+  ],
+  "_copyright": "Copyright (c) Huawei Technologies Co., Ltd. 2026-2026. All rights reserved. Licensed under the Mulan PSL v2."
+}
