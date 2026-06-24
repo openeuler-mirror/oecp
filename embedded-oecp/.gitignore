@@ -1,0 +1,16 @@
+# Copyright (c) Huawei Technologies Co., Ltd. 2026-2026. All rights reserved.
+# [embedded-oecp] is licensed under the Mulan PSL v2.
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+/build/
+/dist/
+.pytest_cache/
+
+# Workdir runtime
+workdir/cache/
+workdir/report/
+workdir/conf/config.yaml
