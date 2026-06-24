@@ -106,6 +106,7 @@ def render_terminal_screenshot(
 
 def _load_font(size: int):
     from PIL import ImageFont
+    logger = get_logger()
 
     cjk_paths = [
         ("/usr/share/fonts/opentype/noto/NotoSansMonoCJK-Regular.ttc", 2),
@@ -116,8 +117,9 @@ def _load_font(size: int):
     for path, index in cjk_paths:
         try:
             return ImageFont.truetype(path, size, index=index)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug(f"CJK font not found {path}: {e}")
+            continue
 
     mono_paths = [
         "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
@@ -126,8 +128,9 @@ def _load_font(size: int):
     for path in mono_paths:
         try:
             return ImageFont.truetype(path, size)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug(f"Mono font not found {path}: {e}")
+            continue
 
     return ImageFont.load_default()
 

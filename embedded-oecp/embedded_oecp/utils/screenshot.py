@@ -113,11 +113,16 @@ def _render_url_screenshot(url: str, output_path: str, width: int, height: int) 
 
 def save_webpage_content(url: str, output_path: str, timeout: int = 30) -> bool:
     import subprocess
+    import shutil
     logger = get_logger()
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+    curl_path = shutil.which("curl")
+    if not curl_path:
+        logger.warning("curl not found in PATH")
+        return False
     try:
         result = subprocess.run(
-            ["curl", "-sL", "-o", output_path, url],
+            [curl_path, "-sL", "-o", output_path, url],
             capture_output=True, text=True, timeout=timeout,
         )
         if result.returncode == 0 and os.path.isfile(output_path):

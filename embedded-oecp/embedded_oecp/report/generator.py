@@ -49,6 +49,18 @@ SUMMARY_TABLE_ROW_MAP = {
 }
 
 
+def _docx_element(obj):
+    return getattr(obj, "_element")
+
+
+def _row_tr(row):
+    return getattr(row, "_tr")
+
+
+def _table_tbl(table):
+    return getattr(table, "_tbl")
+
+
 class ReportGenerator:
     def __init__(self, output_dir: str, template_path: str = None):
         self.output_dir = output_dir
@@ -101,7 +113,7 @@ class ReportGenerator:
         logger = get_logger()
         security_table = None
         for table in doc.tables:
-            if table._element.getparent() is not None:
+            if _docx_element(table).getparent() is not None:
                 for row in table.rows:
                     for cell in row.cells:
                         if "安全配置" in cell.text or "安全认证" in cell.text:
@@ -115,7 +127,7 @@ class ReportGenerator:
         if security_table is None:
             return
 
-        security_table._element.getparent().remove(security_table._element)
+        _docx_element(security_table).getparent().remove(_docx_element(security_table))
         logger.info("Removed security table from template")
 
         body = doc.element.body
@@ -161,7 +173,7 @@ class ReportGenerator:
                 break
 
         if summary_table and row_to_remove:
-            summary_table._element.remove(row_to_remove._tr)
+            _docx_element(summary_table).remove(_row_tr(row_to_remove))
             logger.info("Removed security row from summary table")
 
         env_table = None
@@ -169,7 +181,7 @@ class ReportGenerator:
             for row in table.rows:
                 if "构建容器版本" in row.cells[0].text:
                     env_table = table
-                    row._tr.getparent().remove(row._tr)
+                    _row_tr(row).getparent().remove(_row_tr(row))
                     logger.info("Removed 构建容器版本 row from env table")
                     break
             if env_table:
@@ -189,7 +201,7 @@ class ReportGenerator:
 
         for _ in range(9):
             p = doc.add_paragraph()
-            cover_elements.append(p._element)
+            cover_elements.append(_docx_element(p))
 
         p = doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -197,20 +209,20 @@ class ReportGenerator:
         run.font.size = Pt(42)
         run.font.color.rgb = RGBColor(0x00, 0xB0, 0xF0)
         run.font.name = "宋体"
-        run._element.rPr.rFonts.set(_qn("w:eastAsia"), "宋体")
-        cover_elements.append(p._element)
+        _docx_element(run).rPr.rFonts.set(_qn("w:eastAsia"), "宋体")
+        cover_elements.append(_docx_element(p))
 
         p = doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         run = p.add_run("兼容性认证测试报告")
         run.font.size = Pt(42)
         run.font.name = "宋体"
-        run._element.rPr.rFonts.set(_qn("w:eastAsia"), "宋体")
-        cover_elements.append(p._element)
+        _docx_element(run).rPr.rFonts.set(_qn("w:eastAsia"), "宋体")
+        cover_elements.append(_docx_element(p))
 
         for _ in range(3):
             p = doc.add_paragraph()
-            cover_elements.append(p._element)
+            cover_elements.append(_docx_element(p))
 
         for label in ["拟  制", "审  核"]:
             p = doc.add_paragraph()
@@ -218,12 +230,12 @@ class ReportGenerator:
             p.alignment = WD_ALIGN_PARAGRAPH.CENTER
             run = p.add_run(label)
             run.font.name = "宋体"
-            run._element.rPr.rFonts.set(_qn("w:eastAsia"), "宋体")
-            cover_elements.append(p._element)
+            _docx_element(run).rPr.rFonts.set(_qn("w:eastAsia"), "宋体")
+            cover_elements.append(_docx_element(p))
 
         for _ in range(2):
             p = doc.add_paragraph()
-            cover_elements.append(p._element)
+            cover_elements.append(_docx_element(p))
 
         p = doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -231,15 +243,15 @@ class ReportGenerator:
         run.font.size = Pt(16)
         run.font.color.rgb = RGBColor(0x00, 0xB0, 0xF0)
         run.font.name = "宋体"
-        run._element.rPr.rFonts.set(_qn("w:eastAsia"), "宋体")
-        cover_elements.append(p._element)
+        _docx_element(run).rPr.rFonts.set(_qn("w:eastAsia"), "宋体")
+        cover_elements.append(_docx_element(p))
 
         for _ in range(2):
             p = doc.add_paragraph()
-            cover_elements.append(p._element)
+            cover_elements.append(_docx_element(p))
 
         p = doc.add_paragraph()
-        p_pr = p._element.get_or_add_pPr()
+        p_pr = _docx_element(p).get_or_add_pPr()
         sect_pr = etree.SubElement(p_pr, _qn("w:sectPr"))
         pg_sz = etree.SubElement(sect_pr, _qn("w:pgSz"))
         pg_sz.set(_qn("w:w"), "11906")
@@ -253,7 +265,7 @@ class ReportGenerator:
         pg_mar.set(_qn("w:footer"), "992")
         pg_mar.set(_qn("w:gutter"), "0")
         sect_pr.set(_qn("w:type"), "nextPage")
-        cover_elements.append(p._element)
+        cover_elements.append(_docx_element(p))
 
         for elem in reversed(cover_elements):
             body.remove(elem)
@@ -300,7 +312,7 @@ class ReportGenerator:
                         for run in para.runs:
                             run.font.name = "宋体"
                             run.font.size = Pt(10.5)
-                            run._element.rPr.rFonts.set(_qn("w:eastAsia"), "宋体")
+                            _docx_element(run).rPr.rFonts.set(_qn("w:eastAsia"), "宋体")
 
     def _fill_basic_info(self, doc: Document, config: dict):
         if not config:
@@ -404,7 +416,7 @@ class ReportGenerator:
         screenshot_path = os.path.join(evidence_dir, "os_release.png")
         render_terminal_screenshot("被测操作系统版本", lines, screenshot_path)
 
-        tbl = env_table._tbl
+        tbl = _table_tbl(env_table)
         test_tool_row_idx = None
         for i, row in enumerate(env_table.rows):
             if "测试工具" in row.cells[0].text:
@@ -414,12 +426,12 @@ class ReportGenerator:
         if test_tool_row_idx is None:
             return
 
-        new_row_xml = copy.deepcopy(env_table.rows[test_tool_row_idx]._tr)
-        env_table.rows[test_tool_row_idx]._tr.addnext(new_row_xml)
+        new_row_xml = copy.deepcopy(_row_tr(env_table.rows[test_tool_row_idx]))
+        _row_tr(env_table.rows[test_tool_row_idx]).addnext(new_row_xml)
 
         new_row = None
         for row in env_table.rows:
-            if row._tr is new_row_xml:
+            if _row_tr(row) is new_row_xml:
                 new_row = row
                 break
 
@@ -1197,7 +1209,7 @@ class ReportGenerator:
         shape_id = "_x0000_i1026"
         object_id = "_1468075725"
 
-        obj_elem = etree.SubElement(ole_run._element, qn("w:object"))
+        obj_elem = etree.SubElement(ole__docx_element(run), qn("w:object"))
 
         shape_elem = etree.SubElement(obj_elem, f"{{{ns_vml}}}shape")
         shape_elem.set("id", shape_id)
@@ -1364,7 +1376,7 @@ class ReportGenerator:
         shape_id = f"_x0000_i102{ole_idx + 5}"
         object_id = f"_14680757{ole_idx + 25}"
 
-        obj_elem = etree.SubElement(ole_run._element, qn("w:object"))
+        obj_elem = etree.SubElement(ole__docx_element(run), qn("w:object"))
 
         shape_elem = etree.SubElement(obj_elem, f"{{{ns_vml}}}shape")
         shape_elem.set("id", shape_id)
