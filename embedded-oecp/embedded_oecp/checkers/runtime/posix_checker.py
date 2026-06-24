@@ -13,7 +13,6 @@
 # Description: embedded-oecp utility
 # **********************************************************************************
 import os
-import sys
 import json
 import time
 import subprocess
@@ -170,16 +169,14 @@ class PosixChecker(BaseChecker):
         start_time = time.time()
         cases_done = 0
 
-        sys.stderr.write(f"\n{'='*60}\n POSIX 测试执行中\n{'='*60}\n")
-        sys.stderr.flush()
+        logger.info(f"\n{'='*60}\n POSIX 测试执行中\n{'='*60}")
 
         for line in iter(proc.stdout.readline, ""):
             if not line:
                 break
             line = line.rstrip("\n")
             stdout_lines.append(line)
-            sys.stderr.write(line + "\n")
-            sys.stderr.flush()
+            logger.info(line)
             if "oe_test_result:" in line or "The case exit by code" in line:
                 cases_done += 1
 
@@ -188,8 +185,10 @@ class PosixChecker(BaseChecker):
 
         elapsed = time.time() - start_time
         mins, secs = divmod(int(elapsed), 60)
-        sys.stderr.write(f"\n{'='*60}\n✓ POSIX测试执行完成 [{mins:02d}:{secs:02d}]，共 {cases_done} 用例\n{'='*60}\n")
-        sys.stderr.flush()
+        logger.info(
+            f"\n{'='*60}\n✓ POSIX测试执行完成 [{mins:02d}:{secs:02d}]，"
+            f"共 {cases_done} 用例\n{'='*60}"
+        )
 
         stdout = "\n".join(stdout_lines)
         return cmd, rc, stdout, ""
