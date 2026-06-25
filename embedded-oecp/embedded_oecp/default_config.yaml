@@ -1,0 +1,35 @@
+# **********************************************************************************
+# Copyright (c) Huawei Technologies Co., Ltd. 2026-2026. All rights reserved.
+# [embedded-oecp] is licensed under the Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#     http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
+# PURPOSE.
+# See the Mulan PSL v2 for more details.
+# **********************************************************************************
+
+baseline_repo: https://atomgit.com/openeuler/yocto-meta-openeuler.git
+baseline_branch: master
+verbose: false
+arch: aarch64
+kernel:
+  mainstream_versions:
+  - '5.10'
+  - '6.6'
+image_build:
+  dir: /home/ubuntu/demo/build/raspberrypi4-64
+toolchain:
+  dir: /usr1/openeuler/gcc/openeuler_gcc_arm64le
+device:
+  ip: 192.168.136.132
+  user: root
+  password: openEuler@123
+  port: 22
+mugen:
+  at_config: embedded_osv_at.json
+  posix_config: embedded_osv_posix.json
+  remote: https://atomgit.com/openeuler/mugen.git
+  branch: master
+  sdk_install_dir: /opt/sdk

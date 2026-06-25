@@ -1,0 +1,10 @@
+# Copyright (c) Huawei Technologies Co., Ltd. 2026-2026. All rights reserved.
+# [embedded-oecp] is licensed under the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at: http://license.coscl.org.cn/MulanPSL2
+
+pyyaml>=5.4
+python-docx>=0.8.11
+lxml>=4.6
+Pillow>=8.0
+paramiko>=2.7
+openpyxl>=3.0
