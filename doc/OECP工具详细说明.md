@@ -171,7 +171,7 @@ oecp工具适用于比较两个ISO镜像之间的差别，具体比较项有：
 
 install oecp:
 '''
-git clone https://gitee.com/openeuler/oecp
+git clone https://atomgit.com/openeuler/oecp
 cd oecp
 使用前，安装python依赖库
 pip3 install -r requirement
@@ -397,7 +397,7 @@ oecp工具会展示一份最终报告，用于展示最终的测试结果，测�
     
   2.2 基本功能检测
 
-    -基本功能验证使用测试框架mugen（https://gitee.com/openeuler/mugen），也可执行lkp工具mugen job初始生成基本功能报告：smoke-basic-os.json
+    -基本功能验证使用测试框架mugen（https://atomgit.com/openeuler/mugen），也可执行lkp工具mugen job初始生成基本功能报告：smoke-basic-os.json
     -基本功能基线报告命名规范示例：openEuler-20.03-LTS-aarch64-dvd.iso.at.json
     -基本功能待检测报告命名规范示例：openEuler-22.03-LTS-aarch64-dvd.iso.at.json
     -输出报告：all-AT-report.csv,其中测试用例失败项compare result结果为fail，成功项为pass

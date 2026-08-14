@@ -3,7 +3,7 @@ OECP测试要求如下：
 | -------- | --------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ---- |
 | 工具检测 |                 |                                                              |                                                              |      |
 |          | 核心包          | 核心包一致性比例                                             | 名称、小版本完全一致，核心包包括核心包内容一致性，内核、gcc、glibc、zlib、systemd、openssh、libxml2、e2fsprogs、curl、grep、iputils核心模块一致性，JDK如果没有，则不会纳入比较项 | 必选 |
-|          | 软件包          | L1/L2 软件包一致性比例                                       | L1 100%兼容，L2 95%以上兼容，参考社区等级清单定义（附上链接）https://gitee.com/openeuler/oec-application/blob/master/doc/compatibility_level.md | 必选 |
+|          | 软件包          | L1/L2 软件包一致性比例                                       | L1 100%兼容，L2 95%以上兼容，参考社区等级清单定义（附上链接）https://atomgit.com/openeuler/oec-application/blob/master/doc/compatibility_level.md | 必选 |
 |          | 内核KABI接口    | OSV内核KABI接口白名单与openEuler内核KABI接口白名单一致性比例 | 内核-KABI白名单 90%以上兼容                                  | 必选 |
 |          | 用户态ABI接口   | OSV软件包ABI接口与openEuler软件包ABI一致性比例               | L1 100%兼容，L2 95%以上兼容，参考社区等级清单定义            | 必选 |
 |          | Service默认配置 | OSV软件包Service文件与openEuler软件包Service文件一致性比例   | 全量默认配置一致性90%以上                                    | 可选 |

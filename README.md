@@ -58,7 +58,7 @@ install abidiff (openEuler): ''' yum install -y libabigail '''
 
 install oecp:
 '''
-git clone https://gitee.com/openeuler/oecp.git;
+git clone https://atomgit.com/openeuler/oecp.git;
 cd oecp;
 pip3 install -r requirement
 '''

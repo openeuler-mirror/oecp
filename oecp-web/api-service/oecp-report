@@ -15,7 +15,7 @@ function get_oecp_app(){
     if [ ! -d $oecp_app ] ; then
         mkdir -p $oecp_app
         echo "Start clone oecp tools"
-        git clone https://gitee.com/openeuler/oecp.git $oecp_app
+        git clone https://atomgit.com/openeuler/oecp.git $oecp_app
         echo "Finish clone oecp tools"
     fi
     echo "Update or install oecp requirement"

@@ -10,7 +10,7 @@
 |        | 构建工程   | 使用openEuler嵌入式yocto工程                    | 构建命令一致                                                 |
 |        |            |                                                 | 构建目录结构一致                                             |
 |        | 包列表     | 构建结束生成的包列表信息和社区一致              | 包列表中70%软件包（社区的软件包）和社区版本一致              |
-| 运行时 | 内核       | 内核KABI一致                                    | 白名单内KABI一致，可以增删KABI，但相同的接口必须保持ABI一致。白名单范围为https://gitee.com/src-openeuler/kernel/blob/xxx/kabi_whitelist_XXX。 |
+| 运行时 | 内核       | 内核KABI一致                                    | 白名单内KABI一致，可以增删KABI，但相同的接口必须保持ABI一致。白名单范围为https://atomgit.com/src-openeuler/kernel/blob/xxx/kabi_whitelist_XXX。 |
 |        | 基础中间件 | libc版本一致                                    | 版本一致，ABI兼容                                            |
 |        | 基础功能   | 基础测试通过                                    | 社区AT测试用例测试通过                                       |
 |        | POSIX      | 和社区接口保持一致                              | 使用posixtestsuite测试，测试结果和社区一致                   |
