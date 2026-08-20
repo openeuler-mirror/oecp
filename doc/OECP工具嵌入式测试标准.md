@@ -4,7 +4,7 @@
 |        |            |                                                 | openEuler嵌入式内核（某个发行版本）的最新commit id在被测代码git中能查询到 |
 |        | 基础中间件 | libc保持同openEuler嵌入式一致                   | 版本号一致                                                   |
 |        |            |                                                 | openEuler上基础中间件的最新commit id在被测代码git中能查询到  |
-|        | 其他软件包 | 如果openEuler社区有，超过70%都选自openEuler社区 | git仓库的remote为gitee.com/src-openeuler或gitee.com/openeuler |
+|        | 其他软件包 | 如果openEuler社区有，超过70%都选自openEuler社区 | atomgit仓库的remote为atomgit.com/src-openeuler或atomgit.com/openeuler |
 |        |            |                                                 | openEuler嵌入式的基线快照中软件包的commit id可以在被测代码git中查询到 |
 | 构建   | 编译器     | 使用openEuler嵌入式的交叉编译器                 | 编译器目录文件MD5一致                                        |
 |        | 构建工程   | 使用openEuler嵌入式yocto工程                    | 构建命令一致                                                 |
