@@ -8,7 +8,7 @@ The OECP tool focuses on the openEuler kernel and base packages, ensuring that c
 
 1. Detect differences between two ISOs (RPM-based): packages, files inside packages, library file interfaces (C/C++), and kernel KABI changes
 2. Detect changes and differences of the same software (rpm package) across different versions
-3. **Embedded scenarios are not supported yet. Stay tuned.**
+3. Embedded scenarios, please refer to [embedded‑oecp](./embedded-oecp/README.en.md)
 
 **Check items**
 
