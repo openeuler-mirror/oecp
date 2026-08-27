@@ -8,7 +8,7 @@ OECP工具聚焦openEuler内核和基础包，保障二次发行版生态核心�
 
 2、检测同一个软件（rpm包）在不同版本下的变化以及差异
 
-3、**暂不支持嵌入式场景，敬请期待**
+3、嵌入式场景参考[embedded-oecp](./embedded-oecp/README.md)
 
 **检查项**
 
