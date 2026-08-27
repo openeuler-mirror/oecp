@@ -18,6 +18,7 @@
 import io
 import os
 import struct
+from typing import NamedTuple
 from unittest import TestCase
 from unittest.mock import call, patch
 
@@ -38,6 +39,22 @@ SYM_FMT = '<IBBHQQ'
 
 def pack_sym(st_name, st_info, st_shndx, st_value):
     return struct.pack(SYM_FMT, st_name, (st_info << 4) | STT_NOTYPE, 0, st_shndx, st_value, 0)
+
+
+class Shdr(NamedTuple):
+    name: int
+    sh_type: int
+    flags: int
+    off: int
+    size: int
+    link: int = 0
+    info: int = 0
+    entsize: int = 0
+
+
+def pack_shdr(shdr):
+    return struct.pack(SHDR_FMT, shdr.name, shdr.sh_type, shdr.flags, 0,
+                       shdr.off, shdr.size, shdr.link, shdr.info, 0, shdr.entsize)
 
 
 def build_elf(mode):
@@ -68,14 +85,11 @@ def build_elf(mode):
     eh = struct.pack(ELF_HDR_FMT, b'\x7fELF' + b'\x02\x01\x01' + b'\x00' * 9,
                      62, 1, 1, 0, 0, e_shoff, 0, 64, 0, 0, 64, 5, 4)
 
-    def shdr(name, sh_type, flags, off, size, link=0, info=0, entsize=0):
-        return struct.pack(SHDR_FMT, name, sh_type, flags, 0, off, size, link, info, 0, entsize)
-
-    null = shdr(0, 0, 0, 0, 0)
-    s1 = shdr(1, SHT_SYMTAB, 0, symtab_off, len(symtab), link=2, info=1, entsize=24)
-    s2 = shdr(9, SHT_STRTAB, 0, strtab_off, len(sym_names))
-    s3 = shdr(17, SHT_PROGBITS, 0, rodata_off, len(rodata))
-    shstr = shdr(25, SHT_STRTAB, 0, shstr_off, len(sec_names))
+    null = pack_shdr(Shdr(0, 0, 0, 0, 0))
+    s1 = pack_shdr(Shdr(1, SHT_SYMTAB, 0, symtab_off, len(symtab), link=2, info=1, entsize=24))
+    s2 = pack_shdr(Shdr(9, SHT_STRTAB, 0, strtab_off, len(sym_names)))
+    s3 = pack_shdr(Shdr(17, SHT_PROGBITS, 0, rodata_off, len(rodata)))
+    shstr = pack_shdr(Shdr(25, SHT_STRTAB, 0, shstr_off, len(sec_names)))
 
     blob = eh + null + s1 + s2 + s3 + shstr
     blob += sec_names + sym_names + symtab + rodata
@@ -121,27 +135,33 @@ class TestProvidedKabi(TestCase):
 
     @patch('oecp.kabi.kabi_generate.CsvResult')
     def test_generate_writes_only_unified_kabi_result(self, csv_result):
+        def fake_dir_kabi_generate(driver_dir):
+            return (
+                {
+                    '0x00000001': 'kernel_api',
+                    '0x00000002': 'shared_api',
+                },
+                {
+                    '0x00000001': 'consumer_a.ko',
+                    '0x00000002': 'consumer_b.ko',
+                },
+                {
+                    '0x00000002': 'shared_api',
+                    '0x00000003': 'not_kabi_api',
+                },
+                {
+                    '0x00000002': 'provider.ko',
+                    '0x00000003': 'provider.ko',
+                },
+            )
+
+        def fake_get_kabiwhite_list():
+            return None
+
         result_writer = csv_result.return_value
         generator = KabiGenerate(os.path.dirname(__file__), None, None)
-        generator.dir_kabi_generate = lambda _: (
-            {
-                '0x00000001': 'kernel_api',
-                '0x00000002': 'shared_api',
-            },
-            {
-                '0x00000001': 'consumer_a.ko',
-                '0x00000002': 'consumer_b.ko',
-            },
-            {
-                '0x00000002': 'shared_api',
-                '0x00000003': 'not_kabi_api',
-            },
-            {
-                '0x00000002': 'provider.ko',
-                '0x00000003': 'provider.ko',
-            },
-        )
-        generator.get_kabiwhite_list = lambda: None
+        generator.dir_kabi_generate = fake_dir_kabi_generate
+        generator.get_kabiwhite_list = fake_get_kabiwhite_list
         generator.generate()
 
         csv_result.assert_called_once_with()

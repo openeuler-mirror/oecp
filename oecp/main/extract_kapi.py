@@ -87,7 +87,8 @@ class EXTRACTKAPI:
 
         return match_flag
 
-    def get_declare_macro(self, component_args):
+    @staticmethod
+    def get_declare_macro(component_args):
         models, symbol, model, _, fun_return = component_args
         match_flag = False
         if re.match(r'[\t| ]+', model):
