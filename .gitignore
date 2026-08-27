@@ -1,0 +1,29 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Distribution / packaging (root only, avoid matching source dirs like checkers/build)
+/build/
+/dist/
+*.egg-info/
+*.egg
+
+# Test / coverage caches
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# IDE
+.idea/
+*.swp
+
+# Logs and temporary files
+*.log
+*.tmp

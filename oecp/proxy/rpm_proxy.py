@@ -17,6 +17,7 @@
 """
 import os
 import re
+import shlex
 import subprocess
 import logging
 import tarfile
@@ -186,6 +187,7 @@ class RPMProxy(object):
         @param package: rpm包路径
         @return: None
         """
+        logger.info("execute command: rpm2cpio %s | cpio -d -i", shlex.quote(package))
         stdin = subprocess.Popen(['rpm2cpio', package], stdout=subprocess.PIPE)
         p = subprocess.Popen(['cpio', '-d', '-i'],
                              stdin=stdin.stdout,
@@ -201,6 +203,7 @@ class RPMProxy(object):
 
     @classmethod
     def uncompress_source_rpm(cls, src_package, src_kernel=True):
+        src_package = os.path.abspath(src_package)
         dir_path = os.path.dirname(src_package)
         extract_dir_obj = tempfile.TemporaryDirectory(suffix='__srpm__', dir=dir_path)
         extract_dir_name = extract_dir_obj.name
