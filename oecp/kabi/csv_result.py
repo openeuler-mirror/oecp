@@ -22,8 +22,8 @@ logger = logging.getLogger("oecp")
 
 
 class CsvResult:
-    def __init__(self):
-        self.file_path = "/tmp/oecp/kabi-result-%s.csv" % datetime.now(tz=timezone.utc).strftime('%Y-%m-%d_%H-%M-%S')
+    def __init__(self, name="kabi-result"):
+        self.file_path = "/tmp/oecp/%s-%s.csv" % (name, datetime.now(tz=timezone.utc).strftime('%Y-%m-%d_%H-%M-%S'))
         # Ensure the directory exists
         os.makedirs(os.path.dirname(self.file_path), exist_ok=True)
         # Create an empty CSV file if it doesn't exist

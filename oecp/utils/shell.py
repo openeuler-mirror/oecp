@@ -13,7 +13,11 @@
 # **********************************************************************************
 """
 
+import logging
+import shlex
 import subprocess
+
+logger = logging.getLogger('oecp')
 
 
 def shell_cmd(cmd_list, inmsg=None):
@@ -22,6 +26,7 @@ def shell_cmd(cmd_list, inmsg=None):
     :param inmsg:
     :return:
     """
+    logger.info("execute command: %s", " ".join(shlex.quote(str(arg)) for arg in cmd_list))
     p = subprocess.Popen(cmd_list, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if inmsg:
         p.stdin.write(inmsg)

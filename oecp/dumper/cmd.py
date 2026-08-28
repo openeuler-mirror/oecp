@@ -13,8 +13,8 @@
 # **********************************************************************************
 """
 
-import os
 import logging
+import os
 
 from oecp.dumper.base import AbstractDumper
 
@@ -23,7 +23,7 @@ logger = logging.getLogger('oecp')
 
 class CmdDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
-        super(CmdDumper, self).__init__(repository, cache, config)
+        super().__init__(repository, cache, config)
         self.cache_dumper = self.get_cache_dumper(self.cache_require_key)
         self.extract_info = self.cache_dumper.get_extract_info()
         self._component_key = 'cmd'

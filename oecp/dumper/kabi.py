@@ -16,22 +16,21 @@
 import gzip
 
 from oecp.dumper.base import AbstractDumper
-from oecp.result.constants import CMP_TYPE_KABI, CMP_TYPE_DRIVE_KABI
+from oecp.result.constants import CMP_TYPE_DRIVE_KABI, CMP_TYPE_KABI
 from oecp.utils.kernel import get_file_by_pattern
 
 
 class KabiDumper(AbstractDumper):
     def __init__(self, repository, cache=None, config=None):
-        super(KabiDumper, self).__init__(repository, cache, config)
+        super().__init__(repository, cache, config)
         self.cmp_type = config.get("compare_type")
         self._white_list = self.kabi_white_list
 
     @staticmethod
     def _unzip_gz(file_path):
-        g_file = gzip.GzipFile(file_path)
         f_name = file_path[0:file_path.rindex('.')]
-        open(f_name, "wb+").write(g_file.read())
-        g_file.close()
+        with gzip.GzipFile(file_path) as g_file, open(f_name, "wb+") as f:
+            f.write(g_file.read())
 
     def load_symvers(self, repository):
         rpm_name = repository.get('verbose_path')
@@ -57,7 +56,7 @@ class KabiDumper(AbstractDumper):
         if self.config.get("compare_type") == CMP_TYPE_DRIVE_KABI:
             self._white_list = self.drive_kabi_white_list
         with open(symvers, "r") as f:
-            for line in f.readlines():
+            for line in f:
                 line = line.strip().replace("\n", "")
                 if line == "":
                     continue
@@ -69,11 +68,11 @@ class KabiDumper(AbstractDumper):
                 if self._white_list and hsdp[1] not in self._white_list:
                     continue
                 item.get(self.data, []).append(
-                    {'name': hsdp[1], 'symbol': "=", 'version': "%s %s %s" % (hsdp[0], hsdp[2], hsdp[3])})
+                    {'name': hsdp[1], 'symbol': "=", 'version': f"{hsdp[0]} {hsdp[2]} {hsdp[3]}"})
         return [item]
 
     def run(self):
         result = []
-        for _, repository in self.repository.items():
+        for repository in self.repository.values():
             result.extend(self.load_symvers(repository))
         return result

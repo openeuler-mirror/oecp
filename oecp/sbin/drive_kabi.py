@@ -30,6 +30,7 @@ import time
 import subprocess
 
 def shell_cmd(cmd):
+    print("execute command: %s" % cmd)
     p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
 

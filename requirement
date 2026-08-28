@@ -7,3 +7,4 @@ defusedxml
 openpyxl
 pyyaml
 pandas
+pyelftools

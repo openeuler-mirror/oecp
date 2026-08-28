@@ -13,20 +13,26 @@
 # **********************************************************************************
 """
 import concurrent
+import logging
 import os
 import re
-import logging
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import Pool, cpu_count
+
 import yaml
 
+from oecp.result.constants import (
+    CMP_TYPE_RPM_KERNEL,
+    EXTERN,
+    MACRO_DECLARE,
+    MACRO_DEFINE,
+)
 from oecp.utils.shell import shell_cmd
-from oecp.result.constants import CMP_TYPE_RPM_KERNEL, MACRO_DEFINE, MACRO_DECLARE, EXTERN
 
 logger = logging.getLogger('oecp')
 
 
-class EXTRACTKAPI(object):
+class EXTRACTKAPI:
 
     def __init__(self):
         self.whitelist = []
@@ -63,7 +69,7 @@ class EXTRACTKAPI(object):
     def get_acpi_whitelist_function(component_args):
         models, symbol, _, contents, func_return = component_args
         match_flag = False
-        fun_pattern = r"( )+(\*)?(%s)\([\w\s\*,\n]+?\)\)" % symbol
+        fun_pattern = rf"( )+(\*)?({symbol})\([\w\s\*,\n]+?\)\)"
         if symbol.startswith("acpi_"):
             model_match = re.search(fun_pattern, contents)
             if model_match:
@@ -74,14 +80,15 @@ class EXTRACTKAPI(object):
                 models.append(model)
                 match_flag = True
             else:
-                model_match = re.search(r"ACPI_GLOBAL\([\w, ]*%s\);" % symbol, contents)
+                model_match = re.search(rf"ACPI_GLOBAL\([\w, ]*{symbol}\);", contents)
                 if model_match:
                     models.append(model_match.group())
                     match_flag = True
 
         return match_flag
 
-    def get_declare_macro(self, component_args):
+    @staticmethod
+    def get_declare_macro(component_args):
         models, symbol, model, _, fun_return = component_args
         match_flag = False
         if re.match(r'[\t| ]+', model):
@@ -126,7 +133,7 @@ class EXTRACTKAPI(object):
         attrs = self.load_attrs_macros()
         before_attrs = attrs.get("before_attrs")
         for macro in before_attrs:
-            fun_return = re.sub(r"%s( )?" % macro, "", fun_return)
+            fun_return = re.sub(rf"{macro}( )?", "", fun_return)
 
         return fun_return
 
@@ -135,7 +142,7 @@ class EXTRACTKAPI(object):
         filter_model = False
         if not fun_return or fun_return == "*":
             escape_model = re.escape(model)
-            last_pat = r"\n(.*)\n%s" % escape_model
+            last_pat = rf"\n(.*)\n{escape_model}"
             last_matchs = re.search(last_pat, contents)
             if last_matchs:
                 fun_return = last_matchs.group(1)
@@ -250,9 +257,7 @@ class EXTRACTKAPI(object):
 
                     fun_return, filter_model = self.prase_fun_return(symbol, model, contents)
                     component_args = (models, symbol, model, contents, fun_return)
-                    if filter_model:
-                        continue
-                    elif self.get_extern_function(component_args):
+                    if filter_model or self.get_extern_function(component_args):
                         continue
                     elif self.get_common_function(component_args):
                         continue
